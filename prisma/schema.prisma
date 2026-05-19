@@ -1,0 +1,504 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  RESEARCHER
+  ADMIN
+}
+
+enum RentType {
+  ASKING
+  CLOSED
+  RENEWED
+}
+
+enum VerificationState {
+  SEED_ESTIMATE
+  PENDING_REVIEW
+  COMMUNITY_REVIEW
+  VERIFIED
+  DISPUTED
+  REJECTED
+}
+
+enum FurnishingType {
+  UNFURNISHED
+  SEMI_FURNISHED
+  FULLY_FURNISHED
+}
+
+enum OccupancyType {
+  FAMILY
+  BACHELOR
+  SHARED
+  ANY
+}
+
+enum SourceType {
+  TENANT_SUBMITTED
+  LEASE_RENEWAL
+  LISTING_ESTIMATE
+  MANUAL_VERIFICATION
+  COMMUNITY_AUDIT
+}
+
+enum VoteValue {
+  AGREE
+  DISAGREE
+  NEEDS_PROOF
+  DUPLICATE
+}
+
+enum ModerationAction {
+  REQUEST_PROOF
+  DELAY_PUBLISH
+  MARK_VERIFIED
+  MARK_DISPUTED
+  REJECT
+  MERGE_DUPLICATE
+  PENALIZE_REPUTATION
+}
+
+enum ModerationStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum ReportStatus {
+  OPEN
+  TRIAGED
+  RESOLVED
+  REJECTED
+}
+
+enum FraudSignalType {
+  RATE_LIMIT
+  DUPLICATE_DEVICE
+  RENT_SPIKE
+  IP_CLUSTER
+  BROKER_PATTERN
+  COORDINATED_SPAM
+  PROOF_MISMATCH
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  emailHash          String?             @unique
+  phoneHash          String?             @unique
+  displayName        String?
+  role               UserRole            @default(USER)
+  otpVerified        Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  reputation         UserReputation?
+  rentSubmissions    RentSubmission[]
+  votes              SubmissionVote[]
+  reports            Report[]
+  moderationEvents   ModerationEvent[]   @relation("ModeratorEvents")
+  deviceFingerprints DeviceFingerprint[]
+  auditLogs          AuditLog[]
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model City {
+  id         String     @id @default(cuid())
+  name       String
+  slug       String     @unique
+  state      String
+  country    String     @default("India")
+  lat        Decimal    @db.Decimal(9, 6)
+  lng        Decimal    @db.Decimal(9, 6)
+  zones      Zone[]
+  localities Locality[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Zone {
+  id         String     @id @default(cuid())
+  cityId     String
+  name       String
+  slug       String
+  city       City       @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  localities Locality[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@unique([cityId, slug])
+}
+
+model Locality {
+  id                  String                   @id @default(cuid())
+  cityId              String
+  zoneId              String?
+  name                String
+  slug                String
+  summary             String?
+  lat                 Decimal                  @db.Decimal(9, 6)
+  lng                 Decimal                  @db.Decimal(9, 6)
+  aliases             String[]                 @default([])
+  commuteAnchors      String[]                 @default([])
+  medianIncomeAssumed Int?
+  city                City                     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  zone                Zone?                    @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  microLocalities     MicroLocality[]
+  buildings           Building[]
+  rentSubmissions     RentSubmission[]
+  snapshots           HistoricalRentSnapshot[]
+  trendAggregates     TrendAggregate[]
+  reports             Report[]
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  @@unique([cityId, slug])
+  @@index([slug])
+}
+
+model MicroLocality {
+  id              String           @id @default(cuid())
+  localityId      String
+  name            String
+  slug            String
+  lat             Decimal?         @db.Decimal(9, 6)
+  lng             Decimal?         @db.Decimal(9, 6)
+  aliases         String[]         @default([])
+  locality        Locality         @relation(fields: [localityId], references: [id], onDelete: Cascade)
+  buildings       Building[]
+  rentSubmissions RentSubmission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([localityId, slug])
+}
+
+model Building {
+  id              String                   @id @default(cuid())
+  localityId      String
+  microLocalityId String?
+  name            String
+  slug            String                   @unique
+  lat             Decimal?                 @db.Decimal(9, 6)
+  lng             Decimal?                 @db.Decimal(9, 6)
+  gated           Boolean                  @default(false)
+  ageYears        Int?
+  totalUnits      Int?
+  locality        Locality                 @relation(fields: [localityId], references: [id], onDelete: Cascade)
+  microLocality   MicroLocality?           @relation(fields: [microLocalityId], references: [id], onDelete: SetNull)
+  aliases         BuildingAlias[]
+  metadata        BuildingMetadata?
+  rentSubmissions RentSubmission[]
+  amenities       BuildingAmenity[]
+  snapshots       HistoricalRentSnapshot[]
+  reports         Report[]
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@index([localityId])
+}
+
+model BuildingAlias {
+  id         String   @id @default(cuid())
+  buildingId String
+  alias      String
+  normalized String
+  source     String   @default("community")
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([buildingId, normalized])
+  @@index([normalized])
+}
+
+model Amenity {
+  id        String            @id @default(cuid())
+  name      String
+  slug      String            @unique
+  category  String?
+  buildings BuildingAmenity[]
+}
+
+model BuildingAmenity {
+  buildingId String
+  amenityId  String
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  amenity    Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([buildingId, amenityId])
+}
+
+model BuildingMetadata {
+  id              String   @id @default(cuid())
+  buildingId      String   @unique
+  builderName     String?
+  possessionYear  Int?
+  totalBlocks     Int?
+  parkingPolicy   String?
+  petPolicy       String?
+  notes           String?
+  publicFacts     Json     @default("{}")
+  building        Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  updatedAt       DateTime @updatedAt
+}
+
+model RentSubmission {
+  id                      String              @id @default(cuid())
+  userId                  String?
+  localityId              String
+  microLocalityId          String?
+  buildingId              String?
+  deviceFingerprintId     String?
+  bhk                     String
+  carpetAreaSqft          Int?
+  superBuiltUpAreaSqft    Int?
+  furnishing              FurnishingType
+  parkingCount            Int                 @default(0)
+  maintenanceIncluded     Boolean             @default(false)
+  maintenanceAmount       Int                 @default(0)
+  securityDeposit         Int
+  moveInDate              DateTime
+  leaseDurationMonths     Int?
+  floorNumber             Int?
+  facing                  String?
+  buildingAgeYears        Int?
+  gatedSociety            Boolean             @default(false)
+  petFriendly             Boolean             @default(false)
+  occupancyType           OccupancyType
+  metroDistanceKm         Decimal?            @db.Decimal(5, 2)
+  amenitiesSnapshot       Json                @default("[]")
+  brokerInvolved          Boolean             @default(false)
+  rentAmount              Int
+  effectiveMonthlyCost    Int
+  proofObjectKey          String?
+  proofRedactionStatus    String?
+  sourceType              SourceType
+  rentType                RentType
+  roommateCount           Int?
+  trustScore              Decimal             @default(0) @db.Decimal(5, 2)
+  confidenceLevel         String              @default("LOW")
+  verificationState       VerificationState   @default(PENDING_REVIEW)
+  anomalyScore            Decimal             @default(0) @db.Decimal(5, 2)
+  freshnessScore          Decimal             @default(100) @db.Decimal(5, 2)
+  communityAgreementScore Decimal             @default(0) @db.Decimal(5, 2)
+  publishedAt             DateTime?
+  submittedAt             DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  user                    User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  locality                Locality            @relation(fields: [localityId], references: [id], onDelete: Cascade)
+  microLocality           MicroLocality?       @relation(fields: [microLocalityId], references: [id], onDelete: SetNull)
+  building                Building?           @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+  deviceFingerprint       DeviceFingerprint?  @relation(fields: [deviceFingerprintId], references: [id], onDelete: SetNull)
+  verificationLogs        VerificationLog[]
+  moderationEvents        ModerationEvent[]
+  anomalyFlags            AnomalyFlag[]
+  votes                   SubmissionVote[]
+  reports                 Report[]
+  trustScores             TrustScore[]
+  fraudSignals            FraudSignal[]
+
+  @@index([localityId, bhk, rentType])
+  @@index([buildingId])
+  @@index([verificationState])
+  @@index([submittedAt])
+}
+
+model VerificationLog {
+  id             String         @id @default(cuid())
+  submissionId   String
+  actorUserId    String?
+  method         String
+  result         String
+  scoreDelta     Decimal        @default(0) @db.Decimal(5, 2)
+  metadata       Json           @default("{}")
+  createdAt      DateTime       @default(now())
+  submission     RentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
+
+model ModerationEvent {
+  id             String           @id @default(cuid())
+  submissionId   String?
+  moderatorId    String?
+  action         ModerationAction
+  status         ModerationStatus @default(OPEN)
+  reason         String
+  metadata       Json             @default("{}")
+  createdAt      DateTime         @default(now())
+  resolvedAt     DateTime?
+  submission     RentSubmission?  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  moderator      User?            @relation("ModeratorEvents", fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([action])
+}
+
+model TrustScore {
+  id             String         @id @default(cuid())
+  submissionId   String
+  score          Decimal        @db.Decimal(5, 2)
+  confidence     String
+  factorBreakdown Json          @default("{}")
+  calculatedAt   DateTime       @default(now())
+  submission     RentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId, calculatedAt])
+}
+
+model UserReputation {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  reputationScore       Decimal  @default(40) @db.Decimal(5, 2)
+  acceptedSubmissions   Int      @default(0)
+  disputedSubmissions   Int      @default(0)
+  moderationHelpfulness Decimal  @default(0) @db.Decimal(5, 2)
+  lastCalculatedAt      DateTime @default(now())
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HistoricalRentSnapshot {
+  id                 String    @id @default(cuid())
+  localityId         String
+  buildingId         String?
+  bhk                String?
+  month              DateTime
+  p10                Int
+  p25                Int
+  median             Int
+  p75                Int
+  p90                Int
+  sampleSize         Int
+  confidenceScore    Decimal   @db.Decimal(5, 2)
+  verifiedRatio      Decimal   @db.Decimal(5, 2)
+  locality           Locality  @relation(fields: [localityId], references: [id], onDelete: Cascade)
+  building           Building? @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@unique([localityId, buildingId, bhk, month])
+  @@index([month])
+}
+
+model AnomalyFlag {
+  id             String         @id @default(cuid())
+  submissionId   String
+  zScore         Decimal?       @db.Decimal(8, 4)
+  iqrOutlier     Boolean        @default(false)
+  madOutlier     Boolean        @default(false)
+  clusterKey     String?
+  severity       String
+  explanation    String
+  createdAt      DateTime       @default(now())
+  resolvedAt     DateTime?
+  submission     RentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([severity])
+  @@index([clusterKey])
+}
+
+model SubmissionVote {
+  id             String         @id @default(cuid())
+  submissionId   String
+  userId         String
+  value          VoteValue
+  weight         Decimal        @default(1) @db.Decimal(6, 3)
+  reason         String?
+  createdAt      DateTime       @default(now())
+  submission     RentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, userId])
+  @@index([value])
+}
+
+model TrendAggregate {
+  id              String   @id @default(cuid())
+  localityId      String
+  bhk             String?
+  furnishing      FurnishingType?
+  month           DateTime
+  medianRent      Int
+  p25             Int
+  p75             Int
+  sampleSize      Int
+  confidenceScore Decimal  @db.Decimal(5, 2)
+  generatedAt     DateTime @default(now())
+  locality        Locality @relation(fields: [localityId], references: [id], onDelete: Cascade)
+
+  @@unique([localityId, bhk, furnishing, month])
+}
+
+model Report {
+  id             String          @id @default(cuid())
+  reporterId     String?
+  submissionId   String?
+  localityId     String?
+  buildingId     String?
+  reason         String
+  status         ReportStatus    @default(OPEN)
+  metadata       Json            @default("{}")
+  createdAt      DateTime        @default(now())
+  resolvedAt     DateTime?
+  reporter       User?           @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+  submission     RentSubmission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  locality       Locality?       @relation(fields: [localityId], references: [id], onDelete: Cascade)
+  building       Building?       @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model DeviceFingerprint {
+  id              String           @id @default(cuid())
+  userId          String?
+  fingerprintHash String           @unique
+  firstSeenAt     DateTime         @default(now())
+  lastSeenAt      DateTime         @default(now())
+  ipHash          String?
+  userAgentHash   String?
+  riskScore       Decimal          @default(0) @db.Decimal(5, 2)
+  metadata        Json             @default("{}")
+  user            User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  submissions     RentSubmission[]
+  fraudSignals    FraudSignal[]
+
+  @@index([riskScore])
+}
+
+model FraudSignal {
+  id                    String              @id @default(cuid())
+  submissionId          String?
+  deviceFingerprintId   String?
+  signalType            FraudSignalType
+  score                 Decimal             @db.Decimal(5, 2)
+  evidence              Json                @default("{}")
+  createdAt             DateTime            @default(now())
+  submission            RentSubmission?     @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  deviceFingerprint     DeviceFingerprint?  @relation(fields: [deviceFingerprintId], references: [id], onDelete: SetNull)
+
+  @@index([signalType])
+  @@index([score])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String
+  before    Json?
+  after     Json?
+  ipHash    String?
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
