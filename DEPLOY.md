@@ -14,9 +14,21 @@ Complete step-by-step instructions to create a new repository, push this codebas
 
 ---
 
-## Step 1: Create a New GitHub Repository
+## Step 1: Create a New GitHub Repository & Push
 
-### Option A: Via GitHub CLI (Recommended)
+### Option A: Quick One-Liner
+
+```bash
+# 1. Create a new repository on GitHub first (no README, .gitignore, or license).
+# 2. Copy the repository URL (e.g., https://github.com/YOUR_USERNAME/hydrent.git).
+# 3. Run these commands in the project folder:
+
+git remote add origin https://github.com/YOUR_USERNAME/hydrent.git
+git branch -M main
+git push -u origin main
+```
+
+### Option B: Via GitHub CLI
 
 ```bash
 # Install gh if you haven't already
@@ -25,33 +37,8 @@ Complete step-by-step instructions to create a new repository, push this codebas
 # Authenticate with GitHub
 git login
 
-# Create a new private repository on your account
-gh repo create hydrent --private --source=. --push
-```
-
-### Option B: Via GitHub Web + Terminal
-
-1. Go to https://github.com/new and create a new repository called `hydrent`.
-2. Do NOT initialize it with a README, .gitignore, or license.
-3. Copy the repository URL (e.g., `https://github.com/YOUR_USERNAME/hydrent.git`).
-4. Back in your terminal, run:
-
-```bash
-# Initialize Git (if not already)
-git init
-
-# Add all files
-git add .
-
-# Commit
-git commit -m "feat: initial HydRent platform commit"
-
-# Connect to your new GitHub repository
-git remote add origin https://github.com/YOUR_USERNAME/hydrent.git
-
-# Push to main branch
-git branch -M main
-git push -u origin main
+# Create a new private repository on your account and push
+git repo create hydrent --private --source=. --push
 ```
 
 ---
