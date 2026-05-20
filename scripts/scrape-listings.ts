@@ -29,80 +29,130 @@ const LOCALITY_RENT_DATA: Record<string, {
   min4: number; max4: number;
   micros: string[];
 }> = {
-  gachibowli: {
-    zone: "West Hyderabad", lat: 17.4401, lng: 78.3489,
-    min1: 12000, max1: 25000, min2: 18000, max2: 55000, min3: 30000, max3: 80000, min4: 45000, max4: 120000,
-    micros: ["DLF Cybercity", "Indira Nagar", "Gachibowli Road", "Nanakramguda", "Mokila"],
-  },
-  kondapur: {
-    zone: "West Hyderabad", lat: 17.4639, lng: 78.3649,
-    min1: 10000, max1: 22000, min2: 16000, max2: 45000, min3: 28000, max3: 65000, min4: 40000, max4: 95000,
-    micros: ["Kothaguda", "Jubilee Enclave", "Chitrapuri Colony", "Masjid Banda", "Bachupally Road"],
-  },
-  madhapur: {
-    zone: "West Hyderabad", lat: 17.4483, lng: 78.3915,
-    min1: 11000, max1: 23000, min2: 17000, max2: 48000, min3: 29000, max3: 70000, min4: 42000, max4: 100000,
-    micros: ["Hitech City Road", "Sriram Nagar", "Kavuri Hills", "Ayyappa Society", "Cyber Gateway"],
-  },
-  manikonda: {
-    zone: "West Hyderabad", lat: 17.4056, lng: 78.3743,
-    min1: 9000, max1: 20000, min2: 14000, max2: 40000, min3: 25000, max3: 58000, min4: 35000, max4: 85000,
-    micros: ["Shirdi Sai Nagar", "Alkapur", "Neknampur", "Lanco Hills Road", "Puppalaguda"],
-  },
-  nallagandla: {
-    zone: "North West Hyderabad", lat: 17.4738, lng: 78.3028,
-    min1: 8000, max1: 18000, min2: 12000, max2: 35000, min3: 22000, max3: 50000, min4: 32000, max4: 75000,
-    micros: ["Suncity", "Sri Venkateswara Colony", "Appa Junction", "Chanda Nagar", "RTC Colony"],
-  },
-  begumpet: {
-    zone: "Central Hyderabad", lat: 17.4447, lng: 78.4664,
-    min1: 10000, max1: 20000, min2: 15000, max2: 38000, min3: 25000, max3: 55000, min4: 38000, max4: 80000,
-    micros: ["Prakash Nagar", "Shyam Nagar", "Mayur Marg", "Begumpet Road", "Greenlands"],
-  },
-  kukatpally: {
-    zone: "North West Hyderabad", lat: 17.4851, lng: 78.3955,
-    min1: 8000, max1: 16000, min2: 12000, max2: 32000, min3: 20000, max3: 45000, min4: 30000, max4: 65000,
-    micros: ["Allapur", "HYDERNAGAR", "JNTU Road", "Balanagar", "Prasanth Nagar"],
-  },
-  miyapur: {
-    zone: "North West Hyderabad", lat: 17.5004, lng: 78.3512,
-    min1: 7000, max1: 15000, min2: 11000, max2: 30000, min3: 18000, max3: 42000, min4: 28000, max4: 60000,
-    micros: ["Miyapur Cross Road", "Brilliant Grama", "Sathupally Road", "Ramachandrapuram", "BEERAMGUDA"],
-  },
   ameerpet: {
     zone: "Central Hyderabad", lat: 17.4376, lng: 78.4482,
     min1: 9000, max1: 18000, min2: 14000, max2: 35000, min3: 23000, max3: 50000, min4: 35000, max4: 75000,
     micros: ["Krishna Nagar", "Pushpa Basti", "Sara Enclave", "Leelanagar", "Ameerpet Road"],
   },
-  uppal: {
-    zone: "East Hyderabad", lat: 17.4036, lng: 78.5541,
-    min1: 7000, max1: 14000, min2: 10000, max2: 28000, min3: 17000, max3: 40000, min4: 25000, max4: 55000,
-    micros: ["Vijayapuri Colony", "Bhagyanagar", "Uppal Depot", "Budhapur", "Ramanthapur"],
+  attapur: {
+    zone: "South Hyderabad", lat: 17.3550, lng: 78.4100,
+    min1: 6000, max1: 12000, min2: 10000, max2: 22000, min3: 16000, max3: 35000, min4: 25000, max4: 50000,
+    micros: ["Rajiv Nagar", "Shivrampally", "Attapur Road", "Karwan", "Barkas"],
   },
-  "lb-nagar": {
-    zone: "South Hyderabad", lat: 17.3450, lng: 78.5480,
-    min1: 6000, max1: 13000, min2: 10000, max2: 25000, min3: 16000, max3: 38000, min4: 24000, max4: 52000,
-    micros: ["Vanastalipuram", "Saroor Nagar", "Sainikpuri", "Mansoorabad", "Rajiv Nagar"],
-  },
-  "jubilee-hills": {
-    zone: "West Hyderabad", lat: 17.4297, lng: 78.4070,
-    min1: 15000, max1: 35000, min2: 25000, max2: 75000, min3: 40000, max3: 120000, min4: 60000, max4: 200000,
-    micros: ["Road No. 36", "Road No. 10", "Film Nagar", "Venkatagiri", "Banjara Hills Road"],
+  bachupally: {
+    zone: "North West Hyderabad", lat: 17.5020, lng: 78.3280,
+    min1: 7000, max1: 14000, min2: 10000, max2: 28000, min3: 18000, max3: 40000, min4: 28000, max4: 58000,
+    micros: ["Miyapur Road", "Bachupally Cross", "Nizampet Road", "Kistareddypet", "Gandhi Nagar"],
   },
   "banjara-hills": {
     zone: "Central Hyderabad", lat: 17.4156, lng: 78.4340,
     min1: 18000, max1: 40000, min2: 30000, max2: 85000, min3: 45000, max3: 150000, min4: 70000, max4: 250000,
     micros: ["Road No. 2", "Road No. 12", "Gouri Shankar Nagar", "Shyam Nagar", "Krishna Nagar"],
   },
-  "hitech-city": {
-    zone: "West Hyderabad", lat: 17.4478, lng: 78.3765,
-    min1: 13000, max1: 28000, min2: 20000, max2: 60000, min3: 35000, max3: 90000, min4: 50000, max4: 140000,
-    micros: ["Hitech Circle", "Cyber Towers", "Mindspace", "Patrika Nagar", "Madhapur Road"],
+  chandanagar: {
+    zone: "North West Hyderabad", lat: 17.4900, lng: 78.2800,
+    min1: 7000, max1: 14000, min2: 10000, max2: 26000, min3: 17000, max3: 38000, min4: 25000, max4: 55000,
+    micros: ["Chanda Nagar Road", "Gangaram", "Dundigal Road", "Gopanapally", "Kollur"],
+  },
+  dilsukhnagar: {
+    zone: "South Hyderabad", lat: 17.3650, lng: 78.5300,
+    min1: 7000, max1: 14000, min2: 11000, max2: 26000, min3: 18000, max3: 38000, min4: 26000, max4: 55000,
+    micros: ["Saroornagar", "Gaddiannaram", "Kothapet", "Chaitanyapuri", "Krishna Nagar"],
+  },
+  "film-nagar": {
+    zone: "West Hyderabad", lat: 17.4220, lng: 78.4150,
+    min1: 12000, max1: 25000, min2: 20000, max2: 50000, min3: 32000, max3: 75000, min4: 50000, max4: 110000,
+    micros: ["Jubilee Hills Road", "Film Nagar Colony", "Green Valley", "Panjagutta", "Sri Nagar"],
+  },
+  hafeezpet: {
+    zone: "North West Hyderabad", lat: 17.4770, lng: 78.3180,
+    min1: 7000, max1: 15000, min2: 11000, max2: 28000, min3: 18000, max3: 40000, min4: 28000, max4: 58000,
+    micros: ["Hafeezpet Road", "Allwyn Colony", "Bharat Nagar", "Miyapur", "Aditya Nagar"],
+  },
+  himayatnagar: {
+    zone: "Central Hyderabad", lat: 17.4060, lng: 78.4720,
+    min1: 10000, max1: 18000, min2: 14000, max2: 32000, min3: 22000, max3: 48000, min4: 35000, max4: 70000,
+    micros: ["Himayatnagar Road", "Ashok Nagar", "Somaliguda", "Barkatpura", "Vidyanagar"],
+  },
+  "jubilee-hills": {
+    zone: "West Hyderabad", lat: 17.4297, lng: 78.4070,
+    min1: 15000, max1: 35000, min2: 25000, max2: 75000, min3: 40000, max3: 120000, min4: 60000, max4: 200000,
+    micros: ["Road No. 36", "Road No. 10", "Film Nagar", "Venkatagiri", "Banjara Hills Road"],
+  },
+  kompally: {
+    zone: "North Hyderabad", lat: 17.5210, lng: 78.4850,
+    min1: 7000, max1: 14000, min2: 10000, max2: 25000, min3: 17000, max3: 38000, min4: 25000, max4: 55000,
+    micros: ["Kompally Road", "Dulapally", "Kompally Cross", "Bowrampet", "Quthbullapur"],
+  },
+  "kphb-colony": {
+    zone: "North West Hyderabad", lat: 17.4900, lng: 78.3980,
+    min1: 8000, max1: 16000, min2: 12000, max2: 30000, min3: 20000, max3: 45000, min4: 30000, max4: 60000,
+    micros: ["KPHB Phase 1", "KPHB Phase 4", "JNTU Road", "Balanagar", "Hydernagar"],
+  },
+  kukatpally: {
+    zone: "North West Hyderabad", lat: 17.4851, lng: 78.3955,
+    min1: 8000, max1: 16000, min2: 12000, max2: 32000, min3: 20000, max3: 45000, min4: 30000, max4: 65000,
+    micros: ["Allapur", "HYDERNAGAR", "JNTU Road", "Balanagar", "Prasanth Nagar"],
+  },
+  "lb-nagar": {
+    zone: "South Hyderabad", lat: 17.3450, lng: 78.5480,
+    min1: 6000, max1: 13000, min2: 10000, max2: 25000, min3: 16000, max3: 38000, min4: 24000, max4: 52000,
+    micros: ["Vanastalipuram", "Saroor Nagar", "Sainikpuri", "Mansoorabad", "Rajiv Nagar"],
+  },
+  mehdipatnam: {
+    zone: "South West Hyderabad", lat: 17.3900, lng: 78.4360,
+    min1: 8000, max1: 16000, min2: 12000, max2: 30000, min3: 20000, max3: 45000, min4: 30000, max4: 60000,
+    micros: ["Mehdipatnam Road", "Gudimalkapur", "Ahmed Nagar", "Toli Chowki", "Santosh Nagar"],
+  },
+  miyapur: {
+    zone: "North West Hyderabad", lat: 17.5004, lng: 78.3512,
+    min1: 7000, max1: 15000, min2: 11000, max2: 30000, min3: 18000, max3: 42000, min4: 28000, max4: 60000,
+    micros: ["Miyapur Cross Road", "Brilliant Grama", "Sathupally Road", "Ramachandrapuram", "BEERAMGUDA"],
+  },
+  nampally: {
+    zone: "Central Hyderabad", lat: 17.3930, lng: 78.4700,
+    min1: 9000, max1: 18000, min2: 13000, max2: 30000, min3: 20000, max3: 45000, min4: 32000, max4: 65000,
+    micros: ["Nampally Road", "Afzal Gunj", "Abids", "Purani Haveli", "Bazar Ghat"],
+  },
+  nizampet: {
+    zone: "North West Hyderabad", lat: 17.4950, lng: 78.3350,
+    min1: 7000, max1: 14000, min2: 10000, max2: 26000, min3: 17000, max3: 38000, min4: 25000, max4: 55000,
+    micros: ["Nizampet Road", "Bachupally Road", "Kistareddypet", "Quthbullapur", "RTC Colony"],
+  },
+  punjagutta: {
+    zone: "Central Hyderabad", lat: 17.4180, lng: 78.4460,
+    min1: 12000, max1: 25000, min2: 18000, max2: 45000, min3: 30000, max3: 70000, min4: 45000, max4: 100000,
+    micros: ["Panjagutta Road", "Somajiguda", "Banjara Hills", "ACP Colony", "Raj Bhavan Road"],
   },
   secunderabad: {
     zone: "Central Hyderabad", lat: 17.4399, lng: 78.4983,
     min1: 8000, max1: 16000, min2: 12000, max2: 30000, min3: 20000, max3: 45000, min4: 30000, max4: 60000,
     micros: ["Parade Grounds", "St Johns Road", "Sikh Village", "Tarnaka", "Adikmet"],
+  },
+  somajiguda: {
+    zone: "Central Hyderabad", lat: 17.4200, lng: 78.4570,
+    min1: 12000, max1: 25000, min2: 18000, max2: 42000, min3: 28000, max3: 65000, min4: 42000, max4: 95000,
+    micros: ["Somajiguda Road", "Raj Bhavan Road", "ACP Colony", "Himayat Nagar", "Greenlands"],
+  },
+  "sr-nagar": {
+    zone: "West Hyderabad", lat: 17.4370, lng: 78.4300,
+    min1: 9000, max1: 18000, min2: 13000, max2: 32000, min3: 22000, max3: 48000, min4: 32000, max4: 70000,
+    micros: ["SR Nagar Road", "Sanath Nagar", "Prakash Nagar", "Erragadda", "Bharat Nagar"],
+  },
+  tellapur: {
+    zone: "West Hyderabad", lat: 17.4730, lng: 78.2900,
+    min1: 7000, max1: 15000, min2: 11000, max2: 28000, min3: 18000, max3: 42000, min4: 28000, max4: 60000,
+    micros: ["Tellapur Road", "Gopanapally", "Osman Nagar", "Kollur", "Nallagandla"],
+  },
+  tolichowki: {
+    zone: "South West Hyderabad", lat: 17.3750, lng: 78.4200,
+    min1: 8000, max1: 15000, min2: 12000, max2: 28000, min3: 20000, max3: 42000, min4: 30000, max4: 60000,
+    micros: ["Tolichowki Road", "Shastri Nagar", "Ahmed Nagar", "Gudimalkapur", "Mehdipatnam"],
+  },
+  uppal: {
+    zone: "East Hyderabad", lat: 17.4036, lng: 78.5541,
+    min1: 7000, max1: 14000, min2: 10000, max2: 28000, min3: 17000, max3: 40000, min4: 25000, max4: 55000,
+    micros: ["Vijayapuri Colony", "Bhagyanagar", "Uppal Depot", "Budhapur", "Ramanthapur"],
   },
 };
 
