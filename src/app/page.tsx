@@ -74,7 +74,7 @@ export default async function HomePage() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-full border-[#2d3f2d] text-[#86efac] hover:bg-[#1a221a] hover:text-[#f0fdf4] px-6">
-              <Link href="/hyderabad/gachibowli">
+              <Link href="/explore">
                 Explore localities
               </Link>
             </Button>
