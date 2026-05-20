@@ -7,16 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { getLocality, getSubmissionsForLocality, localities } from "@/lib/data/hyderabad";
+import { getAllLocalities, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 const bhks = ["1rk", "1bhk", "2bhk", "3bhk", "4bhk"];
 
-export function generateStaticParams() {
-  return localities.flatMap((locality) =>
-    bhks.map((bhk) => ({ localitySlug: locality.slug, bhk })),
-  );
+export async function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({
@@ -25,7 +25,7 @@ export async function generateMetadata({
   params: Promise<{ localitySlug: string; bhk: string }>;
 }): Promise<Metadata> {
   const { localitySlug, bhk } = await params;
-  const locality = getLocality(localitySlug);
+  const locality = await getLocalityBySlug(localitySlug);
   if (!locality) return {};
   const label = bhk.toUpperCase();
   return baseMetadata({
@@ -41,17 +41,18 @@ export default async function BhkPage({
   params: Promise<{ localitySlug: string; bhk: string }>;
 }) {
   const { localitySlug, bhk } = await params;
-  const locality = getLocality(localitySlug);
+  const locality = await getLocalityBySlug(localitySlug);
   if (!locality || !bhks.includes(bhk)) notFound();
 
   const label = bhk.toUpperCase();
-  const submissions = getSubmissionsForLocality(locality.slug).filter(
+  const allSubmissions = await getSubmissionsForLocality(locality.slug);
+  const submissions = allSubmissions.filter(
     (submission) => submission.bhk.toLowerCase() === bhk,
   );
-  const fallbackSubmissions = getSubmissionsForLocality(locality.slug);
-  const aggregate = aggregateRent(submissions.length ? submissions : fallbackSubmissions, {
+  const aggregate = aggregateRent(submissions.length ? submissions : allSubmissions, {
     label: `${label} in ${locality.name}`,
   });
+  const hasData = submissions.length > 0;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -60,8 +61,9 @@ export default async function BhkPage({
         {label} rent in {locality.name}
       </h1>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-        Programmatic SEO report generated from the same trust-weighted rent engine used across
-        HydRent. When BHK-specific data is sparse, the page clearly falls back to locality context.
+        {hasData
+          ? `${submissions.length} verified ${label} signals from the community.`
+          : `No ${label} data yet for ${locality.name}. Submit your rent to help build this report.`}
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
@@ -69,14 +71,22 @@ export default async function BhkPage({
           <CardHeader>
             <CardTitle>{label} verified range</CardTitle>
             <CardDescription>
-              {submissions.length} exact BHK signals, {fallbackSubmissions.length} locality signals.
+              {submissions.length} exact BHK signals, {allSubmissions.length} locality signals.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold tracking-normal">{formatINR(aggregate.median)}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {formatINR(aggregate.p25)} - {formatINR(aggregate.p75)} central range
-            </p>
+            {hasData ? (
+              <>
+                <p className="text-4xl font-semibold tracking-normal">{formatINR(aggregate.median)}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {formatINR(aggregate.p25)} - {formatINR(aggregate.p75)} central range
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No {label} data available yet. Be the first to submit.
+              </p>
+            )}
             <div className="mt-5">
               <ConfidenceMeter score={aggregate.confidenceScore} level={aggregate.confidenceLevel} />
             </div>
@@ -85,10 +95,18 @@ export default async function BhkPage({
         <Card>
           <CardHeader>
             <CardTitle>Distribution</CardTitle>
-            <CardDescription>Available BHK-specific and locality fallback samples.</CardDescription>
+            <CardDescription>
+              {hasData ? "BHK-specific and locality fallback samples." : "No data to display yet."}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <RentDistributionChart submissions={submissions.length ? submissions : fallbackSubmissions} />
+            {hasData ? (
+              <RentDistributionChart submissions={submissions} />
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Submit your rent to see distribution data here.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

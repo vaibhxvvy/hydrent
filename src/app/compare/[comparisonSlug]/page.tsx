@@ -7,12 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { getLocality, getSubmissionsForLocality, localities } from "@/lib/data/hyderabad";
+import { getAllLocalities, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return [{ comparisonSlug: "gachibowli-vs-kondapur" }, { comparisonSlug: "madhapur-vs-manikonda" }];
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({
@@ -22,8 +24,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { comparisonSlug } = await params;
   const [leftSlug, rightSlug] = comparisonSlug.split("-vs-");
-  const left = leftSlug ? getLocality(leftSlug) : undefined;
-  const right = rightSlug ? getLocality(rightSlug) : undefined;
+  const left = leftSlug ? await getLocalityBySlug(leftSlug) : undefined;
+  const right = rightSlug ? await getLocalityBySlug(rightSlug) : undefined;
   if (!left || !right) return {};
   return baseMetadata({
     title: `${left.name} vs ${right.name} rent comparison`,
@@ -39,14 +41,24 @@ export default async function ComparePage({
 }) {
   const { comparisonSlug } = await params;
   const [leftSlug, rightSlug] = comparisonSlug.split("-vs-");
-  const left = leftSlug ? getLocality(leftSlug) : undefined;
-  const right = rightSlug ? getLocality(rightSlug) : undefined;
+  const [left, right] = await Promise.all([
+    leftSlug ? getLocalityBySlug(leftSlug) : null,
+    rightSlug ? getLocalityBySlug(rightSlug) : null,
+  ]);
   if (!left || !right) notFound();
 
-  const leftAggregate = aggregateRent(getSubmissionsForLocality(left.slug), { label: left.name });
-  const rightAggregate = aggregateRent(getSubmissionsForLocality(right.slug), { label: right.name });
+  const [leftSubmissions, rightSubmissions, allLocalities] = await Promise.all([
+    getSubmissionsForLocality(left.slug),
+    getSubmissionsForLocality(right.slug),
+    getAllLocalities(),
+  ]);
+
+  const leftAggregate = aggregateRent(leftSubmissions, { label: left.name });
+  const rightAggregate = aggregateRent(rightSubmissions, { label: right.name });
   const delta = leftAggregate.median - rightAggregate.median;
-  const allOther = localities.filter((locality) => ![left.slug, right.slug].includes(locality.slug));
+  const allOther = allLocalities.filter((locality) => ![left.slug, right.slug].includes(locality.slug));
+  const hasLeftData = leftAggregate.sampleSize > 0;
+  const hasRightData = rightAggregate.sampleSize > 0;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -60,72 +72,88 @@ export default async function ComparePage({
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        {[left, right].map((locality) => {
-          const aggregate = locality.slug === left.slug ? leftAggregate : rightAggregate;
-          return (
-            <Card key={locality.slug}>
-              <CardHeader>
-                <CardTitle>{locality.name}</CardTitle>
-                <CardDescription>{locality.commuteAnchors.join(", ")}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-4xl font-semibold tracking-normal">{formatINR(aggregate.median)}</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {formatINR(aggregate.p25)} - {formatINR(aggregate.p75)}
+        {[
+          { locality: left, aggregate: leftAggregate, hasData: hasLeftData },
+          { locality: right, aggregate: rightAggregate, hasData: hasRightData },
+        ].map(({ locality, aggregate, hasData }) => (
+          <Card key={locality.slug}>
+            <CardHeader>
+              <CardTitle>{locality.name}</CardTitle>
+              <CardDescription>
+                {locality.commuteAnchors.length > 0
+                  ? locality.commuteAnchors.join(", ")
+                  : "Hyderabad"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {hasData ? (
+                <>
+                  <p className="text-4xl font-semibold tracking-normal">{formatINR(aggregate.median)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {formatINR(aggregate.p25)} - {formatINR(aggregate.p75)}
+                  </p>
+                  <div className="mt-5">
+                    <ConfidenceMeter score={aggregate.confidenceScore} level={aggregate.confidenceLevel} />
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No rent data submitted for {locality.name} yet.
                 </p>
-                <div className="mt-5">
-                  <ConfidenceMeter score={aggregate.confidenceScore} level={aggregate.confidenceLevel} />
-                </div>
-                <Button asChild variant="outline" className="mt-5">
-                  <Link href={`/hyderabad/${locality.slug}`}>Open report</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <GitCompareArrows className="size-4 text-primary" aria-hidden="true" />
-            Affordability analysis
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-md border bg-muted/30 p-4">
-            <p className="text-sm text-muted-foreground">Median difference</p>
-            <p className="mt-2 font-mono text-2xl font-semibold">{formatINR(Math.abs(delta))}</p>
-          </div>
-          <div className="rounded-md border bg-muted/30 p-4">
-            <p className="text-sm text-muted-foreground">Lower median market</p>
-            <p className="mt-2 text-2xl font-semibold">{delta > 0 ? right.name : left.name}</p>
-          </div>
-          <div className="rounded-md border bg-muted/30 p-4">
-            <p className="text-sm text-muted-foreground">Income pressure delta</p>
-            <p className="mt-2 font-mono text-2xl font-semibold">
-              {Math.abs(
-                Math.round(
-                  (leftAggregate.median / left.medianIncomeAssumption -
-                    rightAggregate.median / right.medianIncomeAssumption) *
-                    100,
-                ),
               )}
-              pp
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="mt-6 flex flex-wrap gap-2">
-        {allOther.slice(0, 3).map((locality) => (
-          <Button key={locality.slug} asChild variant="outline" size="sm">
-            <Link href={`/compare/${left.slug}-vs-${locality.slug}`}>
-              Compare with {locality.name}
-            </Link>
-          </Button>
+              <Button asChild variant="outline" className="mt-5">
+                <Link href={`/hyderabad/${locality.slug}`}>Open report</Link>
+              </Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
+
+      {hasLeftData && hasRightData && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GitCompareArrows className="size-4 text-primary" aria-hidden="true" />
+              Affordability analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-md border bg-muted/30 p-4">
+              <p className="text-sm text-muted-foreground">Median difference</p>
+              <p className="mt-2 font-mono text-2xl font-semibold">{formatINR(Math.abs(delta))}</p>
+            </div>
+            <div className="rounded-md border bg-muted/30 p-4">
+              <p className="text-sm text-muted-foreground">Lower median market</p>
+              <p className="mt-2 text-2xl font-semibold">{delta > 0 ? right.name : left.name}</p>
+            </div>
+            <div className="rounded-md border bg-muted/30 p-4">
+              <p className="text-sm text-muted-foreground">Income pressure delta</p>
+              <p className="mt-2 font-mono text-2xl font-semibold">
+                {Math.abs(
+                  Math.round(
+                    (leftAggregate.median / left.medianIncomeAssumption -
+                      rightAggregate.median / right.medianIncomeAssumption) *
+                      100,
+                  ),
+                )}
+                pp
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {allOther.length > 0 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {allOther.slice(0, 3).map((locality) => (
+            <Button key={locality.slug} asChild variant="outline" size="sm">
+              <Link href={`/compare/${left.slug}-vs-${locality.slug}`}>
+                Compare with {locality.name}
+              </Link>
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

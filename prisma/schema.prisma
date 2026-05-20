@@ -487,6 +487,18 @@ model FraudSignal {
   @@index([score])
 }
 
+model IssueReport {
+  id          String    @id @default(cuid())
+  name        String?
+  email       String?
+  subject     String
+  message     String
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  @@index([createdAt])
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   actorId   String?

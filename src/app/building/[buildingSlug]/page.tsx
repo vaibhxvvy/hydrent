@@ -8,12 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { buildings, getBuilding, getLocality, getSubmissionsForBuilding } from "@/lib/data/hyderabad";
+import { getAllBuildings, getBuildingBySlug, getLocalityBySlug, getSubmissionsForBuilding } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return buildings.map((building) => ({ buildingSlug: building.slug }));
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({
@@ -22,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ buildingSlug: string }>;
 }): Promise<Metadata> {
   const { buildingSlug } = await params;
-  const building = getBuilding(buildingSlug);
+  const building = await getBuildingBySlug(buildingSlug);
   if (!building) return {};
   return baseMetadata({
     title: `${building.name} rent history`,
@@ -37,12 +39,15 @@ export default async function BuildingPage({
   params: Promise<{ buildingSlug: string }>;
 }) {
   const { buildingSlug } = await params;
-  const building = getBuilding(buildingSlug);
+  const building = await getBuildingBySlug(buildingSlug);
   if (!building) notFound();
 
-  const locality = getLocality(building.localitySlug);
-  const submissions = getSubmissionsForBuilding(building.slug);
+  const [locality, submissions] = await Promise.all([
+    getLocalityBySlug(building.localitySlug),
+    getSubmissionsForBuilding(building.slug),
+  ]);
   const aggregate = aggregateRent(submissions, { label: building.name });
+  const hasData = aggregate.sampleSize > 0;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -53,25 +58,30 @@ export default async function BuildingPage({
             {building.name}
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Building-level intelligence for {building.microLocality}. Aliases are normalized so
-            nicknames like {building.aliases.slice(0, 3).join(", ")} resolve to the same society.
+            Building-level intelligence for {building.microLocality || locality?.name || "Hyderabad"}.
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            {building.amenities.map((amenity) => (
-              <Badge key={amenity} variant="muted">
-                {amenity.replaceAll("_", " ")}
-              </Badge>
-            ))}
+            {building.amenities.length > 0 ? (
+              building.amenities.map((amenity) => (
+                <Badge key={amenity} variant="muted">
+                  {amenity.replaceAll("_", " ")}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="muted">Amenities data coming soon</Badge>
+            )}
           </div>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>Verified building range</CardTitle>
-            <CardDescription>{submissions.length} available rent signals.</CardDescription>
+            <CardDescription>
+              {hasData ? `${submissions.length} available rent signals.` : "No submissions yet."}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {submissions.length ? (
+            {hasData ? (
               <>
                 <p className="text-4xl font-semibold tracking-normal">{formatINR(aggregate.median)}</p>
                 <p className="mt-2 text-sm text-muted-foreground">
@@ -90,28 +100,29 @@ export default async function BuildingPage({
         </Card>
       </div>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Rent distribution</CardTitle>
-            <CardDescription>Building-level sample spread.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RentDistributionChart submissions={submissions} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Building metadata</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 text-sm">
-            <MetadataRow label="Age" value={`${building.ageYears} years`} />
-            <MetadataRow label="Gated society" value={building.gated ? "Yes" : "No"} />
-            <MetadataRow label="Micro-locality" value={building.microLocality} />
-            <MetadataRow label="Known aliases" value={building.aliases.join(", ")} />
-          </CardContent>
-        </Card>
-      </section>
+      {hasData && (
+        <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rent distribution</CardTitle>
+              <CardDescription>Building-level sample spread.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RentDistributionChart submissions={submissions} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Building metadata</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3 text-sm">
+              <MetadataRow label="Age" value={building.ageYears > 0 ? `${building.ageYears} years` : "Unknown"} />
+              <MetadataRow label="Gated society" value={building.gated ? "Yes" : "No"} />
+              <MetadataRow label="Micro-locality" value={building.microLocality || "—"} />
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
       <div className="mt-6 flex flex-wrap gap-2">
         <Button asChild variant="outline">

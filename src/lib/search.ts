@@ -1,16 +1,5 @@
-import { buildings, localities } from "@/lib/data/hyderabad";
-import { slugify } from "@/lib/utils";
-
-const transliterationHints: Record<string, string> = {
-  గచ్చిబౌలి: "gachibowli",
-  కొండాపూర్: "kondapur",
-  మాదాపూర్: "madhapur",
-  మణికొండ: "manikonda",
-};
-
 export function normalizeSearch(input: string) {
-  const hinted = transliterationHints[input.trim()] ?? input;
-  return hinted
+  return input
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -41,48 +30,6 @@ export function levenshtein(a: string, b: string) {
   return matrix[b.length]![a.length]!;
 }
 
-function scoreQuery(query: string, candidates: string[]) {
-  const normalizedQuery = normalizeSearch(query);
-  if (!normalizedQuery) return 0;
-
-  return Math.max(
-    ...candidates.map((candidate) => {
-      const normalizedCandidate = normalizeSearch(candidate);
-      if (normalizedCandidate === normalizedQuery) return 100;
-      if (normalizedCandidate.includes(normalizedQuery)) return 86;
-      if (normalizedQuery.includes(normalizedCandidate)) return 78;
-      const distance = levenshtein(normalizedQuery, normalizedCandidate);
-      return Math.max(0, 70 - distance * 9);
-    }),
-  );
-}
-
-export function searchHydRent(query: string) {
-  const localityResults = localities.map((locality) => ({
-    type: "locality" as const,
-    title: locality.name,
-    subtitle: `${locality.zone} · ${locality.commuteAnchors.slice(0, 2).join(", ")}`,
-    href: `/hyderabad/${locality.slug}`,
-    score: scoreQuery(query, [locality.name, locality.slug, ...locality.aliases]),
-  }));
-
-  const buildingResults = buildings.map((building) => {
-    const locality = localities.find((item) => item.slug === building.localitySlug);
-    return {
-      type: "building" as const,
-      title: building.name,
-      subtitle: `${building.microLocality} · ${locality?.name ?? "Hyderabad"}`,
-      href: `/building/${building.slug}`,
-      score: scoreQuery(query, [building.name, building.slug, ...building.aliases]),
-    };
-  });
-
-  return [...localityResults, ...buildingResults]
-    .filter((result) => result.score >= 42)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 8);
-}
-
 export function routeForBhk(localitySlug: string, bhk: string) {
-  return `/hyderabad/${slugify(localitySlug)}/${bhk.toLowerCase()}`;
+  return `/hyderabad/${localitySlug}/${bhk.toLowerCase()}`;
 }

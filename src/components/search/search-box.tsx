@@ -1,14 +1,48 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Building2, MapPin, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { searchHydRent } from "@/lib/search";
+
+interface SearchResult {
+  type: "locality" | "building";
+  title: string;
+  subtitle: string;
+  href: string;
+  score: number;
+}
 
 export function SearchBox({ autoFocus = false }: { autoFocus?: boolean }) {
   const [query, setQuery] = useState("");
-  const results = useMemo(() => searchHydRent(query), [query]);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const fetchResults = useCallback(async (q: string) => {
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      setResults(data.results || []);
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchResults(query), 200);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query, fetchResults]);
 
   return (
     <div className="relative">
@@ -21,14 +55,16 @@ export function SearchBox({ autoFocus = false }: { autoFocus?: boolean }) {
           autoFocus={autoFocus}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search locality, micro-market, society, or nickname"
+          placeholder="Search your locality... e.g. Kondapur, Gachibowli"
           className="h-12 ps-10 text-base"
         />
       </div>
 
-      {query.length > 1 ? (
+      {query.length > 1 && (
         <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-lg border bg-popover shadow-lg">
-          {results.length > 0 ? (
+          {loading ? (
+            <div className="px-4 py-5 text-sm text-muted-foreground">Searching...</div>
+          ) : results.length > 0 ? (
             <div className="max-h-80 overflow-auto p-1">
               {results.map((result) => (
                 <Link
@@ -56,7 +92,7 @@ export function SearchBox({ autoFocus = false }: { autoFocus?: boolean }) {
             </div>
           )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
