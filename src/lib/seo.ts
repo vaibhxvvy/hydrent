@@ -4,7 +4,7 @@ import { aggregateRent } from "@/lib/analytics/statistics";
 import { getSubmissionsForLocality, localities } from "@/lib/data/hyderabad";
 import { formatINR } from "@/lib/utils";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://hydrent.vercel.app";
 
 export function absoluteUrl(path = "/") {
   return new URL(path, appUrl).toString();

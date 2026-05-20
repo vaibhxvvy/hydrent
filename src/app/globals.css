@@ -2,36 +2,52 @@
 @import "leaflet/dist/leaflet.css";
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-background: oklch(0.985 0 0);
-  --color-foreground: oklch(0.16 0.006 260);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.16 0.006 260);
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.16 0.006 260);
-  --color-primary: oklch(0.45 0.105 168);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.94 0.012 260);
-  --color-secondary-foreground: oklch(0.19 0.012 260);
-  --color-muted: oklch(0.95 0.006 260);
-  --color-muted-foreground: oklch(0.48 0.018 260);
-  --color-accent: oklch(0.92 0.035 85);
-  --color-accent-foreground: oklch(0.24 0.024 85);
-  --color-destructive: oklch(0.58 0.18 28);
-  --color-destructive-foreground: oklch(0.985 0 0);
-  --color-border: oklch(0.88 0.01 260);
-  --color-input: oklch(0.88 0.01 260);
-  --color-ring: oklch(0.45 0.105 168);
-  --color-trust-high: oklch(0.55 0.12 158);
-  --color-trust-medium: oklch(0.67 0.13 80);
-  --color-trust-low: oklch(0.57 0.16 35);
+  --color-background: #0a0f0a;
+  --color-foreground: #f0fdf4;
+  --color-surface: #111811;
+  --color-surface-elevated: #1a221a;
+  --color-card: #111811;
+  --color-card-foreground: #f0fdf4;
+  --color-popover: #1a221a;
+  --color-popover-foreground: #f0fdf4;
+  --color-primary: #22c55e;
+  --color-primary-foreground: #0a0f0a;
+  --color-primary-dim: #16a34a;
+  --color-secondary: #1f2b1f;
+  --color-secondary-foreground: #86efac;
+  --color-muted: #1f2b1f;
+  --color-muted-foreground: #4b7a4b;
+  --color-accent: #4ade80;
+  --color-accent-foreground: #0a0f0a;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f0fdf4;
+  --color-warning: #eab308;
+  --color-border: #1f2b1f;
+  --color-border-bright: #2d3f2d;
+  --color-input: #1f2b1f;
+  --color-ring: #22c55e;
+  --color-verified: #22c55e;
+  --color-unverified: #6b7280;
+  --color-trust-high: #22c55e;
+  --color-trust-medium: #eab308;
+  --color-trust-low: #ef4444;
+
   --radius: 0.5rem;
   --radius-sm: calc(var(--radius) * 0.75);
   --radius-md: var(--radius);
   --radius-lg: var(--radius);
   --radius-xl: var(--radius);
+  --radius-card: 12px;
+  --radius-button: 8px;
+  --radius-pill: 999px;
+  --radius-input: 8px;
+
+  --shadow-card: 0 1px 3px rgba(34, 197, 94, 0.05);
+  --shadow-elevated: 0 4px 24px rgba(34, 197, 94, 0.08);
+  --shadow-glow: 0 0 40px rgba(34, 197, 94, 0.12);
 }
 
 * {
@@ -44,28 +60,29 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, oklch(0.995 0 0) 0%, oklch(0.975 0.006 260) 100%),
-    var(--color-background);
+  background: var(--color-background);
   color: var(--color-foreground);
-  font-feature-settings:
-    "rlig" 1,
-    "calt" 1;
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
 ::selection {
-  background: oklch(0.88 0.08 168);
-  color: oklch(0.18 0.03 168);
+  background: rgba(34, 197, 94, 0.3);
+  color: #f0fdf4;
 }
 
 .leaflet-container {
   min-height: 100%;
   font: inherit;
-  background: var(--color-muted);
+  background: #0a0f0a;
 }
 
 .leaflet-control-attribution {
   font-size: 10px;
+  color: #4b7a4b;
+}
+
+.leaflet-control-attribution a {
+  color: #22c55e;
 }
 
 .focus-ring {
@@ -75,4 +92,59 @@ body {
 
 .focus-ring:focus-visible {
   outline-color: var(--color-ring);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.25);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-checkmark {
+  stroke-dasharray: 100;
+  animation: checkmark 0.6s ease-out forwards;
 }

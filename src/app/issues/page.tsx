@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Send } from "lucide-react";
 
 export default function IssueReportPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -32,90 +28,63 @@ export default function IssueReportPage() {
         body: JSON.stringify(data),
       });
 
-      const result = await res.json();
-      if (result.success) {
+      if (res.ok) {
         setSubmitted(true);
       } else {
-        setError("Failed to submit issue. Please try again.");
+        const err = await res.json();
+        setError(err.error || "Something went wrong");
       }
     } catch {
-      setError("Failed to submit issue. Please try again.");
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  if (submitted) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-4 text-center">
+        <div className="flex size-16 items-center justify-center rounded-full bg-[#22c55e]/20">
+          <svg className="size-8 text-[#22c55e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline className="animate-checkmark" points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <h1 className="mt-5 text-2xl font-bold text-[#f0fdf4]">Thank you</h1>
+        <p className="mt-3 text-sm text-[#86efac]">We&apos;ll review your report and get back to you if needed.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Report an Issue or Suggest Improvements</CardTitle>
-          <CardDescription>
-            Found a bug or have a suggestion? Let us know and it will be routed to labusepc@gmail.com!
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {submitted ? (
-            <div className="rounded-md bg-emerald-50 p-4 text-sm text-emerald-800">
-              Thank you! Your issue has been submitted successfully.
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Your name (optional)"
-                />
-              </div>
+    <div className="mx-auto max-w-lg px-4 py-12 sm:px-6">
+      <h1 className="text-2xl font-bold text-[#f0fdf4]">Report an Issue</h1>
+      <p className="mt-2 text-sm text-[#86efac]">Help us improve HydRent by reporting bugs or suggesting features.</p>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Your email (optional)"
-                />
-              </div>
+      <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+        <div>
+          <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-[#f0fdf4]">Name</label>
+          <input id="name" name="name" required className="h-11 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 text-sm text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]" />
+        </div>
+        <div>
+          <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#f0fdf4]">Email</label>
+          <input id="email" name="email" type="email" required className="h-11 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 text-sm text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]" />
+        </div>
+        <div>
+          <label htmlFor="subject" className="mb-1.5 block text-sm font-medium text-[#f0fdf4]">Subject</label>
+          <input id="subject" name="subject" required className="h-11 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 text-sm text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]" />
+        </div>
+        <div>
+          <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-[#f0fdf4]">Message</label>
+          <textarea id="message" name="message" rows={5} required className="w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 py-3 text-sm text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)] resize-y" />
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  placeholder="Brief description of the issue"
-                  required
-                />
-              </div>
+        {error && <p className="text-sm text-[#ef4444]">{error}</p>}
 
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  placeholder="Please describe the issue or your suggestion in detail"
-                  required
-                  rows={6}
-                />
-              </div>
-
-              {error && (
-                <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Submitting..." : "Submit Issue"}
-                </Button>
-              </div>
-            </form>
-          )}
-        </CardContent>
-      </Card>
+        <button type="submit" disabled={loading} className="flex items-center gap-2 rounded-lg bg-[#22c55e] px-5 py-2.5 text-sm font-medium text-[#0a0f0a] hover:bg-[#16a34a] transition-colors disabled:opacity-50">
+          <Send className="size-4" />
+          {loading ? "Sending..." : "Submit report"}
+        </button>
+      </form>
     </div>
   );
 }

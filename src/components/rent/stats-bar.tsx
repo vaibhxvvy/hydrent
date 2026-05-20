@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatINR } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 
 interface StatsData {
   totalSubmissions: number;
@@ -41,17 +41,15 @@ export function StatsBar({ initial }: { initial: StatsData }) {
     return () => clearInterval(interval);
   }, []);
 
-  if (stats.totalSubmissions < 10) return null;
-
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border bg-card px-4 py-3 text-sm">
-      <span className="font-medium">{formatINR(stats.totalSubmissions)} rents submitted</span>
-      <span className="text-muted-foreground">·</span>
-      <span>{stats.localitiesWithData} localities covered</span>
-      <span className="text-muted-foreground">·</span>
-      <span>{stats.closedRentPercentage}% closed rents</span>
-      <span className="text-muted-foreground">·</span>
-      <span className="text-muted-foreground">Updated {timeAgo(stats.lastUpdated)}</span>
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-sm">
+      <span className="text-[#f0fdf4]">{formatNumber(stats.totalSubmissions)} rents verified</span>
+      <span className="text-[#22c55e]">·</span>
+      <span className="text-[#f0fdf4]">{stats.localitiesWithData} localities</span>
+      <span className="text-[#22c55e]">·</span>
+      <span className="text-[#f0fdf4]">{stats.closedRentPercentage}% closed deals</span>
+      <span className="text-[#22c55e]">·</span>
+      <span className="text-[#4b7a4b]">Updated {timeAgo(stats.lastUpdated)}</span>
     </div>
   );
 }
