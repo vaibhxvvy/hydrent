@@ -37,3 +37,6 @@ prisma/dev.db
 prisma/*.db
 
 .vercel
+
+# local changelog (agent memory, not for GitHub)
+.CHANGELOG.md

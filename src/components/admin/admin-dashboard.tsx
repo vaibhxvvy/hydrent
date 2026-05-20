@@ -113,18 +113,18 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#f0fdf4]">Admin Panel</h1>
-        <p className="mt-1 text-sm text-[#4b7a4b]">Moderation, scraper management, and locality health.</p>
+        <h1 className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">Admin Panel</h1>
+        <p className="mt-1 text-sm text-[var(--md-sys-color-on-surface-variant)]">Moderation, scraper management, and locality health.</p>
       </div>
 
       {/* Tab navigation */}
-      <div className="mb-6 flex gap-1 rounded-lg border border-[#1f2b1f] bg-[#111811] p-1">
+      <div className="mb-6 flex gap-1 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-1">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              tab === t.id ? "bg-[#22c55e] text-[#0a0f0a]" : "text-[#86efac] hover:text-[#f0fdf4]"
+              tab === t.id ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" : "text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)]"
             }`}
           >
             {t.label}
@@ -136,37 +136,37 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
       {tab === "dashboard" && (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-4">
-              <p className="text-sm text-[#4b7a4b]">Total submissions</p>
-              <p className="mt-1 font-mono text-2xl font-bold text-[#f0fdf4]">{submissions.length}</p>
+            <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-4">
+              <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Total submissions</p>
+              <p className="mt-1 font-mono text-2xl font-bold text-[var(--md-sys-color-on-surface)]">{submissions.length}</p>
             </div>
-            <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-4">
-              <p className="text-sm text-[#4b7a4b]">Pending review</p>
-              <p className={`mt-1 font-mono text-2xl font-bold ${pending > 5 ? "text-[#ef4444]" : "text-[#eab308]"}`}>{pending}</p>
+            <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-4">
+              <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Pending review</p>
+              <p className={`mt-1 font-mono text-2xl font-bold ${pending > 5 ? "text-[var(--md-sys-color-error)]" : "text-[#eab308]"}`}>{pending}</p>
             </div>
-            <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-4">
-              <p className="text-sm text-[#4b7a4b]">Approved this week</p>
-              <p className="mt-1 font-mono text-2xl font-bold text-[#22c55e]">{approvedThisWeek}</p>
+            <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-4">
+              <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Approved this week</p>
+              <p className="mt-1 font-mono text-2xl font-bold text-[var(--md-sys-color-primary)]">{approvedThisWeek}</p>
             </div>
-            <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-4">
-              <p className="text-sm text-[#4b7a4b]">Flagged</p>
-              <p className={`mt-1 font-mono text-2xl font-bold ${flagged > 0 ? "text-[#ef4444]" : "text-[#22c55e]"}`}>{flagged}</p>
+            <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-4">
+              <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Flagged</p>
+              <p className={`mt-1 font-mono text-2xl font-bold ${flagged > 0 ? "text-[var(--md-sys-color-error)]" : "text-[var(--md-sys-color-primary)]"}`}>{flagged}</p>
             </div>
           </div>
 
           {/* Activity feed */}
-          <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-5">
-            <h2 className="text-sm font-semibold text-[#f0fdf4]">Live activity feed</h2>
+          <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-5">
+            <h2 className="text-sm font-semibold text-[var(--md-sys-color-on-surface)]">Live activity feed</h2>
             <div className="mt-3 space-y-2">
               {activityFeed.length > 0 ? (
                 activityFeed.slice(0, 10).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg bg-[#1a221a] px-3 py-2 text-sm">
-                    <span className="text-[#86efac]">{item.text}</span>
-                    <span className="text-xs text-[#4b7a4b]">{item.time}</span>
+                  <div key={item.id} className="flex items-center justify-between rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-3 py-2 text-sm">
+                    <span className="text-[var(--md-sys-color-on-surface-variant)]">{item.text}</span>
+                    <span className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{item.time}</span>
                   </div>
                 ))
               ) : (
-                <p className="py-4 text-center text-sm text-[#4b7a4b]">No recent activity</p>
+                <p className="py-4 text-center text-sm text-[var(--md-sys-color-on-surface-variant)]">No recent activity</p>
               )}
             </div>
           </div>
@@ -183,7 +183,7 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                  filter === f ? "bg-[#22c55e] text-[#0a0f0a]" : "border border-[#2d3f2d] text-[#86efac] hover:bg-[#1a221a]"
+                  filter === f ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" : "border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                 }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -194,10 +194,10 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
           {/* Bulk actions */}
           {selectedSubs.size > 0 && (
             <div className="flex gap-2">
-              <button onClick={() => handleBulkAction("APPROVE")} className="rounded-lg bg-[#22c55e] px-3 py-1.5 text-xs font-medium text-[#0a0f0a] hover:bg-[#16a34a]">
+              <button onClick={() => handleBulkAction("APPROVE")} className="rounded-lg bg-[var(--md-sys-color-primary)] px-3 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110">
                 Approve selected ({selectedSubs.size})
               </button>
-              <button onClick={() => handleBulkAction("FLAG")} className="rounded-lg bg-[#eab308] px-3 py-1.5 text-xs font-medium text-[#0a0f0a] hover:bg-[#d9a406]">
+              <button onClick={() => handleBulkAction("FLAG")} className="rounded-lg bg-[var(--md-sys-color-tertiary)] px-3 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-primary)] hover:bg-[#d9a406]">
                 Flag selected
               </button>
               <button onClick={() => handleBulkAction("REJECT")} className="rounded-lg bg-[#ef4444] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#dc2626]">
@@ -207,10 +207,10 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
           )}
 
           {/* Table */}
-          <div className="overflow-x-auto rounded-xl border border-[#1f2b1f]">
+          <div className="overflow-x-auto rounded-xl border border-[var(--md-sys-color-outline)]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1f2b1f] bg-[#111811]">
+                <tr className="border-b border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)]">
                   <th className="px-3 py-3 text-left">
                     <input
                       type="checkbox"
@@ -218,23 +218,23 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
                         if (e.target.checked) setSelectedSubs(new Set(filteredSubmissions.map((s) => s.id)));
                         else setSelectedSubs(new Set());
                       }}
-                      className="accent-[#22c55e]"
+                      className="accent-[var(--md-sys-color-primary)]"
                     />
                   </th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Locality</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">BHK</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Rent</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Trust</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Type</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Source</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Date</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Actions</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Locality</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">BHK</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Rent</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Trust</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Type</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Source</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Date</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSubmissions.length > 0 ? (
                   filteredSubmissions.slice(0, 50).map((sub) => (
-                    <tr key={sub.id} className="border-b border-[#1f2b1f] hover:bg-[#1a221a] transition-colors">
+                    <tr key={sub.id} className="border-b border-[var(--md-sys-color-outline)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors">
                       <td className="px-3 py-3">
                         <input
                           type="checkbox"
@@ -245,34 +245,34 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
                             else next.add(sub.id);
                             setSelectedSubs(next);
                           }}
-                          className="accent-[#22c55e]"
+                          className="accent-[var(--md-sys-color-primary)]"
                         />
                       </td>
-                      <td className="px-3 py-3 text-[#f0fdf4]">{sub.localitySlug}</td>
-                      <td className="px-3 py-3 font-mono text-[#f0fdf4]">{sub.bhk}</td>
-                      <td className="px-3 py-3 font-mono text-[#22c55e]">₹{sub.rentAmount.toLocaleString()}</td>
+                      <td className="px-3 py-3 text-[var(--md-sys-color-on-surface)]">{sub.localitySlug}</td>
+                      <td className="px-3 py-3 font-mono text-[var(--md-sys-color-on-surface)]">{sub.bhk}</td>
+                      <td className="px-3 py-3 font-mono text-[var(--md-sys-color-primary)]">₹{sub.rentAmount.toLocaleString()}</td>
                       <td className="px-3 py-3">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          sub.trustScore >= 70 ? "bg-[#22c55e] text-[#0a0f0a]" : sub.trustScore >= 40 ? "bg-[#eab308] text-[#0a0f0a]" : "bg-[#ef4444] text-white"
+                          sub.trustScore >= 70 ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" : sub.trustScore >= 40 ? "bg-[var(--md-sys-color-tertiary)] text-[var(--md-sys-color-on-primary)]" : "bg-[#ef4444] text-white"
                         }`}>
                           {sub.trustScore}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-[#86efac]">{sub.rentType}</td>
-                      <td className="px-3 py-3 text-[#4b7a4b]">{sub.sourceType}</td>
-                      <td className="px-3 py-3 text-[#4b7a4b]">{timeAgo(sub.submittedAt)}</td>
+                      <td className="px-3 py-3 text-[var(--md-sys-color-on-surface-variant)]">{sub.rentType}</td>
+                      <td className="px-3 py-3 text-[var(--md-sys-color-on-surface-variant)]">{sub.sourceType}</td>
+                      <td className="px-3 py-3 text-[var(--md-sys-color-on-surface-variant)]">{timeAgo(sub.submittedAt)}</td>
                       <td className="px-3 py-3">
                         <div className="flex gap-1">
-                          <button className="rounded p-1 text-[#22c55e] hover:bg-[#1a221a]" title="Approve"><Check className="size-3.5" /></button>
-                          <button className="rounded p-1 text-[#eab308] hover:bg-[#1a221a]" title="Flag"><Flag className="size-3.5" /></button>
-                          <button className="rounded p-1 text-[#ef4444] hover:bg-[#1a221a]" title="Reject"><Trash2 className="size-3.5" /></button>
+                          <button className="rounded p-1 text-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-surface-container-high)]" title="Approve"><Check className="size-3.5" /></button>
+                          <button className="rounded p-1 text-[#eab308] hover:bg-[var(--md-sys-color-surface-container-high)]" title="Flag"><Flag className="size-3.5" /></button>
+                          <button className="rounded p-1 text-[var(--md-sys-color-error)] hover:bg-[var(--md-sys-color-surface-container-high)]" title="Reject"><Trash2 className="size-3.5" /></button>
                         </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={9} className="px-3 py-12 text-center text-[#4b7a4b]">No submissions found.</td>
+                    <td colSpan={9} className="px-3 py-12 text-center text-[var(--md-sys-color-on-surface-variant)]">No submissions found.</td>
                   </tr>
                 )}
               </tbody>
@@ -285,37 +285,37 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
       {tab === "localities" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-[#4b7a4b]">{localities.length} localities</p>
-            <button className="flex items-center gap-1 rounded-lg border border-[#2d3f2d] px-3 py-1.5 text-sm text-[#86efac] hover:bg-[#1a221a] transition-colors">
+            <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">{localities.length} localities</p>
+            <button className="flex items-center gap-1 rounded-lg border border-[var(--md-sys-color-outline)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors">
               <RefreshCw className="size-3.5" />
               Recalculate all
             </button>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-[#1f2b1f]">
+          <div className="overflow-x-auto rounded-xl border border-[var(--md-sys-color-outline)]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#1f2b1f] bg-[#111811]">
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Locality</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Submissions</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Scraped</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Confidence</th>
-                  <th className="px-3 py-3 text-left font-medium text-[#4b7a4b]">Last updated</th>
+                <tr className="border-b border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)]">
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Locality</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Submissions</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Scraped</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Confidence</th>
+                  <th className="px-3 py-3 text-left font-medium text-[var(--md-sys-color-on-surface-variant)]">Last updated</th>
                 </tr>
               </thead>
               <tbody>
                 {localities.map((loc) => (
-                  <tr key={loc.id} className="border-b border-[#1f2b1f] hover:bg-[#1a221a] transition-colors">
-                    <td className="px-3 py-3 font-medium text-[#f0fdf4]">{loc.name}</td>
-                    <td className="px-3 py-3 font-mono text-[#f0fdf4]">{loc.submissionCount}</td>
-                    <td className="px-3 py-3 text-[#4b7a4b]">{loc.scrapedCount}</td>
+                  <tr key={loc.id} className="border-b border-[var(--md-sys-color-outline)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors">
+                    <td className="px-3 py-3 font-medium text-[var(--md-sys-color-on-surface)]">{loc.name}</td>
+                    <td className="px-3 py-3 font-mono text-[var(--md-sys-color-on-surface)]">{loc.submissionCount}</td>
+                    <td className="px-3 py-3 text-[var(--md-sys-color-on-surface-variant)]">{loc.scrapedCount}</td>
                     <td className="px-3 py-3">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        loc.confidenceScore >= 70 ? "bg-[#22c55e] text-[#0a0f0a]" : loc.confidenceScore >= 40 ? "bg-[#eab308] text-[#0a0f0a]" : "bg-[#ef4444] text-white"
+                        loc.confidenceScore >= 70 ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" : loc.confidenceScore >= 40 ? "bg-[var(--md-sys-color-tertiary)] text-[var(--md-sys-color-on-primary)]" : "bg-[#ef4444] text-white"
                       }`}>
                         {loc.confidenceScore}/100
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-[#4b7a4b]">{loc.lastUpdated ? timeAgo(loc.lastUpdated) : "—"}</td>
+                    <td className="px-3 py-3 text-[var(--md-sys-color-on-surface-variant)]">{loc.lastUpdated ? timeAgo(loc.lastUpdated) : "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -327,14 +327,14 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
       {/* SCRAPER TAB */}
       {tab === "scraper" && (
         <div className="space-y-6">
-          <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-6">
-            <h2 className="text-lg font-semibold text-[#f0fdf4]">Scraper Management</h2>
-            <p className="mt-1 text-sm text-[#4b7a4b]">Generate seed listings for all localities.</p>
+          <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-6">
+            <h2 className="text-lg font-semibold text-[var(--md-sys-color-on-surface)]">Scraper Management</h2>
+            <p className="mt-1 text-sm text-[var(--md-sys-color-on-surface-variant)]">Generate seed listings for all localities.</p>
 
             <button
               onClick={handleRunScraper}
               disabled={scraperRunning}
-              className="mt-4 flex items-center gap-2 rounded-lg bg-[#22c55e] px-5 py-2.5 text-sm font-medium text-[#0a0f0a] hover:bg-[#16a34a] transition-colors disabled:opacity-50"
+              className="mt-4 flex items-center gap-2 rounded-lg bg-[var(--md-sys-color-primary)] px-5 py-2.5 text-sm font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-colors disabled:opacity-50"
             >
               {scraperRunning ? (
                 <>
@@ -350,23 +350,23 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
             </button>
 
             {scraperResult && (
-              <div className="mt-4 rounded-lg border border-[#22c55e]/30 bg-[#1a221a] p-3 text-sm text-[#86efac]">
+              <div className="mt-4 rounded-lg border border-[#22c55e]/30 bg-[var(--md-sys-color-surface-container-high)] p-3 text-sm text-[var(--md-sys-color-on-surface-variant)]">
                 {scraperResult}
               </div>
             )}
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border border-[#1f2b1f] bg-[#0a0f0a] p-4">
-                <p className="text-sm text-[#4b7a4b]">Total scraped</p>
-                <p className="mt-1 font-mono text-xl font-bold text-[#f0fdf4]">{localities.reduce((a, l) => a + l.scrapedCount, 0)}</p>
+              <div className="rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] p-4">
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Total scraped</p>
+                <p className="mt-1 font-mono text-xl font-bold text-[var(--md-sys-color-on-surface)]">{localities.reduce((a, l) => a + l.scrapedCount, 0)}</p>
               </div>
-              <div className="rounded-lg border border-[#1f2b1f] bg-[#0a0f0a] p-4">
-                <p className="text-sm text-[#4b7a4b]">Localities covered</p>
-                <p className="mt-1 font-mono text-xl font-bold text-[#f0fdf4]">{localities.filter((l) => l.scrapedCount > 0).length}</p>
+              <div className="rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] p-4">
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Localities covered</p>
+                <p className="mt-1 font-mono text-xl font-bold text-[var(--md-sys-color-on-surface)]">{localities.filter((l) => l.scrapedCount > 0).length}</p>
               </div>
-              <div className="rounded-lg border border-[#1f2b1f] bg-[#0a0f0a] p-4">
-                <p className="text-sm text-[#4b7a4b]">Last scrape</p>
-                <p className="mt-1 font-mono text-xl font-bold text-[#f0fdf4]">—</p>
+              <div className="rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] p-4">
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Last scrape</p>
+                <p className="mt-1 font-mono text-xl font-bold text-[var(--md-sys-color-on-surface)]">—</p>
               </div>
             </div>
           </div>
@@ -376,35 +376,35 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
       {/* SETTINGS TAB */}
       {tab === "settings" && (
         <div className="space-y-4">
-          <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-5">
+          <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#f0fdf4]">Show scraped data disclaimer</p>
-                <p className="text-sm text-[#4b7a4b]">Display disclaimer on locality pages about scraped listing data.</p>
+                <p className="font-medium text-[var(--md-sys-color-on-surface)]">Show scraped data disclaimer</p>
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Display disclaimer on locality pages about scraped listing data.</p>
               </div>
-              <div className="h-6 w-11 rounded-full bg-[#22c55e] p-0.5 transition-colors">
+              <div className="h-6 w-11 rounded-full bg-[var(--md-sys-color-primary)] p-0.5 transition-colors">
                 <div className="h-5 w-5 rounded-full bg-white shadow-sm ml-auto" />
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-5">
+          <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#f0fdf4]">Min submissions to show on homepage</p>
-                <p className="text-sm text-[#4b7a4b]">Current: 1</p>
+                <p className="font-medium text-[var(--md-sys-color-on-surface)]">Min submissions to show on homepage</p>
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Current: 1</p>
               </div>
-              <input type="number" defaultValue={1} min={0} max={10} className="w-20 rounded-lg border border-[#2d3f2d] bg-[#0a0f0a] px-3 py-1.5 text-sm text-[#f0fdf4] outline-none focus:border-[#22c55e]" />
+              <input type="number" defaultValue={1} min={0} max={10} className="w-20 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface)] outline-none focus:border-[#22c55e]" />
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-5">
+          <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#f0fdf4]">Admin email for notifications</p>
-                <p className="text-sm text-[#4b7a4b]">labusepc@gmail.com</p>
+                <p className="font-medium text-[var(--md-sys-color-on-surface)]">Admin email for notifications</p>
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">labusepc@gmail.com</p>
               </div>
-              <input type="email" defaultValue="labusepc@gmail.com" className="w-64 rounded-lg border border-[#2d3f2d] bg-[#0a0f0a] px-3 py-1.5 text-sm text-[#f0fdf4] outline-none focus:border-[#22c55e]" />
+              <input type="email" defaultValue="labusepc@gmail.com" className="w-64 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface)] outline-none focus:border-[#22c55e]" />
             </div>
           </div>
         </div>

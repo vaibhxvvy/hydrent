@@ -18,12 +18,12 @@ export default async function SubmitPage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       {status === "queued" && (
-        <div className="mb-6 rounded-lg border border-[#22c55e]/30 bg-[#1a221a] p-4 text-sm text-[#86efac]">
+        <div className="mb-6 rounded-lg border border-[var(--md-sys-color-primary)]/30 bg-[var(--md-sys-color-surface-container-high)] p-4 text-sm text-[var(--md-sys-color-on-surface-variant)]">
           Submission queued for trust scoring and community validation.
         </div>
       )}
       {status === "invalid" && (
-        <div className="mb-6 rounded-lg border border-[#eab308]/30 bg-[#1a221a] p-4 text-sm text-[#eab308]">
+        <div className="mb-6 rounded-lg border border-[var(--md-sys-color-tertiary)]/30 bg-[var(--md-sys-color-surface-container-high)] p-4 text-sm text-[var(--md-sys-color-tertiary)]">
           Some required fields were missing or outside expected ranges.
         </div>
       )}

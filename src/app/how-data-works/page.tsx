@@ -21,29 +21,29 @@ export default function HowDataWorksPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <div className="text-center">
-        <ShieldCheck className="mx-auto size-10 text-[#22c55e]" />
-        <h1 className="mt-4 text-3xl font-bold text-[#f0fdf4]">How HydRent data works</h1>
-        <p className="mt-3 max-w-2xl text-[#86efac]">
+        <ShieldCheck className="mx-auto size-10 text-[var(--md-sys-color-primary)]" />
+        <h1 className="mt-4 text-3xl font-bold text-[var(--md-sys-color-on-surface)]">How HydRent data works</h1>
+        <p className="mt-3 max-w-2xl text-[var(--md-sys-color-on-surface-variant)]">
           Open-source-inspired verification without a single truth gatekeeper.
         </p>
       </div>
 
       <div className="mt-10 grid gap-4 md:grid-cols-2">
         {sections.map((s) => (
-          <div key={s.title} className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-5">
+          <div key={s.title} className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-5">
             <div className="flex items-center gap-3">
-              <span className="flex size-9 items-center justify-center rounded-lg bg-[#1a221a]">
-                <s.icon className="size-4 text-[#22c55e]" />
+              <span className="flex size-9 items-center justify-center rounded-lg bg-[var(--md-sys-color-surface-container-high)]">
+                <s.icon className="size-4 text-[var(--md-sys-color-primary)]" />
               </span>
-              <h2 className="font-semibold text-[#f0fdf4]">{s.title}</h2>
+              <h2 className="font-semibold text-[var(--md-sys-color-on-surface)]">{s.title}</h2>
             </div>
-            <p className="mt-3 text-sm leading-6 text-[#86efac]">{s.text}</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--md-sys-color-on-surface-variant)]">{s.text}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-10 rounded-xl border border-[#22c55e]/30 bg-[#111811] p-6">
-        <h2 className="text-lg font-bold text-[#f0fdf4]">Weighting model</h2>
+      <div className="mt-10 rounded-xl border border-[var(--md-sys-color-primary)]/30 bg-[var(--elevation-level-1)] p-6">
+        <h2 className="text-lg font-bold text-[var(--md-sys-color-on-surface)]">Weighting model</h2>
         <div className="mt-4 space-y-3">
           {[
             ["Rent type", "Closed deal 40pts · Renewal 30pts · Asking 20pts"],
@@ -53,9 +53,9 @@ export default function HowDataWorksPage() {
             ["Recency", "+10 points if submitted within 30 days"],
             ["Broker cap", "Broker submissions capped at 30/100 max"],
           ].map(([label, value]) => (
-            <div key={label} className="flex items-center justify-between rounded-lg bg-[#1a221a] px-4 py-3 text-sm">
-              <span className="text-[#4b7a4b]">{label}</span>
-              <span className="text-[#f0fdf4]">{value}</span>
+            <div key={label} className="flex items-center justify-between rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-4 py-3 text-sm">
+              <span className="text-[var(--md-sys-color-on-surface-variant)]">{label}</span>
+              <span className="text-[var(--md-sys-color-on-surface)]">{value}</span>
             </div>
           ))}
         </div>

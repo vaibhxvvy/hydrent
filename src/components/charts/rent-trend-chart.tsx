@@ -19,8 +19,8 @@ export function RentTrendChart({ data }: { data: TrendPoint[] }) {
         <AreaChart data={data} margin={{ left: 0, right: 8, top: 10, bottom: 0 }}>
           <defs>
             <linearGradient id="rentBand" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3f8f79" stopOpacity={0.24} />
-              <stop offset="95%" stopColor="#3f8f79" stopOpacity={0.04} />
+              <stop offset="5%" stopColor="var(--md-sys-color-primary)" stopOpacity={0.24} />
+              <stop offset="95%" stopColor="var(--md-sys-color-primary)" stopOpacity={0.04} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

@@ -8,21 +8,11 @@ import { InteractiveMap } from "@/components/maps/interactive-map";
 import { Button } from "@/components/ui/button";
 
 interface MapLocality {
-  id: string;
-  name: string;
-  slug: string;
-  zone: string;
-  lat: number;
-  lng: number;
-  submissionCount: number;
-  confidenceScore: number;
-  median2BHK: number | null;
+  id: string; name: string; slug: string; zone: string;
+  lat: number; lng: number; submissionCount: number; confidenceScore: number; median2BHK: number | null;
   bhkBreakdown: Array<{ bhk: string; count: number; minRent: number; maxRent: number; medianRent: number | null }>;
   furnishingBreakdown: Array<{ furnishing: string; count: number }>;
-  avgTrustScore: number;
-  avgRent: number;
-  minRent: number;
-  maxRent: number;
+  avgTrustScore: number; avgRent: number; minRent: number; maxRent: number;
 }
 
 export function HomeClient({ children, mapLocalities }: {
@@ -30,7 +20,6 @@ export function HomeClient({ children, mapLocalities }: {
   mapLocalities: MapLocality[];
 }) {
   const [mapOpen, setMapOpen] = useState(false);
-
   const closeMap = useCallback(() => setMapOpen(false), []);
 
   return (
@@ -43,7 +32,6 @@ export function HomeClient({ children, mapLocalities }: {
         {children}
       </motion.div>
 
-      {/* Full-screen map overlay */}
       <AnimatePresence>
         {mapOpen && (
           <motion.div
@@ -52,20 +40,15 @@ export function HomeClient({ children, mapLocalities }: {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.2, 0, 0, 1] }}
-            className="fixed inset-0 z-[9999] bg-[#0a0f0a]"
+            className="fixed inset-0 z-[9999] bg-[var(--md-sys-color-background)]"
           >
             <div className="relative h-full w-full">
-              <InteractiveMap
-                localities={mapLocalities}
-                onClose={closeMap}
-                standalone={true}
-              />
+              <InteractiveMap localities={mapLocalities} onClose={closeMap} standalone />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Floating Explore CTA */}
       {mapLocalities.length > 0 && !mapOpen && (
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -75,9 +58,9 @@ export function HomeClient({ children, mapLocalities }: {
         >
           <Button
             onClick={() => setMapOpen(true)}
-            className="rounded-full bg-[#22c55e] text-[#0a0f0a] hover:bg-[#16a34a] px-6 py-3 font-semibold shadow-level-3 animate-pulse-glow"
+            className="shadow-level-3 animate-pulse-glow gap-2"
           >
-            <MapPin className="mr-2 size-4" />
+            <MapPin className="size-4" />
             Explore Hyderabad on map
           </Button>
         </motion.div>

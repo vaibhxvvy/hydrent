@@ -71,7 +71,7 @@ export function SearchBox({ autoFocus = false }: { autoFocus?: boolean }) {
   return (
     <div className="relative">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#4b7a4b]" aria-hidden="true" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--md-sys-color-on-surface-variant)]" aria-hidden="true" />
         <input
           ref={inputRef}
           autoFocus={autoFocus}
@@ -81,17 +81,17 @@ export function SearchBox({ autoFocus = false }: { autoFocus?: boolean }) {
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
           onKeyDown={handleKeyDown}
           placeholder="Search Kondapur, Gachibowli, Madhapur..."
-          className="h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] pl-10 pr-4 text-base text-[#f0fdf4] placeholder-[#4b7a4b] outline-none transition-all focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+          className="h-12 w-full rounded-[--radius-input] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-10 pr-4 text-base text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none transition-all focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(124,158,255,0.15)]"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="size-4 animate-spin rounded-full border-2 border-[#2d3f2d] border-t-[#22c55e]" />
+            <div className="size-4 animate-spin rounded-full border-2 border-[var(--md-sys-color-outline)] border-t-[var(--md-sys-color-primary)]" />
           </div>
         )}
       </div>
 
       {isOpen && query.length > 1 && (
-        <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-lg border border-[#1f2b1f] bg-[#111811] shadow-[0_4px_24px_rgba(34,197,94,0.08)]">
+        <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-[--radius-md] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] shadow-level-2">
           {results.length > 0 ? (
             <div className="max-h-80 overflow-auto p-1">
               {results.map((result, idx) => (
@@ -102,28 +102,28 @@ export function SearchBox({ autoFocus = false }: { autoFocus?: boolean }) {
                     setIsOpen(false);
                     setQuery("");
                   }}
-                  className={`flex w-full items-center gap-3 rounded-md px-3 py-3 text-sm text-left transition-colors ${
+                  className={`flex w-full items-center gap-3 rounded-[--radius-sm] px-3 py-3 text-sm text-left transition-colors ${
                     idx === selectedIndex
-                      ? "bg-[#1a221a] text-[#f0fdf4]"
-                      : "text-[#86efac] hover:bg-[#1a221a]"
+                      ? "bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)]"
+                      : "text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                   }`}
                 >
-                  <span className="flex size-8 items-center justify-center rounded-md bg-[#1a221a]">
+                  <span className="flex size-8 items-center justify-center rounded-[--radius-sm] bg-[var(--md-sys-color-surface-container-high)]">
                     {result.type === "building" ? (
-                      <Building2 className="size-4 text-[#4b7a4b]" />
+                      <Building2 className="size-4 text-[var(--md-sys-color-on-surface-variant)]" />
                     ) : (
-                      <MapPin className="size-4 text-[#22c55e]" />
+                      <MapPin className="size-4 text-[var(--md-sys-color-primary)]" />
                     )}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate font-medium text-[#f0fdf4]">{result.title}</span>
-                    <span className="block truncate text-[#4b7a4b]">{result.subtitle}</span>
+                    <span className="block truncate font-medium text-[var(--md-sys-color-on-surface)]">{result.title}</span>
+                    <span className="block truncate text-[var(--md-sys-color-on-surface-variant)]">{result.subtitle}</span>
                   </span>
                 </button>
               ))}
             </div>
           ) : (
-            <div className="px-4 py-5 text-sm text-[#4b7a4b]">
+            <div className="px-4 py-5 text-sm text-[var(--md-sys-color-on-surface-variant)]">
               No indexed match yet. HydRent can still accept a rent submission for this place.
             </div>
           )}

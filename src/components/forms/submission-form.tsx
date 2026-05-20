@@ -105,20 +105,20 @@ export function SubmissionForm() {
   if (submitted) {
     return (
       <div className="mx-auto max-w-lg py-12 text-center">
-        <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-[#22c55e]/20">
-          <svg className="size-10 text-[#22c55e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)]/20">
+          <svg className="size-10 text-[var(--md-sys-color-primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline className="animate-checkmark" points="20 6 9 17 4 12" />
           </svg>
         </div>
-        <h2 className="mt-6 text-2xl font-bold text-[#f0fdf4]">Submitted anonymously ✓</h2>
-        <div className="mt-6 rounded-xl border border-[#1f2b1f] bg-[#111811] p-6">
-          <p className="text-sm text-[#4b7a4b]">Your trust score</p>
-          <p className="mt-1 font-mono text-4xl font-bold text-[#22c55e]">{trustScore}/100</p>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#1f2b1f]">
-            <div className="h-full rounded-full bg-[#22c55e] transition-all" style={{ width: `${trustScore}%` }} />
+        <h2 className="mt-6 text-2xl font-bold text-[var(--md-sys-color-on-surface)]">Submitted anonymously ✓</h2>
+        <div className="mt-6 rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-6">
+          <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Your trust score</p>
+          <p className="mt-1 font-mono text-4xl font-bold text-[var(--md-sys-color-primary)]">{trustScore}/100</p>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--md-sys-color-outline)]">
+            <div className="h-full rounded-full bg-[var(--md-sys-color-primary)] transition-all" style={{ width: `${trustScore}%` }} />
           </div>
           {locality && rentAmount > 0 && (
-            <p className="mt-4 text-sm text-[#86efac]">
+            <p className="mt-4 text-sm text-[var(--md-sys-color-on-surface-variant)]">
               {locality} median: ~{formatINR(rentAmount)} · Your rent: {formatINR(rentAmount)}
             </p>
           )}
@@ -129,13 +129,13 @@ export function SubmissionForm() {
               const text = `I just submitted my rent on HydRent! Check out ${locality} rent data.`;
               window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
             }}
-            className="rounded-full border border-[#2d3f2d] bg-[#1a221a] px-5 py-2 text-sm font-medium text-[#86efac] hover:bg-[#1f2b1f] transition-colors"
+            className="rounded-full border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-container-high)] px-5 py-2 text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
           >
             Share on WhatsApp
           </button>
           <a
             href={`/hyderabad/${locality}`}
-            className="rounded-full bg-[#22c55e] px-5 py-2 text-sm font-medium text-[#0a0f0a] hover:bg-[#16a34a] transition-colors"
+            className="rounded-full bg-[var(--md-sys-color-primary)] px-5 py-2 text-sm font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-colors"
           >
             Explore {locality} →
           </a>
@@ -152,15 +152,15 @@ export function SubmissionForm() {
           <div key={label} className="flex items-center gap-2">
             <div className={`flex size-8 items-center justify-center rounded-full text-sm font-medium transition-all ${
               idx < step
-                ? "bg-[#22c55e] text-[#0a0f0a]"
+                ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
                 : idx === step
-                  ? "border-2 border-[#22c55e] bg-[#22c55e]/20 text-[#22c55e]"
-                  : "border border-[#1f2b1f] text-[#4b7a4b]"
+                  ? "border-2 border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary)]/20 text-[var(--md-sys-color-primary)]"
+                  : "border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-on-surface-variant)]"
             }`}>
               {idx < step ? <Check className="size-4" /> : idx + 1}
             </div>
             {idx < STEPS.length - 1 && (
-              <div className={`h-0.5 w-8 transition-colors ${idx < step ? "bg-[#22c55e]" : "bg-[#1f2b1f]"}`} />
+              <div className={`h-0.5 w-8 transition-colors ${idx < step ? "bg-[var(--md-sys-color-primary)]" : "bg-[var(--md-sys-color-outline)]"}`} />
             )}
           </div>
         ))}
@@ -171,19 +171,19 @@ export function SubmissionForm() {
         {step === 0 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-[#f0fdf4]">Where&apos;s your flat?</h2>
-              <p className="mt-2 text-[#86efac]">Tap the map or search your locality</p>
+              <h2 className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">Where&apos;s your flat?</h2>
+              <p className="mt-2 text-[var(--md-sys-color-on-surface-variant)]">Tap the map or search your locality</p>
             </div>
             <div className="relative">
-              <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#4b7a4b]" />
+              <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--md-sys-color-on-surface-variant)]" />
               <select
                 value={locality}
                 onChange={(e) => setLocality(e.target.value)}
-                className="h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] pl-10 pr-4 text-[#f0fdf4] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)] appearance-none"
+                className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-10 pr-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)] appearance-none"
               >
-                <option value="" className="bg-[#111811]">Select your locality</option>
+                <option value="" className="bg-[var(--elevation-level-1)]">Select your locality</option>
                 {localities.map((l) => (
-                  <option key={l.slug} value={l.slug} className="bg-[#111811]">{l.name}</option>
+                  <option key={l.slug} value={l.slug} className="bg-[var(--elevation-level-1)]">{l.name}</option>
                 ))}
               </select>
             </div>
@@ -191,7 +191,7 @@ export function SubmissionForm() {
               value={microLocality}
               onChange={(e) => setMicroLocality(e.target.value)}
               placeholder="Micro-locality / building name (optional)"
-              className="h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+              className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
             />
           </div>
         )}
@@ -200,13 +200,13 @@ export function SubmissionForm() {
         {step === 1 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-[#f0fdf4]">About the flat</h2>
-              <p className="mt-2 text-[#86efac]">Tell us about your rental</p>
+              <h2 className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">About the flat</h2>
+              <p className="mt-2 text-[var(--md-sys-color-on-surface-variant)]">Tell us about your rental</p>
             </div>
 
             {/* BHK selection */}
             <div>
-              <p className="mb-3 text-sm font-medium text-[#f0fdf4]">BHK</p>
+              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">BHK</p>
               <div className="flex gap-2">
                 {BHK_OPTIONS.map((opt) => (
                   <button
@@ -214,8 +214,8 @@ export function SubmissionForm() {
                     onClick={() => setBhk(opt === "5+" ? "4BHK" : opt)}
                     className={`flex-1 rounded-lg py-3 text-sm font-medium transition-all ${
                       bhk === (opt === "5+" ? "4BHK" : opt)
-                        ? "bg-[#22c55e] text-[#0a0f0a]"
-                        : "border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a]"
+                        ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                        : "border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                     }`}
                   >
                     {opt}
@@ -226,28 +226,28 @@ export function SubmissionForm() {
 
             {/* Rent input */}
             <div>
-              <p className="mb-3 text-sm font-medium text-[#f0fdf4]">Monthly rent</p>
+              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Monthly rent</p>
               <div className="relative">
-                <IndianRupee className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[#22c55e]" />
+                <IndianRupee className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[var(--md-sys-color-primary)]" />
                 <input
                   type="number"
                   value={rentAmount}
                   onChange={(e) => setRentAmount(Number(e.target.value))}
-                  className="h-14 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] pl-12 pr-4 font-mono text-2xl font-bold text-[#f0fdf4] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="h-14 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-12 pr-4 font-mono text-2xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               </div>
             </div>
 
             {/* Maintenance toggle */}
             <div>
-              <p className="mb-3 text-sm font-medium text-[#f0fdf4]">Maintenance</p>
+              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Maintenance</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setMaintenanceIncluded(true)}
                   className={`rounded-lg px-5 py-2.5 text-sm font-medium transition-all ${
                     maintenanceIncluded
-                      ? "bg-[#22c55e] text-[#0a0f0a]"
-                      : "border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a]"
+                      ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                      : "border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                   }`}
                 >
                   Included ✓
@@ -256,8 +256,8 @@ export function SubmissionForm() {
                   onClick={() => setMaintenanceIncluded(false)}
                   className={`rounded-lg px-5 py-2.5 text-sm font-medium transition-all ${
                     !maintenanceIncluded
-                      ? "bg-[#22c55e] text-[#0a0f0a]"
-                      : "border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a]"
+                      ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                      : "border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                   }`}
                 >
                   Not included
@@ -269,14 +269,14 @@ export function SubmissionForm() {
                   value={maintenanceAmount}
                   onChange={(e) => setMaintenanceAmount(Number(e.target.value))}
                   placeholder="Maintenance amount"
-                  className="mt-3 h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 font-mono text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="mt-3 h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               )}
             </div>
 
             {/* Furnishing */}
             <div>
-              <p className="mb-3 text-sm font-medium text-[#f0fdf4]">Furnishing</p>
+              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Furnishing</p>
               <div className="flex gap-2">
                 {FURNISHING_OPTIONS.map((opt) => {
                   const label = opt === "FULLY_FURNISHED" ? "Furnished" : opt === "SEMI_FURNISHED" ? "Semi" : "Unfurnished";
@@ -286,8 +286,8 @@ export function SubmissionForm() {
                       onClick={() => setFurnishing(opt)}
                       className={`flex-1 rounded-lg py-3 text-sm font-medium transition-all ${
                         furnishing === opt
-                          ? "bg-[#22c55e] text-[#0a0f0a]"
-                          : "border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a]"
+                          ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                          : "border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                       }`}
                     >
                       {label}
@@ -300,29 +300,29 @@ export function SubmissionForm() {
             {/* Other fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="mb-2 text-sm font-medium text-[#f0fdf4]">Security deposit</p>
+                <p className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Security deposit</p>
                 <input
                   type="number"
                   value={securityDeposit}
                   onChange={(e) => setSecurityDeposit(Number(e.target.value))}
-                  className="h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 font-mono text-[#f0fdf4] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium text-[#f0fdf4]">Move-in date</p>
+                <p className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Move-in date</p>
                 <input
                   type="date"
                   value={moveInDate}
                   onChange={(e) => setMoveInDate(e.target.value)}
-                  className="h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 text-[#f0fdf4] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               </div>
             </div>
 
             {/* Effective cost */}
-            <div className="rounded-lg border border-[#22c55e]/30 bg-[#1a221a] p-4">
-              <p className="text-sm text-[#4b7a4b]">Effective monthly cost</p>
-              <p className="mt-1 font-mono text-2xl font-bold text-[#22c55e]">{formatINR(effective)}</p>
+            <div className="rounded-lg border border-[var(--md-sys-color-primary)]/30 bg-[var(--md-sys-color-surface-container-high)] p-4">
+              <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Effective monthly cost</p>
+              <p className="mt-1 font-mono text-2xl font-bold text-[var(--md-sys-color-primary)]">{formatINR(effective)}</p>
             </div>
           </div>
         )}
@@ -331,24 +331,24 @@ export function SubmissionForm() {
         {step === 2 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-[#f0fdf4]">Boost your trust score</h2>
-              <p className="mt-2 text-[#86efac]">Optional. Each one increases how much weight your submission gets.</p>
+              <h2 className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">Boost your trust score</h2>
+              <p className="mt-2 text-[var(--md-sys-color-on-surface-variant)]">Optional. Each one increases how much weight your submission gets.</p>
             </div>
 
             {/* Trust score preview */}
-            <div className="rounded-lg border border-[#1f2b1f] bg-[#111811] p-4">
+            <div className="rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-[#4b7a4b]">Current trust score</p>
-                <p className="font-mono text-lg font-bold text-[#22c55e]">{trustScore}/100</p>
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Current trust score</p>
+                <p className="font-mono text-lg font-bold text-[var(--md-sys-color-primary)]">{trustScore}/100</p>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#1f2b1f]">
-                <div className="h-full rounded-full bg-[#22c55e] transition-all" style={{ width: `${trustScore}%` }} />
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--md-sys-color-outline)]">
+                <div className="h-full rounded-full bg-[var(--md-sys-color-primary)] transition-all" style={{ width: `${trustScore}%` }} />
               </div>
             </div>
 
             {/* Who are you */}
             <div>
-              <p className="mb-3 text-sm font-medium text-[#f0fdf4]">Who are you?</p>
+              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Who are you?</p>
               <div className="flex gap-2">
                 {SUBMITTER_OPTIONS.map((opt) => (
                   <button
@@ -356,11 +356,11 @@ export function SubmissionForm() {
                     onClick={() => setSubmitterType(opt.value)}
                     className={`flex-1 rounded-lg py-3 text-sm font-medium transition-all ${
                       submitterType === opt.value
-                        ? "bg-[#22c55e] text-[#0a0f0a]"
-                        : "border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a]"
+                        ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                        : "border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                     }`}
                   >
-                    {opt.label}<br /><span className={`text-xs ${submitterType === opt.value ? "text-[#0a0f0a]/70" : "text-[#4b7a4b]"}`}>+{opt.points}pts</span>
+                    {opt.label}<br /><span className={`text-xs ${submitterType === opt.value ? "text-[var(--md-sys-color-on-primary)]/70" : "text-[var(--md-sys-color-on-surface-variant)]"}`}>+{opt.points}pts</span>
                   </button>
                 ))}
               </div>
@@ -368,7 +368,7 @@ export function SubmissionForm() {
 
             {/* Rent type */}
             <div>
-              <p className="mb-3 text-sm font-medium text-[#f0fdf4]">Rent type</p>
+              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Rent type</p>
               <div className="flex gap-2">
                 {RENT_TYPE_OPTIONS.map((opt) => (
                   <button
@@ -376,11 +376,11 @@ export function SubmissionForm() {
                     onClick={() => setRentType(opt.value)}
                     className={`flex-1 rounded-lg py-3 text-sm font-medium transition-all ${
                       rentType === opt.value
-                        ? "bg-[#22c55e] text-[#0a0f0a]"
-                        : "border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a]"
+                        ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                        : "border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                     }`}
                   >
-                    {opt.label}<br /><span className={`text-xs ${rentType === opt.value ? "text-[#0a0f0a]/70" : "text-[#4b7a4b]"}`}>+{opt.points}pts</span>
+                    {opt.label}<br /><span className={`text-xs ${rentType === opt.value ? "text-[var(--md-sys-color-on-primary)]/70" : "text-[var(--md-sys-color-on-surface-variant)]"}`}>+{opt.points}pts</span>
                   </button>
                 ))}
               </div>
@@ -388,13 +388,13 @@ export function SubmissionForm() {
 
             {/* Email */}
             <div>
-              <p className="mb-2 text-sm font-medium text-[#f0fdf4]">Email (optional)</p>
+              <p className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Email (optional)</p>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Never shown publicly"
-                className="h-12 w-full rounded-lg border border-[#2d3f2d] bg-[#111811] px-4 text-[#f0fdf4] placeholder-[#4b7a4b] outline-none focus:border-[#22c55e] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
               />
             </div>
           </div>
@@ -403,31 +403,31 @@ export function SubmissionForm() {
         {/* Step 4: Confirmation */}
         {step === 3 && (
           <div className="space-y-6 text-center">
-            <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[#22c55e]/20">
-              <Check className="size-8 text-[#22c55e]" />
+            <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)]/20">
+              <Check className="size-8 text-[var(--md-sys-color-primary)]" />
             </div>
-            <h2 className="text-2xl font-bold text-[#f0fdf4]">Ready to submit?</h2>
-            <div className="rounded-xl border border-[#1f2b1f] bg-[#111811] p-6 text-left">
+            <h2 className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">Ready to submit?</h2>
+            <div className="rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-6 text-left">
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#4b7a4b]">Locality</span>
-                  <span className="text-[#f0fdf4]">{locality}</span>
+                  <span className="text-[var(--md-sys-color-on-surface-variant)]">Locality</span>
+                  <span className="text-[var(--md-sys-color-on-surface)]">{locality}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#4b7a4b]">BHK</span>
-                  <span className="text-[#f0fdf4]">{bhk}</span>
+                  <span className="text-[var(--md-sys-color-on-surface-variant)]">BHK</span>
+                  <span className="text-[var(--md-sys-color-on-surface)]">{bhk}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#4b7a4b]">Effective rent</span>
-                  <span className="font-mono text-[#f0fdf4]">{formatINR(effective)}</span>
+                  <span className="text-[var(--md-sys-color-on-surface-variant)]">Effective rent</span>
+                  <span className="font-mono text-[var(--md-sys-color-on-surface)]">{formatINR(effective)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#4b7a4b]">Rent type</span>
-                  <span className="text-[#f0fdf4]">{RENT_TYPE_OPTIONS.find((r) => r.value === rentType)?.label}</span>
+                  <span className="text-[var(--md-sys-color-on-surface-variant)]">Rent type</span>
+                  <span className="text-[var(--md-sys-color-on-surface)]">{RENT_TYPE_OPTIONS.find((r) => r.value === rentType)?.label}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#4b7a4b]">Trust score</span>
-                  <span className="font-mono text-[#22c55e]">{trustScore}/100</span>
+                  <span className="text-[var(--md-sys-color-on-surface-variant)]">Trust score</span>
+                  <span className="font-mono text-[var(--md-sys-color-primary)]">{trustScore}/100</span>
                 </div>
               </div>
             </div>
@@ -441,7 +441,7 @@ export function SubmissionForm() {
           {step > 0 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="flex items-center gap-2 rounded-lg border border-[#2d3f2d] px-5 py-2.5 text-sm font-medium text-[#86efac] hover:bg-[#1a221a] transition-colors"
+              className="flex items-center gap-2 rounded-lg border border-[var(--md-sys-color-outline)] px-5 py-2.5 text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
             >
               <ArrowLeft className="size-4" />
               Back
@@ -452,7 +452,7 @@ export function SubmissionForm() {
           <button
             onClick={() => setStep(step + 1)}
             disabled={!canProceed}
-            className="flex items-center gap-2 rounded-lg bg-[#22c55e] px-6 py-2.5 text-sm font-medium text-[#0a0f0a] hover:bg-[#16a34a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-lg bg-[var(--md-sys-color-primary)] px-6 py-2.5 text-sm font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Next
             <ArrowRight className="size-4" />
@@ -460,7 +460,7 @@ export function SubmissionForm() {
         ) : (
           <button
             onClick={handleSubmit}
-            className="flex items-center gap-2 rounded-lg bg-[#22c55e] px-6 py-2.5 text-sm font-medium text-[#0a0f0a] hover:bg-[#16a34a] transition-colors"
+            className="flex items-center gap-2 rounded-lg bg-[var(--md-sys-color-primary)] px-6 py-2.5 text-sm font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-colors"
           >
             Submit rent
             <Check className="size-4" />

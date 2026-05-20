@@ -42,14 +42,14 @@ export function StatsBar({ initial }: { initial: StatsData }) {
   }, []);
 
   return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-sm">
-      <span className="text-[#f0fdf4]">{formatNumber(stats.totalSubmissions)} rents verified</span>
-      <span className="text-[#22c55e]">·</span>
-      <span className="text-[#f0fdf4]">{stats.localitiesWithData} localities</span>
-      <span className="text-[#22c55e]">·</span>
-      <span className="text-[#f0fdf4]">{stats.closedRentPercentage}% closed deals</span>
-      <span className="text-[#22c55e]">·</span>
-      <span className="text-[#4b7a4b]">Updated {timeAgo(stats.lastUpdated)}</span>
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs">
+      <span className="text-[var(--md-sys-color-on-surface)]">{formatNumber(stats.totalSubmissions)} rents verified</span>
+      <span className="text-[var(--md-sys-color-primary)]">·</span>
+      <span className="text-[var(--md-sys-color-on-surface)]">{stats.localitiesWithData} localities</span>
+      <span className="text-[var(--md-sys-color-primary)]">·</span>
+      <span className="text-[var(--md-sys-color-on-surface)]">{stats.closedRentPercentage}% closed deals</span>
+      <span className="text-[var(--md-sys-color-primary)]">·</span>
+      <span className="text-[var(--md-sys-color-on-surface-variant)]">Updated {timeAgo(stats.lastUpdated)}</span>
     </div>
   );
 }

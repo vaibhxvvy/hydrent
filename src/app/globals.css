@@ -5,61 +5,100 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-background: #0a0f0a;
-  --color-foreground: #f0fdf4;
-  --color-surface: #111811;
-  --color-surface-elevated: #1a221a;
-  --color-surface-container: #0d140d;
-  --color-surface-container-high: #1a221a;
-  --color-surface-container-highest: #222d22;
-  --color-card: #111811;
-  --color-card-foreground: #f0fdf4;
-  --color-popover: #1a221a;
-  --color-popover-foreground: #f0fdf4;
-  --color-primary: #22c55e;
-  --color-primary-foreground: #0a0f0a;
-  --color-primary-dim: #16a34a;
-  --color-primary-container: #1a3a1a;
-  --color-on-primary-container: #4ade80;
-  --color-secondary: #1f2b1f;
-  --color-secondary-foreground: #86efac;
-  --color-muted: #1f2b1f;
-  --color-muted-foreground: #4b7a4b;
-  --color-accent: #4ade80;
-  --color-accent-foreground: #0a0f0a;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #f0fdf4;
-  --color-warning: #eab308;
-  --color-border: #1f2b1f;
-  --color-border-bright: #2d3f2d;
-  --color-input: #1f2b1f;
-  --color-ring: #22c55e;
-  --color-verified: #22c55e;
-  --color-unverified: #6b7280;
-  --color-trust-high: #22c55e;
-  --color-trust-medium: #eab308;
-  --color-trust-low: #ef4444;
+  /* Material 3 Dark Scheme */
+  --md-sys-color-primary: #7C9EFF;
+  --md-sys-color-on-primary: #003A75;
+  --md-sys-color-primary-container: #00458D;
+  --md-sys-color-on-primary-container: #D8E2FF;
 
-  --radius: 0.5rem;
-  --radius-sm: calc(var(--radius) * 0.75);
+  --md-sys-color-secondary: #22C55E;
+  --md-sys-color-on-secondary: #003916;
+  --md-sys-color-secondary-container: #00522A;
+  --md-sys-color-on-secondary-container: #A1F9B5;
+
+  --md-sys-color-tertiary: #F59E0B;
+  --md-sys-color-on-tertiary: #412D00;
+  --md-sys-color-tertiary-container: #5E4200;
+  --md-sys-color-on-tertiary-container: #FFDEA1;
+
+  --md-sys-color-error: #FFB4AB;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000A;
+  --md-sys-color-on-error-container: #FFDAD6;
+
+  --md-sys-color-background: #0B0F14;
+  --md-sys-color-on-background: #E2E2E9;
+  --md-sys-color-surface: #121821;
+  --md-sys-color-on-surface: #E2E2E9;
+  --md-sys-color-surface-dim: #0B0F14;
+  --md-sys-color-surface-bright: #323842;
+  --md-sys-color-surface-container-lowest: #060A0F;
+  --md-sys-color-surface-container-low: #0F131C;
+  --md-sys-color-surface-container: #131721;
+  --md-sys-color-surface-container-high: #1E222C;
+  --md-sys-color-surface-container-highest: #292D37;
+
+  --md-sys-color-on-surface-variant: #C2C6D0;
+  --md-sys-color-outline: rgba(255, 255, 255, 0.08);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.12);
+
+  /* Tailwind semantic aliases */
+  --color-background: var(--md-sys-color-background);
+  --color-foreground: var(--md-sys-color-on-background);
+  --color-surface: var(--md-sys-color-surface);
+  --color-surface-container: var(--md-sys-color-surface-container);
+  --color-surface-container-high: var(--md-sys-color-surface-container-high);
+  --color-surface-container-highest: var(--md-sys-color-surface-container-highest);
+  --color-primary: var(--md-sys-color-primary);
+  --color-primary-foreground: var(--md-sys-color-on-primary);
+  --color-primary-container: var(--md-sys-color-primary-container);
+  --color-on-primary-container: var(--md-sys-color-on-primary-container);
+  --color-secondary: #22C55E;
+  --color-secondary-foreground: var(--md-sys-color-on-secondary);
+  --color-tertiary: var(--md-sys-color-tertiary);
+  --color-muted: var(--md-sys-color-surface-container-high);
+  --color-muted-foreground: var(--md-sys-color-on-surface-variant);
+  --color-accent: var(--md-sys-color-primary);
+  --color-accent-foreground: var(--md-sys-color-on-primary);
+  --color-destructive: var(--md-sys-color-error);
+  --color-destructive-foreground: var(--md-sys-color-on-error);
+  --color-warning: var(--md-sys-color-tertiary);
+  --color-border: var(--md-sys-color-outline);
+  --color-border-bright: var(--md-sys-color-outline-variant);
+  --color-input: var(--md-sys-color-surface-container-high);
+  --color-ring: var(--md-sys-color-primary);
+  --color-card: var(--md-sys-color-surface);
+  --color-card-foreground: var(--md-sys-color-on-surface);
+  --color-popover: var(--md-sys-color-surface-container-high);
+  --color-popover-foreground: var(--md-sys-color-on-surface);
+  --color-verified: #22C55E;
+  --color-trust-high: #22C55E;
+  --color-trust-medium: #F59E0B;
+  --color-trust-low: var(--md-sys-color-error);
+
+  /* M3 Shape tokens */
+  --radius: 0.75rem;
+  --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: var(--radius);
-  --radius-lg: var(--radius);
-  --radius-xl: var(--radius);
-  --radius-card: 12px;
-  --radius-button: 8px;
+  --radius-lg: calc(var(--radius) * 1.25);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-card: 16px;
+  --radius-button: 20px;
   --radius-pill: 999px;
-  --radius-input: 8px;
+  --radius-input: 12px;
 
-  --shadow-card: 0 1px 3px rgba(34, 197, 94, 0.05);
-  --shadow-elevated: 0 4px 24px rgba(34, 197, 94, 0.08);
-  --shadow-glow: 0 0 40px rgba(34, 197, 94, 0.12);
+  /* M3 Elevation via color ONLY — no shadows for elevation layers */
+  --elevation-level-0: var(--md-sys-color-surface-dim);
+  --elevation-level-1: var(--md-sys-color-surface-container-low);
+  --elevation-level-2: var(--md-sys-color-surface-container);
+  --elevation-level-3: var(--md-sys-color-surface-container-high);
+  --elevation-level-4: var(--md-sys-color-surface-container-highest);
+  --elevation-level-5: #323842;
 
-  /* M3 Elevation */
-  --shadow-level-1: 0 1px 3px 1px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-level-2: 0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-level-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-  --shadow-level-4: 0 6px 10px 4px rgba(0, 0, 0, 0.15), 0 2px 3px 0 rgba(0, 0, 0, 0.3);
-  --shadow-level-5: 0 8px 12px 6px rgba(0, 0, 0, 0.15), 0 4px 4px 0 rgba(0, 0, 0, 0.3);
+  /* Shadows (minimal, for depth accents only) */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 30px rgba(124, 158, 255, 0.08);
 
   /* Motion tokens */
   --motion-duration-short: 150ms;
@@ -70,101 +109,37 @@
   --motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15);
 }
 
-* {
-  border-color: var(--color-border);
-}
+* { border-color: var(--md-sys-color-outline); }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   min-height: 100vh;
-  background: var(--color-background);
-  color: var(--color-foreground);
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-::selection {
-  background: rgba(34, 197, 94, 0.3);
-  color: #f0fdf4;
-}
+::selection { background: rgba(124, 158, 255, 0.3); color: #E2E2E9; }
 
-.leaflet-container {
-  min-height: 100%;
-  font: inherit;
-  background: #0a0f0a;
-}
+.leaflet-container { min-height: 100%; font: inherit; background: var(--md-sys-color-surface-dim); }
+.leaflet-control-attribution { font-size: 10px; color: var(--md-sys-color-outline); }
+.leaflet-control-attribution a { color: var(--md-sys-color-primary); }
 
-.leaflet-control-attribution {
-  font-size: 10px;
-  color: #4b7a4b;
-}
-
-.leaflet-control-attribution a {
-  color: #22c55e;
-}
-
-.focus-ring {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-
-.focus-ring:focus-visible {
-  outline-color: var(--color-ring);
-}
+.focus-ring { outline: 2px solid transparent; outline-offset: 2px; }
+.focus-ring:focus-visible { outline-color: var(--md-sys-color-primary); }
 
 /* M3 Motion Keyframes */
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fade-in-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fade-in-scale { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes slide-down { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(124, 158, 255, 0.1); } 50% { box-shadow: 0 0 40px rgba(124, 158, 255, 0.2); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes checkmark { 0% { stroke-dashoffset: 100; } 100% { stroke-dashoffset: 0; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-@keyframes fade-in-scale {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slide-up {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-@keyframes slide-down {
-  from { transform: translateY(-8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); }
-  50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.25); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes checkmark {
-  0% { stroke-dashoffset: 100; }
-  100% { stroke-dashoffset: 0; }
-}
-
-@keyframes ripple {
-  to { transform: scale(4); opacity: 0; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes breathe {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-/* Utility classes */
+/* Utility animation classes */
 .animate-fade-in-up { animation: fade-in-up 0.4s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-fade-in-scale { animation: fade-in-scale 0.3s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-slide-up { animation: slide-up 0.35s var(--motion-easing-emphasized-decelerate) forwards; }
@@ -172,19 +147,32 @@ body {
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-checkmark { stroke-dasharray: 100; animation: checkmark 0.6s ease-out forwards; }
-.animate-breathe { animation: breathe 2s ease-in-out infinite; }
 
 .stagger-1 { animation-delay: 50ms; animation-fill-mode: both; }
 .stagger-2 { animation-delay: 100ms; animation-fill-mode: both; }
 .stagger-3 { animation-delay: 150ms; animation-fill-mode: both; }
 .stagger-4 { animation-delay: 200ms; animation-fill-mode: both; }
 .stagger-5 { animation-delay: 250ms; animation-fill-mode: both; }
-.stagger-6 { animation-delay: 300ms; animation-fill-mode: both; }
-.stagger-7 { animation-delay: 350ms; animation-fill-mode: both; }
 
-/* M3-style shimmer for skeletons */
 .skeleton-shimmer {
-  background: linear-gradient(90deg, #1a221a 25%, #222d22 50%, #1a221a 75%);
+  background: linear-gradient(90deg, var(--md-sys-color-surface-container) 25%, var(--md-sys-color-surface-container-high) 50%, var(--md-sys-color-surface-container) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* M3 scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--md-sys-color-outline); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--md-sys-color-outline-variant); }
+
+/* Leaflet popup M3 overrides */
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  background: var(--md-sys-color-surface-container-high) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+}
+.leaflet-popup-tip {
+  background: var(--md-sys-color-surface-container-high) !important;
 }

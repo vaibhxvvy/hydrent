@@ -51,37 +51,37 @@ function Markers({ localities }: { localities: LocalityMarker[] }) {
           <Popup>
             <div className="min-w-[180px] space-y-2 font-sans">
               <div>
-                <p className="font-semibold text-base text-[#0a0f0a]">{loc.name}</p>
-                <p className="text-xs text-[#4b7a4b]">{loc.zone}</p>
+                <p className="font-semibold text-base text-[var(--md-sys-color-on-surface)]">{loc.name}</p>
+                <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{loc.zone}</p>
               </div>
               {hasData ? (
                 <>
                   {loc.median2BHK && (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xs text-[#4b7a4b]">2BHK median:</span>
-                      <span className="font-semibold text-[#0a0f0a]">{formatINR(loc.median2BHK)}/mo</span>
+                      <span className="text-xs text-[var(--md-sys-color-on-surface-variant)]">2BHK median:</span>
+                      <span className="font-semibold text-[var(--md-sys-color-on-surface)]">{formatINR(loc.median2BHK)}/mo</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#4b7a4b]">Confidence:</span>
-                    <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: color, color: color === "#eab308" ? "#0a0f0a" : "#fff" }}>
+                    <span className="text-xs text-[var(--md-sys-color-on-surface-variant)]">Confidence:</span>
+                    <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: color, color: color === "#eab308" ? "var(--md-sys-color-background)" : "#fff" }}>
                       {loc.confidenceScore}/100
                     </span>
                   </div>
-                  <p className="text-xs text-[#4b7a4b]">{loc.submissionCount} signals</p>
+                  <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{loc.submissionCount} signals</p>
                   <div className="flex gap-2 pt-1">
-                    <Link href={`/hyderabad/${loc.slug}`} className="rounded bg-[#22c55e] px-3 py-1.5 text-xs font-medium text-[#0a0f0a] hover:bg-[#16a34a]">
+                    <Link href={`/hyderabad/${loc.slug}`} className="rounded bg-[var(--md-sys-color-primary)] px-3 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface)] hover:brightness-110">
                       View report
                     </Link>
-                    <Link href="/submit" className="rounded border border-[#2d3f2d] px-3 py-1.5 text-xs font-medium text-[#86efac] hover:bg-[#1a221a]">
+                    <Link href="/submit" className="rounded border border-[var(--md-sys-color-outline)] px-3 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]">
                       Submit rent
                     </Link>
                   </div>
                 </>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-sm text-[#4b7a4b]">No data yet for {loc.name}</p>
-                  <Link href="/submit" className="inline-block rounded bg-[#22c55e] px-3 py-1.5 text-xs font-medium text-[#0a0f0a] hover:bg-[#16a34a]">
+                  <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">No data yet for {loc.name}</p>
+                  <Link href="/submit" className="inline-block rounded bg-[var(--md-sys-color-primary)] px-3 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface)] hover:brightness-110">
                     Submit →
                   </Link>
                 </div>
@@ -100,14 +100,14 @@ function ZoomControl() {
     <div className="absolute right-3 top-3 z-[1000] flex flex-col gap-1">
       <button
         onClick={() => map.zoomIn()}
-        className="flex size-9 items-center justify-center rounded-lg border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a] transition-colors shadow-lg"
+        className="flex size-9 items-center justify-center rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors shadow-lg"
         aria-label="Zoom in"
       >
         +
       </button>
       <button
         onClick={() => map.zoomOut()}
-        className="flex size-9 items-center justify-center rounded-lg border border-[#2d3f2d] bg-[#111811] text-[#86efac] hover:bg-[#1a221a] transition-colors shadow-lg"
+        className="flex size-9 items-center justify-center rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors shadow-lg"
         aria-label="Zoom out"
       >
         −
@@ -142,10 +142,10 @@ function MapInner({ localities }: { localities: LocalityMarker[] }) {
 const DynamicMap = dynamic(() => Promise.resolve(MapInner), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[480px] w-full items-center justify-center rounded-xl border border-[#1f2b1f] bg-[#0a0f0a] max-md:h-[300px]">
+    <div className="flex h-[480px] w-full items-center justify-center rounded-xl border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-background)] max-md:h-[300px]">
       <div className="flex flex-col items-center gap-3">
-        <div className="size-8 animate-spin rounded-full border-2 border-[#2d3f2d] border-t-[#22c55e]" />
-        <p className="text-sm text-[#4b7a4b]">Loading map...</p>
+        <div className="size-8 animate-spin rounded-full border-2 border-[var(--md-sys-color-outline)] border-t-[var(--md-sys-color-primary)]" />
+        <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Loading map...</p>
       </div>
     </div>
   ),

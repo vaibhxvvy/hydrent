@@ -3,16 +3,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium transition-colors",
+  "inline-flex items-center rounded-[--radius-pill] px-2.5 py-0.5 text-xs font-medium transition-colors",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
-        outline: "text-foreground",
-        trust: "border-[#22c55e]/30 bg-[#22c55e]/10 text-[#4ade80]",
-        warning: "border-[#eab308]/30 bg-[#eab308]/10 text-[#facc15]",
-        muted: "border-border bg-muted text-muted-foreground",
+        default: "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]",
+        secondary: "bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)]",
+        outline: "border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-on-surface)]",
+        trust: "bg-[rgba(34,197,94,0.12)] text-[#22C55E] border border-[rgba(34,197,94,0.2)]",
+        warning: "bg-[rgba(245,158,11,0.12)] text-[#F59E0B] border border-[rgba(245,158,11,0.2)]",
+        muted: "bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)]",
       },
     },
     defaultVariants: {

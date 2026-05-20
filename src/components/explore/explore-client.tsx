@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { ArrowLeft, SlidersHorizontal, X } from "lucide-react";
 import { InteractiveMap } from "@/components/maps/interactive-map";
+import { FilterChip } from "@/components/ui/filter-chip";
+import { MapLegendCard } from "@/components/ui/map-legend-card";
 
 interface FurnishingBreakdownItem {
   furnishing: string;
@@ -11,21 +13,11 @@ interface FurnishingBreakdownItem {
 }
 
 interface LocalityData {
-  id: string;
-  name: string;
-  slug: string;
-  zone: string;
-  lat: number;
-  lng: number;
-  submissionCount: number;
-  confidenceScore: number;
-  median2BHK: number | null;
+  id: string; name: string; slug: string; zone: string;
+  lat: number; lng: number; submissionCount: number; confidenceScore: number; median2BHK: number | null;
   bhkBreakdown: Array<{ bhk: string; count: number; minRent: number; maxRent: number; medianRent: number | null }>;
   furnishingBreakdown: FurnishingBreakdownItem[];
-  avgTrustScore: number;
-  avgRent: number;
-  minRent: number;
-  maxRent: number;
+  avgTrustScore: number; avgRent: number; minRent: number; maxRent: number;
 }
 
 const BHK_OPTIONS = ["All", "1BHK", "2BHK", "3BHK", "4BHK"] as const;
@@ -44,7 +36,6 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
   const [filteredLocality, setFilteredLocality] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Map furnishing display names to enums
   const furnishingToEnum: Record<string, string | null> = {
     "All": null,
     "Fully Furnished": "FULLY_FURNISHED",
@@ -93,64 +84,60 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0a0f0a]">
-      <InteractiveMap localities={filteredLocalities} standalone={true} />
+    <div className="fixed inset-0 z-50 bg-[var(--md-sys-color-background)]">
+      <InteractiveMap localities={filteredLocalities} standalone />
 
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="fixed left-4 top-4 z-[1001] flex size-11 items-center justify-center rounded-full border border-[#2d3f2d] bg-[#111811]/80 text-[#86efac] shadow-level-3 backdrop-blur-md hover:bg-[#1a221a] hover:text-[#f0fdf4] transition-all active:scale-90"
+        className="fixed left-4 top-4 z-[1001] flex size-10 items-center justify-center rounded-[--radius-md] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/80 text-[var(--md-sys-color-on-surface)] backdrop-blur-md hover:bg-[var(--md-sys-color-surface-container-high)] transition-all active:scale-90"
         aria-label="Go back"
       >
-        <ArrowLeft size={20} />
+        <ArrowLeft size={18} />
       </button>
 
+      {/* Legend (top-right) */}
+      <div className="fixed right-4 top-4 z-[1001] hidden sm:block">
+        <MapLegendCard />
+      </div>
+
       {/* Floating filter panel — bottom-center */}
-      <div className="fixed bottom-4 left-1/2 z-[1001] -translate-x-1/2 w-full max-w-lg px-4">
-        {/* Active filters row (compact) */}
-        <div className="flex items-center gap-2 rounded-2xl border border-[#2d3f2d] bg-[#111811]/90 px-3 py-2 shadow-level-3 backdrop-blur-xl">
-          {/* BHK pills */}
+      <div className="fixed bottom-4 left-1/2 z-[1001] -translate-x-1/2 w-full max-w-2xl px-4">
+        <div className="flex items-center gap-2 rounded-[--radius-xl] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/90 px-3 py-2 shadow-level-2 backdrop-blur-xl">
+          {/* BHK filter chips */}
           <div className="flex gap-1">
             {BHK_OPTIONS.map((bhk) => (
-              <button
+              <FilterChip
                 key={bhk}
+                label={bhk === "All" ? "All" : bhk.replace("BHK", "")}
+                active={bhkFilter === bhk}
                 onClick={() => setBhkFilter(bhk)}
-                className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
-                  bhkFilter === bhk
-                    ? "bg-[#22c55e] text-[#0a0f0a] font-bold"
-                    : "text-[#86efac] hover:bg-[#1a221a]"
-                }`}
-              >
-                {bhk === "All" ? "All" : bhk.replace("BHK", "")}
-              </button>
+                size="sm"
+              />
             ))}
           </div>
 
-          <div className="h-5 w-px shrink-0 bg-[#2d3f2d]" />
+          <div className="h-5 w-px shrink-0 bg-[var(--md-sys-color-outline)]" />
 
-          {/* Furnishing pills */}
+          {/* Furnishing chips (desktop) */}
           <div className="hidden sm:flex gap-1">
             {FURNISHING_OPTIONS.map((f) => (
-              <button
+              <FilterChip
                 key={f}
+                label={f === "Fully Furnished" ? "Fully" : f === "Semi Furnished" ? "Semi" : f === "Unfurnished" ? "Unfurn." : f}
+                active={furnishingFilter === f}
                 onClick={() => setFurnishingFilter(f)}
-                className={`rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all whitespace-nowrap ${
-                  furnishingFilter === f
-                    ? "bg-[#22c55e] text-[#0a0f0a] font-bold"
-                    : "text-[#86efac] hover:bg-[#1a221a]"
-                }`}
-              >
-                {f === "Fully Furnished" ? "Fully" : f === "Semi Furnished" ? "Semi" : f === "Unfurnished" ? "Unfurn." : f}
-              </button>
+                size="sm"
+              />
             ))}
           </div>
 
-          {/* Mobile furnishing dropdown */}
+          {/* Mobile furnishing select */}
           <div className="sm:hidden relative">
             <select
               value={furnishingFilter}
               onChange={(e) => setFurnishingFilter(e.target.value)}
-              className="appearance-none rounded-lg border border-[#2d3f2d] bg-[#0a0f0a] px-2 py-1.5 text-[11px] font-medium text-[#86efac] outline-none focus:border-[#22c55e] cursor-pointer"
+              className="appearance-none rounded-[--radius-md] border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-dim)] px-2.5 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] cursor-pointer"
             >
               {FURNISHING_OPTIONS.map((f) => (
                 <option key={f} value={f}>{f === "Fully Furnished" ? "Fully" : f === "Semi Furnished" ? "Semi" : f === "Unfurnished" ? "Unfurn." : f}</option>
@@ -158,14 +145,14 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
             </select>
           </div>
 
-          <div className="h-5 w-px shrink-0 bg-[#2d3f2d]" />
+          <div className="h-5 w-px shrink-0 bg-[var(--md-sys-color-outline)]" />
 
-          {/* Sort + More filters toggle */}
+          {/* Sort + More filters */}
           <div className="flex items-center gap-1">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none rounded-lg border border-[#2d3f2d] bg-[#0a0f0a] px-2 py-1.5 text-[11px] font-medium text-[#86efac] outline-none focus:border-[#22c55e] cursor-pointer"
+              className="appearance-none rounded-[--radius-md] border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-dim)] px-2.5 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] cursor-pointer"
             >
               {SORT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -173,16 +160,16 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
             </select>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`relative rounded-lg p-1.5 transition-all ${
+              className={`relative rounded-[--radius-md] p-1.5 transition-all ${
                 showFilters || activeFilterCount > 0
-                  ? "bg-[#22c55e]/20 text-[#22c55e]"
-                  : "text-[#86efac] hover:bg-[#1a221a]"
+                  ? "bg-[var(--md-sys-color-primary)]/20 text-[var(--md-sys-color-primary)]"
+                  : "text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
               }`}
               aria-label="Toggle filter panel"
             >
               <SlidersHorizontal size={14} />
               {activeFilterCount > 0 && !showFilters && (
-                <span className="absolute -right-0.5 -top-0.5 flex size-3.5 items-center justify-center rounded-full bg-[#22c55e] text-[8px] font-bold text-[#0a0f0a]">
+                <span className="absolute -right-0.5 -top-0.5 flex size-3.5 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[8px] font-bold text-[var(--md-sys-color-on-primary)]">
                   {activeFilterCount}
                 </span>
               )}
@@ -192,76 +179,46 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
 
         {/* Expanded filter panel */}
         {showFilters && (
-          <div className="mt-2 animate-slide-down rounded-2xl border border-[#2d3f2d] bg-[#111811]/95 p-4 shadow-level-4 backdrop-blur-xl">
-            {/* Active filter summary */}
+          <div className="mt-2 animate-slide-down rounded-[--radius-xl] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/95 p-4 shadow-level-3 backdrop-blur-xl">
             {activeFilterCount > 0 && (
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs text-[#4b7a4b]">
+                <span className="text-xs text-[var(--md-sys-color-on-surface-variant)]">
                   {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active
                 </span>
-                <button
-                  onClick={clearAllFilters}
-                  className="flex items-center gap-1 rounded-lg bg-[#1a221a] px-2.5 py-1 text-xs text-[#86efac] hover:bg-[#222d22] transition-all"
-                >
+                <button onClick={clearAllFilters} className="flex items-center gap-1 rounded-[--radius-md] bg-[var(--md-sys-color-surface-container-high)] px-2.5 py-1 text-xs text-[var(--md-sys-color-on-surface)] hover:brightness-110 transition-all">
                   <X size={12} />
                   Clear all
                 </button>
               </div>
             )}
 
-            {/* Furnishing (visible on desktop too as pills) */}
+            {/* Furnishing (mobile) */}
             <div className="sm:hidden mb-3">
-              <p className="mb-1.5 text-xs font-medium text-[#4b7a4b]">Furnishing</p>
+              <p className="mb-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">Furnishing</p>
               <div className="flex flex-wrap gap-1.5">
                 {FURNISHING_OPTIONS.map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFurnishingFilter(f)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                      furnishingFilter === f
-                        ? "bg-[#22c55e] text-[#0a0f0a]"
-                        : "text-[#86efac] hover:bg-[#1a221a]"
-                    }`}
-                  >
-                    {f}
-                  </button>
+                  <FilterChip key={f} label={f} active={furnishingFilter === f} onClick={() => setFurnishingFilter(f)} size="sm" />
                 ))}
               </div>
             </div>
 
             {/* Locality filter */}
             <div>
-              <p className="mb-1.5 text-xs font-medium text-[#4b7a4b]">Locality</p>
+              <p className="mb-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">Locality</p>
               <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
-                <button
-                  onClick={() => { setFilteredLocality(null); }}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                    !filteredLocality ? "bg-[#22c55e] text-[#0a0f0a]" : "text-[#86efac] hover:bg-[#1a221a]"
-                  }`}
-                >
-                  All
-                </button>
+                <FilterChip label="All" active={!filteredLocality} onClick={() => setFilteredLocality(null)} size="sm" />
                 {localities.map((loc) => (
-                  <button
-                    key={loc.id}
-                    onClick={() => { setFilteredLocality(loc.slug); setShowFilters(false); }}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                      filteredLocality === loc.slug ? "bg-[#22c55e] text-[#0a0f0a]" : "text-[#86efac] hover:bg-[#1a221a]"
-                    }`}
-                  >
-                    {loc.name}
-                  </button>
+                  <FilterChip key={loc.id} label={loc.name} active={filteredLocality === loc.slug} onClick={() => { setFilteredLocality(loc.slug); setShowFilters(false); }} size="sm" />
                 ))}
               </div>
             </div>
 
-            {/* Results count */}
-            <div className="mt-3 pt-3 border-t border-[#2d3f2d] flex items-center justify-between text-xs">
-              <span className="text-[#4b7a4b]">
-                <span className="font-mono text-[#f0fdf4]">{filteredLocalities.length}</span> of {localities.length} localities shown
+            <div className="mt-3 pt-3 border-t border-[var(--md-sys-color-outline)] flex items-center justify-between text-xs">
+              <span className="text-[var(--md-sys-color-on-surface-variant)]">
+                <span className="font-mono text-[var(--md-sys-color-on-surface)]">{filteredLocalities.length}</span> of {localities.length} localities
               </span>
-              <span className="text-[#4b7a4b]">
-                <span className="font-mono text-[#22c55e]">
+              <span className="text-[var(--md-sys-color-on-surface-variant)]">
+                <span className="font-mono text-[var(--md-sys-color-primary)]">
                   {filteredLocalities.filter((l) => l.submissionCount > 0).length}
                 </span> with data
               </span>
