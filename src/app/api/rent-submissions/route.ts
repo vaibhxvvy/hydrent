@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/db";
+import { getSupabaseServer } from "@/lib/db";
 import { calculateTrustScore, calculateWeightedMedian } from "@/lib/analytics/trust-engine";
 import { rateLimit } from "@/lib/rate-limit";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export async function POST(request: Request) {
-  const prisma = getPrisma();
+  const supabase = getSupabaseServer();
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "unknown";
 
-  // Parse body
   const body = await request.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -24,51 +23,58 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // 1. IP rate limit: max 3 per IP per 24h
   const limit = rateLimit(`rent-submission:${ip}`, { limit: 3, windowMs: DAY_MS });
   if (!limit.allowed) {
-    // Silent reject - still show success
     return NextResponse.json({ status: "queued", verificationState: "PENDING_REVIEW", trustScore: 0, flagged: "rate_limited" }, { status: 202 });
   }
 
-  // Find locality
-  const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+  const { data: city } = await supabase
+    .from("City")
+    .select("id")
+    .eq("slug", "hyderabad")
+    .limit(1)
+    .maybeSingle();
   if (!city) {
     return NextResponse.json({ error: "City not found" }, { status: 500 });
   }
 
-  const locality = await prisma.locality.findFirst({
-    where: { cityId: city.id, slug: localitySlug },
-  });
+  const { data: locality } = await supabase
+    .from("Locality")
+    .select("id")
+    .eq("cityId", city.id)
+    .eq("slug", localitySlug)
+    .limit(1)
+    .maybeSingle();
   if (!locality) {
     return NextResponse.json({ error: "Locality not found" }, { status: 404 });
   }
 
-  // Get existing submissions for this locality
-  const existingSubmissions = await prisma.rentSubmission.findMany({
-    where: { localityId: locality.id, verificationState: { not: "REJECTED" } },
-  });
+  const { data: existingSubmissions } = await supabase
+    .from("RentSubmission")
+    .select("effectiveMonthlyCost, verificationState")
+    .eq("localityId", locality.id)
+    .neq("verificationState", "REJECTED");
 
-  const localitySubmissionCount = existingSubmissions.length;
-  const localityMedian = localitySubmissionCount > 0
-    ? Math.round(existingSubmissions.reduce((sum, s) => sum + s.effectiveMonthlyCost, 0) / localitySubmissionCount)
+  const localitySubmissionCount = (existingSubmissions || []).length;
+  const costs = (existingSubmissions || []).map((s: Record<string, unknown>) => s.effectiveMonthlyCost as number);
+  const localityMedian = costs.length > 0
+    ? Math.round(costs.reduce((sum: number, v: number) => sum + v, 0) / costs.length)
     : null;
 
-  // 4. Duplicate detection: same IP + same locality + same BHK + same rent within 7 days
-  const sevenDaysAgo = new Date(Date.now() - 7 * DAY_MS);
-  const duplicate = await prisma.rentSubmission.findFirst({
-    where: {
-      localityId: locality.id,
-      bhk,
-      rentAmount: parseInt(rentAmount),
-      submittedAt: { gte: sevenDaysAgo },
-    },
-  });
-  if (duplicate) {
+  const sevenDaysAgo = new Date(Date.now() - 7 * DAY_MS).toISOString();
+  const { data: duplicates } = await supabase
+    .from("RentSubmission")
+    .select("id")
+    .eq("localityId", locality.id)
+    .eq("bhk", bhk)
+    .eq("rentAmount", parseInt(rentAmount))
+    .gte("submittedAt", sevenDaysAgo)
+    .limit(1);
+
+  if (duplicates && duplicates.length > 0) {
     return NextResponse.json({ status: "queued", verificationState: "PENDING_REVIEW", trustScore: 0, flagged: "duplicate" }, { status: 202 });
   }
 
-  // Calculate trust score
   const trustResult = calculateTrustScore(
     {
       rentType: (rentType || "CLOSED") as any,
@@ -81,7 +87,6 @@ export async function POST(request: Request) {
     localitySubmissionCount,
   );
 
-  // 2. Rent sanity check (only if locality has 5+ submissions)
   let flagReason: string | null = null;
   let verificationState = "PENDING_REVIEW";
 
@@ -96,54 +101,56 @@ export async function POST(request: Request) {
     }
   }
 
-  // 3. Broker hard cap already applied in trust score calculation
-
-  // 5. Under 5 submissions: mark as unverified
   if (localitySubmissionCount < 5) {
     verificationState = "PENDING_REVIEW";
   }
 
-  // Save to database
-  await prisma.rentSubmission.create({
-    data: {
+  const { error: insertError } = await supabase
+    .from("RentSubmission")
+    .insert({
       localityId: locality.id,
       bhk,
       rentAmount: parseInt(rentAmount),
       effectiveMonthlyCost: parseInt(rentAmount),
-      furnishing: (furnishing || "UNFURNISHED") as any,
-      rentType: (rentType || "CLOSED") as any,
-      sourceType: (submitterType === "broker" ? "LISTING_ESTIMATE" : submitterType === "owner" ? "LEASE_RENEWAL" : "TENANT_SUBMITTED") as any,
+      furnishing: (furnishing || "UNFURNISHED"),
+      rentType: (rentType || "CLOSED"),
+      sourceType: (submitterType === "broker" ? "LISTING_ESTIMATE" : submitterType === "owner" ? "LEASE_RENEWAL" : "TENANT_SUBMITTED"),
       brokerInvolved: submitterType === "broker",
       trustScore: trustResult.score,
-      verificationState: verificationState as any,
+      verificationState,
       anomalyScore: flagReason ? 80 : 20,
       freshnessScore: 100,
       communityAgreementScore: 50,
       maintenanceIncluded: false,
       maintenanceAmount: 0,
       securityDeposit: 0,
-      moveInDate: new Date(),
+      moveInDate: new Date().toISOString(),
       gatedSociety: false,
       petFriendly: false,
-      occupancyType: "ANY" as any,
+      occupancyType: "ANY",
       parkingCount: 0,
-      submittedAt: new Date(),
-    },
-  });
-
-  // Recalculate locality stats if submission is approved
-  if (verificationState === "VERIFIED") {
-    const allSubmissions = await prisma.rentSubmission.findMany({
-      where: { localityId: locality.id, verificationState: { in: ["VERIFIED", "COMMUNITY_REVIEW"] } },
+      submittedAt: new Date().toISOString(),
     });
 
-    if (allSubmissions.length > 0) {
-      const weighted = calculateWeightedMedian(
-        allSubmissions.map((s) => ({ rentAmount: s.effectiveMonthlyCost, trustScore: Number(s.trustScore) })),
-      );
+  if (insertError) {
+    console.error("Insert error:", insertError);
+    return NextResponse.json({ error: "Failed to save" }, { status: 500 });
+  }
 
-      // Update locality (would need to add these fields to schema)
-      // For now, just log
+  if (verificationState === "VERIFIED") {
+    const { data: allVerified } = await supabase
+      .from("RentSubmission")
+      .select("effectiveMonthlyCost, trustScore")
+      .eq("localityId", locality.id)
+      .in("verificationState", ["VERIFIED", "COMMUNITY_REVIEW"]);
+
+    if (allVerified && allVerified.length > 0) {
+      const weighted = calculateWeightedMedian(
+        (allVerified as Array<{ effectiveMonthlyCost: number; trustScore: number }>).map((s) => ({
+          rentAmount: s.effectiveMonthlyCost,
+          trustScore: Number(s.trustScore),
+        })),
+      );
     }
   }
 

@@ -1,4 +1,4 @@
-import { getPrisma } from "@/lib/db";
+import { getSupabaseServer } from "@/lib/db";
 
 const LOCALITY_DATA: Record<string, { min2Bhk: number; max2Bhk: number; min3Bhk: number; max3Bhk: number; min1Bhk: number; max1Bhk: number }> = {
   gachibowli: { min2Bhk: 18000, max2Bhk: 55000, min3Bhk: 30000, max3Bhk: 80000, min1Bhk: 12000, max1Bhk: 25000 },
@@ -27,53 +27,62 @@ function rand(min: number, max: number) {
 
 export async function POST() {
   try {
-    const prisma = getPrisma();
-    const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+    const supabase = getSupabaseServer();
+    const { data: city } = await supabase
+      .from("City")
+      .select("id")
+      .eq("slug", "hyderabad")
+      .limit(1)
+      .maybeSingle();
     if (!city) return Response.json({ error: "Hyderabad not found" }, { status: 400 });
 
-    const localities = await prisma.locality.findMany({ where: { cityId: city.id } });
+    const { data: localities } = await supabase
+      .from("Locality")
+      .select("id, slug")
+      .eq("cityId", city.id);
     let totalCreated = 0;
 
-    for (const locality of localities) {
+    for (const locality of (localities || []) as Array<{ id: string; slug: string }>) {
       const data = LOCALITY_DATA[locality.slug];
       if (!data) continue;
 
       const count = rand(10, 15);
+      const rows: Array<Record<string, unknown>> = [];
       for (let i = 0; i < count; i++) {
         const bhk = BHK_OPTIONS[rand(0, 2) % 3] as "1BHK" | "2BHK" | "3BHK";
         const rentAmount = bhk === "1BHK" ? rand(data.min1Bhk, data.max1Bhk) : bhk === "2BHK" ? rand(data.min2Bhk, data.max2Bhk) : rand(data.min3Bhk, data.max3Bhk);
         const roundedRent = Math.round(rentAmount / 500) * 500;
         const maintenance = roundedRent < 15000 ? rand(500, 2000) : rand(1500, 5000);
 
-        await prisma.rentSubmission.create({
-          data: {
-            localityId: locality.id,
-            bhk: bhk!,
-            furnishing: FURNISHING[rand(0, 2)]!,
-            rentAmount: roundedRent,
-            effectiveMonthlyCost: roundedRent + maintenance,
-            maintenanceAmount: maintenance,
-            maintenanceIncluded: Math.random() < 0.3,
-            securityDeposit: roundedRent * rand(2, 6),
-            moveInDate: new Date(Date.now() - rand(0, 30) * 86400000),
-            leaseDurationMonths: 11,
-            parkingCount: rand(0, 2),
-            gatedSociety: Math.random() < 0.4,
-            petFriendly: Math.random() < 0.2,
-            occupancyType: Math.random() < 0.5 ? "FAMILY" : "BACHELOR",
-            brokerInvolved: true,
-            sourceType: "LISTING_ESTIMATE",
-            rentType: "ASKING",
-            trustScore: 25,
-            anomalyScore: rand(20, 50),
-            freshnessScore: rand(40, 80),
-            verificationState: "VERIFIED",
-            submittedAt: new Date(Date.now() - rand(0, 30) * 86400000),
-            publishedAt: new Date(),
-          },
+        rows.push({
+          localityId: locality.id,
+          bhk,
+          furnishing: FURNISHING[rand(0, 2)],
+          rentAmount: roundedRent,
+          effectiveMonthlyCost: roundedRent + maintenance,
+          maintenanceAmount: maintenance,
+          maintenanceIncluded: Math.random() < 0.3,
+          securityDeposit: roundedRent * rand(2, 6),
+          moveInDate: new Date(Date.now() - rand(0, 30) * 86400000).toISOString(),
+          leaseDurationMonths: 11,
+          parkingCount: rand(0, 2),
+          gatedSociety: Math.random() < 0.4,
+          petFriendly: Math.random() < 0.2,
+          occupancyType: Math.random() < 0.5 ? "FAMILY" : "BACHELOR",
+          brokerInvolved: true,
+          sourceType: "LISTING_ESTIMATE",
+          rentType: "ASKING",
+          trustScore: 25,
+          anomalyScore: rand(20, 50),
+          freshnessScore: rand(40, 80),
+          verificationState: "VERIFIED",
+          submittedAt: new Date(Date.now() - rand(0, 30) * 86400000).toISOString(),
+          publishedAt: new Date().toISOString(),
         });
-        totalCreated++;
       }
+
+      const { error } = await supabase.from("RentSubmission").insert(rows);
+      if (!error) totalCreated += rows.length;
     }
 
     return Response.json({ message: `Scraper completed: ${totalCreated} new listings created.` });

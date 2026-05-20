@@ -1,26 +1,25 @@
 import { NextResponse } from "next/server";
 import { createTransport } from "nodemailer";
-import { getPrisma } from "@/lib/db";
+import { getSupabaseServer } from "@/lib/db";
 
-// Handler for the POST request
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name, email, message, subject } = body;
 
-    // Save the issue to the database
-    const prisma = getPrisma();
-    
-    const issueReport = await prisma.issueReport.create({
-      data: {
+    const supabase = getSupabaseServer();
+
+    const { error } = await supabase
+      .from("IssueReport")
+      .insert({
         name: name || null,
         email: email || null,
         subject: subject || "Issue Report",
-        message: message
-      }
-    });
+        message,
+      });
 
-    // Configure the email transport
+    if (error) throw error;
+
     const transporter = createTransport({
       service: "gmail",
       auth: {
@@ -29,7 +28,6 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send email notification
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: "labusepc@gmail.com",

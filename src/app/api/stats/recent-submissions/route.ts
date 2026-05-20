@@ -1,18 +1,24 @@
-import { getPrisma } from "@/lib/db";
+import { getSupabaseServer } from "@/lib/db";
 
 export async function GET() {
   try {
-    const prisma = getPrisma();
-    const submissions = await prisma.rentSubmission.findMany({
-      where: { verificationState: { not: "REJECTED" } },
-      include: { locality: true },
-      orderBy: { submittedAt: "desc" },
-      take: 5,
-    });
+    const supabase = getSupabaseServer();
+    const { data: submissions, error } = await supabase
+      .from("RentSubmission")
+      .select("bhk, effectiveMonthlyCost, trustScore, submittedAt, locality:Locality(name)")
+      .neq("verificationState", "REJECTED")
+      .order("submittedAt", { ascending: false })
+      .limit(5);
+
+    if (error || !submissions) {
+      return Response.json([]);
+    }
 
     const now = new Date();
-    const data = submissions.map((s) => {
-      const diffMs = now.getTime() - new Date(s.submittedAt).getTime();
+    const data = submissions.map((s: Record<string, unknown>) => {
+      const locality = s.locality as { name: string } | null;
+      const submittedAt = new Date(s.submittedAt as string);
+      const diffMs = now.getTime() - submittedAt.getTime();
       const diffMin = Math.floor(diffMs / 60000);
       let timeAgo = "just now";
       if (diffMin >= 1 && diffMin < 60) timeAgo = `${diffMin}m ago`;
@@ -22,7 +28,7 @@ export async function GET() {
       }
       return {
         bhk: s.bhk,
-        locality: s.locality.name,
+        locality: locality?.name || "Unknown",
         rent: s.effectiveMonthlyCost,
         trustScore: Math.round(Number(s.trustScore)),
         timeAgo,

@@ -1,5 +1,4 @@
-import { PrismaClient, type RentSubmission as PrismaRentSubmission, type Locality as PrismaLocality } from "@prisma/client";
-import { getPrisma } from "@/lib/db";
+import { getSupabaseServer } from "@/lib/db";
 
 export type DbLocality = {
   id: string;
@@ -55,186 +54,242 @@ export type DbSubmission = {
   ipHash: string | null;
 };
 
-function mapLocality(locality: PrismaLocality): DbLocality {
-  return {
-    id: locality.id,
-    name: locality.name,
-    slug: locality.slug,
-    zone: locality.zoneId || "Hyderabad",
-    city: "Hyderabad",
-    lat: Number(locality.lat),
-    lng: Number(locality.lng),
-    aliases: locality.aliases as string[] || [],
-    commuteAnchors: locality.commuteAnchors as string[] || [],
-    summary: locality.summary || "",
-    medianIncomeAssumption: locality.medianIncomeAssumed || 100000,
-  };
-}
-
-function mapSubmission(sub: PrismaRentSubmission): DbSubmission {
-  return {
-    id: sub.id,
-    localitySlug: (sub as unknown as Record<string, unknown>).localitySlug as string || "",
-    microLocality: sub.microLocalityId || null,
-    buildingSlug: null, // Not in current schema directly via this relation path
-    bhk: sub.bhk,
-    carpetAreaSqft: sub.carpetAreaSqft,
-    superBuiltUpAreaSqft: sub.superBuiltUpAreaSqft,
-    furnishing: sub.furnishing,
-    parkingCount: sub.parkingCount,
-    maintenanceIncluded: sub.maintenanceIncluded,
-    maintenanceAmount: sub.maintenanceAmount,
-    securityDeposit: sub.securityDeposit,
-    moveInDate: sub.moveInDate,
-    leaseDurationMonths: sub.leaseDurationMonths,
-    floorNumber: sub.floorNumber,
-    facing: sub.facing,
-    buildingAgeYears: sub.buildingAgeYears,
-    gatedSociety: sub.gatedSociety,
-    petFriendly: sub.petFriendly,
-    occupancyType: sub.occupancyType,
-    metroDistanceKm: sub.metroDistanceKm ? Number(sub.metroDistanceKm) : null,
-    amenities: sub.amenitiesSnapshot,
-    brokerInvolved: sub.brokerInvolved,
-    rentAmount: sub.rentAmount,
-    effectiveMonthlyCost: sub.effectiveMonthlyCost,
-    proofObjectKey: sub.proofObjectKey,
-    sourceType: sub.sourceType,
-    rentType: sub.rentType,
-    roommateCount: sub.roommateCount,
-    trustScore: Number(sub.trustScore),
-    confidenceLevel: sub.confidenceLevel,
-    verificationState: sub.verificationState,
-    anomalyScore: Number(sub.anomalyScore),
-    freshnessScore: Number(sub.freshnessScore),
-    communityAgreementScore: Number(sub.communityAgreementScore),
-    submittedAt: sub.submittedAt,
-    ipHash: sub.deviceFingerprintId ? sub.deviceFingerprintId : null,
-  };
+function db() {
+  return getSupabaseServer();
 }
 
 export async function getAllLocalities(): Promise<DbLocality[]> {
-  const prisma = getPrisma();
-  const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+  const supabase = db();
+  const { data: city } = await supabase
+    .from("City")
+    .select("id, name")
+    .eq("slug", "hyderabad")
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!city) return [];
-  
-  const localities = await prisma.locality.findMany({
-    where: { cityId: city.id },
-    include: { zone: true },
-  });
-  
-  return localities.map((l) => ({
-    id: l.id,
-    name: l.name,
-    slug: l.slug,
-    zone: l.zone?.name || l.zoneId || "Hyderabad",
+
+  const { data: zones } = await supabase
+    .from("Zone")
+    .select("id, name")
+    .throwOnError();
+  const zoneMap = new Map((zones || []).map((z: { id: string; name: string }) => [z.id, z.name]));
+
+  const { data: localities } = await supabase
+    .from("Locality")
+    .select("*")
+    .eq("cityId", city.id)
+    .throwOnError();
+
+  return ((localities || []) as Array<Record<string, unknown>>).map((l: Record<string, unknown>) => ({
+    id: l.id as string,
+    name: l.name as string,
+    slug: l.slug as string,
+    zone: (l.zoneId ? (zoneMap.get(l.zoneId as string) || "Hyderabad") : "Hyderabad") as string,
     city: city.name,
     lat: Number(l.lat),
     lng: Number(l.lng),
-    aliases: l.aliases as string[] || [],
-    commuteAnchors: l.commuteAnchors as string[] || [],
-    summary: l.summary || "",
-    medianIncomeAssumption: l.medianIncomeAssumed || 100000,
+    aliases: (l.aliases as string[]) || [],
+    commuteAnchors: (l.commuteAnchors as string[]) || [],
+    summary: (l.summary as string) || "",
+    medianIncomeAssumption: (l.medianIncomeAssumed as number) || 100000,
   }));
 }
 
 export async function getLocalityBySlug(slug: string): Promise<DbLocality | null> {
-  const prisma = getPrisma();
-  const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+  const supabase = db();
+  const { data: city } = await supabase
+    .from("City")
+    .select("id, name")
+    .eq("slug", "hyderabad")
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!city) return null;
-  
-  const locality = await prisma.locality.findFirst({
-    where: { cityId: city.id, slug },
-    include: { zone: true },
-  });
-  
+
+  const { data: locality } = await supabase
+    .from("Locality")
+    .select("*, zone:Zone(name)")
+    .eq("cityId", city.id)
+    .eq("slug", slug)
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
+
   if (!locality) return null;
+  const l = locality as Record<string, unknown>;
+  const zone = l.zone as { name: string } | null;
   return {
-    id: locality.id,
-    name: locality.name,
-    slug: locality.slug,
-    zone: locality.zone?.name || locality.zoneId || "Hyderabad",
+    id: l.id as string,
+    name: l.name as string,
+    slug: l.slug as string,
+    zone: zone?.name || (l.zoneId as string) || "Hyderabad",
     city: city.name,
-    lat: Number(locality.lat),
-    lng: Number(locality.lng),
-    aliases: locality.aliases as string[] || [],
-    commuteAnchors: locality.commuteAnchors as string[] || [],
-    summary: locality.summary || "",
-    medianIncomeAssumption: locality.medianIncomeAssumed || 100000,
+    lat: Number(l.lat),
+    lng: Number(l.lng),
+    aliases: (l.aliases as string[]) || [],
+    commuteAnchors: (l.commuteAnchors as string[]) || [],
+    summary: (l.summary as string) || "",
+    medianIncomeAssumption: (l.medianIncomeAssumed as number) || 100000,
   };
 }
 
 export async function getSubmissionsForLocalitySlug(slug: string): Promise<DbSubmission[]> {
-  const prisma = getPrisma();
-  const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+  const supabase = db();
+  const { data: city } = await supabase
+    .from("City")
+    .select("id")
+    .eq("slug", "hyderabad")
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!city) return [];
-  
-  const locality = await prisma.locality.findFirst({
-    where: { cityId: city.id, slug },
-  });
-  
+
+  const { data: locality } = await supabase
+    .from("Locality")
+    .select("id")
+    .eq("cityId", city.id)
+    .eq("slug", slug)
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!locality) return [];
-  
-  const submissions = await prisma.rentSubmission.findMany({
-    where: { localityId: locality.id, verificationState: { not: "REJECTED" } },
-    orderBy: { submittedAt: "desc" },
-  });
-  
-  return submissions.map(mapSubmission);
+
+  const { data: submissions } = await supabase
+    .from("RentSubmission")
+    .select("*")
+    .eq("localityId", locality.id)
+    .neq("verificationState", "REJECTED")
+    .order("submittedAt", { ascending: false })
+    .throwOnError();
+
+  return ((submissions || []) as Array<Record<string, unknown>>).map(mapSubmission);
 }
 
 export async function getAllSubmissions(): Promise<DbSubmission[]> {
-  const prisma = getPrisma();
-  const submissions = await prisma.rentSubmission.findMany({
-    where: { verificationState: { not: "REJECTED" } },
-    orderBy: { submittedAt: "desc" },
-  });
-  return submissions.map(mapSubmission);
+  const supabase = db();
+  const { data: submissions } = await supabase
+    .from("RentSubmission")
+    .select("*")
+    .neq("verificationState", "REJECTED")
+    .order("submittedAt", { ascending: false })
+    .throwOnError();
+
+  return ((submissions || []) as Array<Record<string, unknown>>).map(mapSubmission);
 }
 
 export async function getLocalityStats() {
-  const prisma = getPrisma();
-  const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+  const supabase = db();
+  const { data: city } = await supabase
+    .from("City")
+    .select("id")
+    .eq("slug", "hyderabad")
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!city) return { totalSubmissions: 0, totalLocalities: 0, closedRentPercentage: 0, lastUpdated: new Date() };
-  
-  const localities = await prisma.locality.findMany({ where: { cityId: city.id } });
-  const submissions = await prisma.rentSubmission.findMany({
-    where: { locality: { cityId: city.id } },
-  });
-  
-  const closed = submissions.filter((s) => s.rentType === "CLOSED").length;
-  const lastSubmitted = submissions.length > 0 ? new Date(Math.max(...submissions.map((s) => new Date(s.submittedAt).getTime()))) : new Date();
-  
+
+  const { data: localities } = await supabase
+    .from("Locality")
+    .select("id")
+    .eq("cityId", city.id)
+    .throwOnError();
+
+  const { data: submissions } = await supabase
+    .from("RentSubmission")
+    .select("rentType, submittedAt")
+    .throwOnError();
+
+  const rows = (submissions || []) as { rentType: string; submittedAt: string }[];
+  const closed = rows.filter((s) => s.rentType === "CLOSED").length;
+  const lastSubmitted = rows.length > 0
+    ? new Date(Math.max(...rows.map((s) => new Date(s.submittedAt).getTime())))
+    : new Date();
+
   return {
-    totalSubmissions: submissions.length,
-    totalLocalities: localities.length,
-    closedRentPercentage: submissions.length > 0 ? Math.round((closed / submissions.length) * 100) : 0,
+    totalSubmissions: rows.length,
+    totalLocalities: (localities || []).length,
+    closedRentPercentage: rows.length > 0 ? Math.round((closed / rows.length) * 100) : 0,
     lastUpdated: lastSubmitted,
   };
 }
 
 export async function getTrendSeriesForLocality(slug: string) {
-  const prisma = getPrisma();
-  const city = await prisma.city.findFirst({ where: { slug: "hyderabad" } });
+  const supabase = db();
+  const { data: city } = await supabase
+    .from("City")
+    .select("id")
+    .eq("slug", "hyderabad")
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!city) return [];
-  
-  const locality = await prisma.locality.findFirst({
-    where: { cityId: city.id, slug },
-  });
-  
+
+  const { data: locality } = await supabase
+    .from("Locality")
+    .select("id")
+    .eq("cityId", city.id)
+    .eq("slug", slug)
+    .limit(1)
+    .maybeSingle()
+    .throwOnError();
   if (!locality) return [];
-  
-  const snapshots = await prisma.historicalRentSnapshot.findMany({
-    where: { localityId: locality.id },
-    orderBy: { month: "asc" },
-  });
-  
-  return snapshots.map((s) => ({
-    month: s.month.toISOString().slice(0, 7),
-    medianRent: s.median,
-    p25: s.p25,
-    p75: s.p75,
-    sampleSize: s.sampleSize,
+
+  const { data: snapshots } = await supabase
+    .from("HistoricalRentSnapshot")
+    .select("*")
+    .eq("localityId", locality.id)
+    .order("month", { ascending: true })
+    .throwOnError();
+
+  return ((snapshots || []) as Array<Record<string, unknown>>).map((s: Record<string, unknown>) => ({
+    month: new Date(s.month as string).toISOString().slice(0, 7),
+    medianRent: s.median as number,
+    p25: s.p25 as number,
+    p75: s.p75 as number,
+    sampleSize: s.sampleSize as number,
     confidenceScore: Number(s.confidenceScore),
   }));
+}
+
+function mapSubmission(sub: Record<string, unknown>): DbSubmission {
+  return {
+    id: sub.id as string,
+    localitySlug: (sub.localitySlug as string) || "",
+    microLocality: (sub.microLocalityId as string) || null,
+    buildingSlug: null,
+    bhk: sub.bhk as string,
+    carpetAreaSqft: sub.carpetAreaSqft as number | null,
+    superBuiltUpAreaSqft: sub.superBuiltUpAreaSqft as number | null,
+    furnishing: sub.furnishing as string,
+    parkingCount: sub.parkingCount as number,
+    maintenanceIncluded: sub.maintenanceIncluded as boolean,
+    maintenanceAmount: sub.maintenanceAmount as number,
+    securityDeposit: sub.securityDeposit as number,
+    moveInDate: new Date(sub.moveInDate as string),
+    leaseDurationMonths: sub.leaseDurationMonths as number | null,
+    floorNumber: sub.floorNumber as number | null,
+    facing: sub.facing as string | null,
+    buildingAgeYears: sub.buildingAgeYears as number | null,
+    gatedSociety: sub.gatedSociety as boolean,
+    petFriendly: sub.petFriendly as boolean,
+    occupancyType: sub.occupancyType as string,
+    metroDistanceKm: sub.metroDistanceKm ? Number(sub.metroDistanceKm) : null,
+    amenities: sub.amenitiesSnapshot,
+    brokerInvolved: sub.brokerInvolved as boolean,
+    rentAmount: sub.rentAmount as number,
+    effectiveMonthlyCost: sub.effectiveMonthlyCost as number,
+    proofObjectKey: sub.proofObjectKey as string | null,
+    sourceType: sub.sourceType as string,
+    rentType: sub.rentType as string,
+    roommateCount: sub.roommateCount as number | null,
+    trustScore: Number(sub.trustScore),
+    confidenceLevel: sub.confidenceLevel as string,
+    verificationState: sub.verificationState as string,
+    anomalyScore: Number(sub.anomalyScore),
+    freshnessScore: Number(sub.freshnessScore),
+    communityAgreementScore: Number(sub.communityAgreementScore),
+    submittedAt: new Date(sub.submittedAt as string),
+    ipHash: (sub.deviceFingerprintId as string) || null,
+  };
 }

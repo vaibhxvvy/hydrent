@@ -22,15 +22,21 @@ export default async function IssuesAdminPage() {
   // Fetch actual issues from the database
   let issues: Issue[] = [];
   try {
-    const { getPrisma } = await import("@/lib/db");
-    const prisma = getPrisma();
-    issues = await prisma.issueReport.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+    const { getSupabaseServer } = await import("@/lib/db");
+    const supabase = getSupabaseServer();
+    const { data } = await supabase
+      .from("IssueReport")
+      .select("*")
+      .order("createdAt", { ascending: false });
+    issues = (data || []).map((r: Record<string, unknown>) => ({
+      id: r.id as string,
+      subject: r.subject as string,
+      message: r.message as string,
+      name: r.name as string | null,
+      email: r.email as string | null,
+      createdAt: new Date(r.createdAt as string),
+    }));
   } catch {
-    // If DB is not available (e.g. static build), show no issues
     issues = [];
   }
 
