@@ -9,6 +9,9 @@
   --color-foreground: #f0fdf4;
   --color-surface: #111811;
   --color-surface-elevated: #1a221a;
+  --color-surface-container: #0d140d;
+  --color-surface-container-high: #1a221a;
+  --color-surface-container-highest: #222d22;
   --color-card: #111811;
   --color-card-foreground: #f0fdf4;
   --color-popover: #1a221a;
@@ -16,6 +19,8 @@
   --color-primary: #22c55e;
   --color-primary-foreground: #0a0f0a;
   --color-primary-dim: #16a34a;
+  --color-primary-container: #1a3a1a;
+  --color-on-primary-container: #4ade80;
   --color-secondary: #1f2b1f;
   --color-secondary-foreground: #86efac;
   --color-muted: #1f2b1f;
@@ -48,6 +53,21 @@
   --shadow-card: 0 1px 3px rgba(34, 197, 94, 0.05);
   --shadow-elevated: 0 4px 24px rgba(34, 197, 94, 0.08);
   --shadow-glow: 0 0 40px rgba(34, 197, 94, 0.12);
+
+  /* M3 Elevation */
+  --shadow-level-1: 0 1px 3px 1px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-level-2: 0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-level-3: 0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --shadow-level-4: 0 6px 10px 4px rgba(0, 0, 0, 0.15), 0 2px 3px 0 rgba(0, 0, 0, 0.3);
+  --shadow-level-5: 0 8px 12px 6px rgba(0, 0, 0, 0.15), 0 4px 4px 0 rgba(0, 0, 0, 0.3);
+
+  /* Motion tokens */
+  --motion-duration-short: 150ms;
+  --motion-duration-medium: 300ms;
+  --motion-duration-long: 500ms;
+  --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1.0);
+  --motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  --motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15);
 }
 
 * {
@@ -94,57 +114,77 @@ body {
   outline-color: var(--color-ring);
 }
 
+/* M3 Motion Keyframes */
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(34, 197, 94, 0.25);
-  }
+  0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.25); }
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes checkmark {
-  0% {
-    stroke-dashoffset: 100;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.5s ease-out forwards;
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
-.animate-checkmark {
-  stroke-dasharray: 100;
-  animation: checkmark 0.6s ease-out forwards;
+/* Utility classes */
+.animate-fade-in-up { animation: fade-in-up 0.4s var(--motion-easing-emphasized-decelerate) forwards; }
+.animate-fade-in-scale { animation: fade-in-scale 0.3s var(--motion-easing-emphasized-decelerate) forwards; }
+.animate-slide-up { animation: slide-up 0.35s var(--motion-easing-emphasized-decelerate) forwards; }
+.animate-slide-down { animation: slide-down 0.25s var(--motion-easing-emphasized-decelerate) forwards; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-checkmark { stroke-dasharray: 100; animation: checkmark 0.6s ease-out forwards; }
+.animate-breathe { animation: breathe 2s ease-in-out infinite; }
+
+.stagger-1 { animation-delay: 50ms; animation-fill-mode: both; }
+.stagger-2 { animation-delay: 100ms; animation-fill-mode: both; }
+.stagger-3 { animation-delay: 150ms; animation-fill-mode: both; }
+.stagger-4 { animation-delay: 200ms; animation-fill-mode: both; }
+.stagger-5 { animation-delay: 250ms; animation-fill-mode: both; }
+.stagger-6 { animation-delay: 300ms; animation-fill-mode: both; }
+.stagger-7 { animation-delay: 350ms; animation-fill-mode: both; }
+
+/* M3-style shimmer for skeletons */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #1a221a 25%, #222d22 50%, #1a221a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileCheck2, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { RentTrendChart } from "@/components/charts/rent-trend-chart";
 import { LocalityMap } from "@/components/maps/locality-map";
 import { LocalityGrid } from "@/components/rent/locality-grid";
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { aggregateRent } from "@/lib/analytics/statistics";
 import { getAllLocalities, getAllLocalitiesWithStats, getAllSubmissions, getCityStats, getTrendSeriesForLocality } from "@/lib/data/db";
 import { formatINR, formatNumber } from "@/lib/utils";
+import { HomeClient } from "@/components/home/home-client";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -49,9 +50,8 @@ export default async function HomePage() {
     median2BHK: loc.median2BHK,
   }));
 
-  return (
+  const content = (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
-
       {/* HERO SECTION */}
       <section className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-center">
         <div>
@@ -251,6 +251,12 @@ export default async function HomePage() {
         </div>
       </section>
     </div>
+  );
+
+  return (
+    <HomeClient mapLocalities={mapLocalities}>
+      {content}
+    </HomeClient>
   );
 }
 
