@@ -35,9 +35,13 @@ export async function generateMetadata({
   params: Promise<{ localitySlug: string }>;
 }): Promise<Metadata> {
   const { localitySlug } = await params;
-  const locality = await getLocalityBySlug(localitySlug);
-  if (!locality) return {};
-  return localityMetadata(locality, `/hyderabad/${locality.slug}`);
+  try {
+    const locality = await getLocalityBySlug(localitySlug);
+    if (!locality) return {};
+    return localityMetadata(locality, `/hyderabad/${locality.slug}`);
+  } catch {
+    return {};
+  }
 }
 
 function timeAgo(date: Date) {
@@ -64,15 +68,30 @@ export default async function LocalityPage({
   params: Promise<{ localitySlug: string }>;
 }) {
   const { localitySlug } = await params;
-  const locality = await getLocalityBySlug(localitySlug);
+
+  let locality: Awaited<ReturnType<typeof getLocalityBySlug>> = null;
+  try {
+    locality = await getLocalityBySlug(localitySlug);
+  } catch {
+    // DB unavailable
+  }
   if (!locality) notFound();
 
-  const [submissions, allBuildings, trendData, allLocalities] = await Promise.all([
-    getSubmissionsForLocality(locality.slug),
-    getAllBuildings(),
-    getTrendSeriesForLocality(locality.slug),
-    getAllLocalitiesWithStats(),
-  ]);
+  let submissions: import("@/lib/types").RentSubmission[] = [];
+  let allBuildings: import("@/lib/types").Building[] = [];
+  let trendData: import("@/lib/types").TrendPoint[] = [];
+  let allLocalities: import("@/lib/data/db").LocalityWithStats[] = [];
+
+  try {
+    [submissions, allBuildings, trendData, allLocalities] = await Promise.all([
+      getSubmissionsForLocality(locality.slug),
+      getAllBuildings(),
+      getTrendSeriesForLocality(locality.slug),
+      getAllLocalitiesWithStats(),
+    ]);
+  } catch {
+    // DB unavailable - render with empty data
+  }
 
   const aggregate = aggregateRent(submissions, { label: locality.name });
   const copy = generatedLocalityCopy(locality);

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { getAllBuildings, getBuildingBySlug, getLocalityBySlug, getSubmissionsForBuilding } from "@/lib/data/db";
+import { getBuildingBySlug, getLocalityBySlug, getSubmissionsForBuilding } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
@@ -24,13 +24,17 @@ export async function generateMetadata({
   params: Promise<{ buildingSlug: string }>;
 }): Promise<Metadata> {
   const { buildingSlug } = await params;
-  const building = await getBuildingBySlug(buildingSlug);
-  if (!building) return {};
-  return baseMetadata({
-    title: `${building.name} rent history`,
-    description: `Verified rent ranges, amenities, aliases, and building-level rental intelligence for ${building.name}, Hyderabad.`,
-    alternates: { canonical: `/building/${building.slug}` },
-  });
+  try {
+    const building = await getBuildingBySlug(buildingSlug);
+    if (!building) return {};
+    return baseMetadata({
+      title: `${building.name} rent history`,
+      description: `Verified rent ranges, amenities, aliases, and building-level rental intelligence for ${building.name}, Hyderabad.`,
+      alternates: { canonical: `/building/${building.slug}` },
+    });
+  } catch {
+    return {};
+  }
 }
 
 export default async function BuildingPage({
@@ -39,13 +43,26 @@ export default async function BuildingPage({
   params: Promise<{ buildingSlug: string }>;
 }) {
   const { buildingSlug } = await params;
-  const building = await getBuildingBySlug(buildingSlug);
+
+  let building: Awaited<ReturnType<typeof getBuildingBySlug>> = null;
+  try {
+    building = await getBuildingBySlug(buildingSlug);
+  } catch {
+    // DB unavailable
+  }
   if (!building) notFound();
 
-  const [locality, submissions] = await Promise.all([
-    getLocalityBySlug(building.localitySlug),
-    getSubmissionsForBuilding(building.slug),
-  ]);
+  let locality: Awaited<ReturnType<typeof getLocalityBySlug>> = null;
+  let submissions: import("@/lib/types").RentSubmission[] = [];
+  try {
+    [locality, submissions] = await Promise.all([
+      getLocalityBySlug(building.localitySlug),
+      getSubmissionsForBuilding(building.slug),
+    ]);
+  } catch {
+    // DB unavailable
+  }
+
   const aggregate = aggregateRent(submissions, { label: building.name });
   const hasData = aggregate.sampleSize > 0;
 

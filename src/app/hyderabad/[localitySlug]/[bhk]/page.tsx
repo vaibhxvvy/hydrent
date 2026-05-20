@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { getAllLocalities, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
+import { getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
@@ -25,14 +25,18 @@ export async function generateMetadata({
   params: Promise<{ localitySlug: string; bhk: string }>;
 }): Promise<Metadata> {
   const { localitySlug, bhk } = await params;
-  const locality = await getLocalityBySlug(localitySlug);
-  if (!locality) return {};
-  const label = bhk.toUpperCase();
-  return baseMetadata({
-    title: `${label} rent in ${locality.name}`,
-    description: `${label} rent ranges, confidence score, and verified community signals for ${locality.name}, Hyderabad.`,
-    alternates: { canonical: `/hyderabad/${locality.slug}/${bhk}` },
-  });
+  try {
+    const locality = await getLocalityBySlug(localitySlug);
+    if (!locality) return {};
+    const label = bhk.toUpperCase();
+    return baseMetadata({
+      title: `${label} rent in ${locality.name}`,
+      description: `${label} rent ranges, confidence score, and verified community signals for ${locality.name}, Hyderabad.`,
+      alternates: { canonical: `/hyderabad/${locality.slug}/${bhk}` },
+    });
+  } catch {
+    return {};
+  }
 }
 
 export default async function BhkPage({
@@ -41,11 +45,23 @@ export default async function BhkPage({
   params: Promise<{ localitySlug: string; bhk: string }>;
 }) {
   const { localitySlug, bhk } = await params;
-  const locality = await getLocalityBySlug(localitySlug);
+
+  let locality: Awaited<ReturnType<typeof getLocalityBySlug>> = null;
+  try {
+    locality = await getLocalityBySlug(localitySlug);
+  } catch {
+    // DB unavailable
+  }
   if (!locality || !bhks.includes(bhk)) notFound();
 
+  let allSubmissions: import("@/lib/types").RentSubmission[] = [];
+  try {
+    allSubmissions = await getSubmissionsForLocality(locality.slug);
+  } catch {
+    // DB unavailable
+  }
+
   const label = bhk.toUpperCase();
-  const allSubmissions = await getSubmissionsForLocality(locality.slug);
   const submissions = allSubmissions.filter(
     (submission) => submission.bhk.toLowerCase() === bhk,
   );

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { getAllLocalities, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
+import { getAllLocalitiesWithStats, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
@@ -24,14 +24,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { comparisonSlug } = await params;
   const [leftSlug, rightSlug] = comparisonSlug.split("-vs-");
-  const left = leftSlug ? await getLocalityBySlug(leftSlug) : undefined;
-  const right = rightSlug ? await getLocalityBySlug(rightSlug) : undefined;
-  if (!left || !right) return {};
-  return baseMetadata({
-    title: `${left.name} vs ${right.name} rent comparison`,
-    description: `Compare affordability, rent ranges, confidence, and commute context between ${left.name} and ${right.name}.`,
-    alternates: { canonical: `/compare/${comparisonSlug}` },
-  });
+  try {
+    const left = leftSlug ? await getLocalityBySlug(leftSlug) : undefined;
+    const right = rightSlug ? await getLocalityBySlug(rightSlug) : undefined;
+    if (!left || !right) return {};
+    return baseMetadata({
+      title: `${left.name} vs ${right.name} rent comparison`,
+      description: `Compare affordability, rent ranges, confidence, and commute context between ${left.name} and ${right.name}.`,
+      alternates: { canonical: `/compare/${comparisonSlug}` },
+    });
+  } catch {
+    return {};
+  }
 }
 
 export default async function ComparePage({
@@ -41,17 +45,30 @@ export default async function ComparePage({
 }) {
   const { comparisonSlug } = await params;
   const [leftSlug, rightSlug] = comparisonSlug.split("-vs-");
-  const [left, right] = await Promise.all([
-    leftSlug ? getLocalityBySlug(leftSlug) : null,
-    rightSlug ? getLocalityBySlug(rightSlug) : null,
-  ]);
+
+  let left: Awaited<ReturnType<typeof getLocalityBySlug>> = null;
+  let right: Awaited<ReturnType<typeof getLocalityBySlug>> = null;
+  try {
+    left = leftSlug ? await getLocalityBySlug(leftSlug) : null;
+    right = rightSlug ? await getLocalityBySlug(rightSlug) : null;
+  } catch {
+    // DB unavailable
+  }
   if (!left || !right) notFound();
 
-  const [leftSubmissions, rightSubmissions, allLocalities] = await Promise.all([
-    getSubmissionsForLocality(left.slug),
-    getSubmissionsForLocality(right.slug),
-    getAllLocalities(),
-  ]);
+  let leftSubmissions: import("@/lib/types").RentSubmission[] = [];
+  let rightSubmissions: import("@/lib/types").RentSubmission[] = [];
+  let allLocalities: import("@/lib/data/db").LocalityWithStats[] = [];
+
+  try {
+    [leftSubmissions, rightSubmissions, allLocalities] = await Promise.all([
+      getSubmissionsForLocality(left.slug),
+      getSubmissionsForLocality(right.slug),
+      getAllLocalitiesWithStats(),
+    ]);
+  } catch {
+    // DB unavailable
+  }
 
   const leftAggregate = aggregateRent(leftSubmissions, { label: left.name });
   const rightAggregate = aggregateRent(rightSubmissions, { label: right.name });

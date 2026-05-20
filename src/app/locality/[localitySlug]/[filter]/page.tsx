@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { aggregateRent } from "@/lib/analytics/statistics";
-import { getAllLocalities, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
+import { getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 
@@ -24,13 +24,17 @@ export async function generateMetadata({
   params: Promise<{ localitySlug: string; filter: string }>;
 }): Promise<Metadata> {
   const { localitySlug, filter } = await params;
-  const locality = await getLocalityBySlug(localitySlug);
-  if (!locality) return {};
-  return baseMetadata({
-    title: `${filter} rentals in ${locality.name}`,
-    description: `Filtered rent intelligence for ${filter} homes in ${locality.name}, Hyderabad.`,
-    alternates: { canonical: `/locality/${locality.slug}/${filter}` },
-  });
+  try {
+    const locality = await getLocalityBySlug(localitySlug);
+    if (!locality) return {};
+    return baseMetadata({
+      title: `${filter} rentals in ${locality.name}`,
+      description: `Filtered rent intelligence for ${filter} homes in ${locality.name}, Hyderabad.`,
+      alternates: { canonical: `/locality/${locality.slug}/${filter}` },
+    });
+  } catch {
+    return {};
+  }
 }
 
 export default async function LocalityFilterPage({
@@ -39,10 +43,22 @@ export default async function LocalityFilterPage({
   params: Promise<{ localitySlug: string; filter: string }>;
 }) {
   const { localitySlug, filter } = await params;
-  const locality = await getLocalityBySlug(localitySlug);
+
+  let locality: Awaited<ReturnType<typeof getLocalityBySlug>> = null;
+  try {
+    locality = await getLocalityBySlug(localitySlug);
+  } catch {
+    // DB unavailable
+  }
   if (!locality || !filters.includes(filter)) notFound();
 
-  const allSubmissions = await getSubmissionsForLocality(locality.slug);
+  let allSubmissions: import("@/lib/types").RentSubmission[] = [];
+  try {
+    allSubmissions = await getSubmissionsForLocality(locality.slug);
+  } catch {
+    // DB unavailable
+  }
+
   const submissions = allSubmissions.filter((submission) => {
     if (filter === "furnished") return submission.furnishing === "FULLY_FURNISHED";
     if (filter === "unfurnished") return submission.furnishing === "UNFURNISHED";
