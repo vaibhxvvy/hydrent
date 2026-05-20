@@ -1,220 +1,188 @@
 # HydRent Deployment Guide
 
-Complete step-by-step instructions to create a new repository, push this codebase, and deploy it live.
+Complete step-by-step instructions to deploy HydRent from your GitHub repo to Vercel with Supabase.
 
 ---
 
 ## Prerequisites
 
-- Node.js 20+ and npm installed
-- Git installed
-- A GitHub account
-- A Vercel account (free tier)
-- A Supabase account (free tier)
+- GitHub account (repo already pushed)
+- Vercel account (free tier)
+- Supabase account (free tier)
 
 ---
 
-## Step 1: Create a New GitHub Repository & Push
+## Step 1: Create Supabase Project (Database)
 
-### Option A: Quick One-Liner
+This gives you a free PostgreSQL database.
 
-```bash
-# 1. Create a new repository on GitHub first (no README, .gitignore, or license).
-# 2. Copy the repository URL (e.g., https://github.com/YOUR_USERNAME/hydrent.git).
-# 3. Run these commands in the project folder:
+1. Go to https://supabase.com and log in.
+2. Click **New Project**.
+3. Choose an organization (or create one).
+4. Enter project details:
+   - Name: `hydrent-db`
+   - Database Password: (enter a strong password)
+   - Region: Choose > **Asia Pacific (Mumbai)** for lowest latency in India, or closest to your users.
+5. Click **Create new project** and wait (~1-2 minutes).
 
-git remote add origin https://github.com/YOUR_USERNAME/hydrent.git
-git branch -M main
-git push -u origin main
-```
+6. Once created, go to **Project Settings** (gear icon at bottom left).
 
-### Option B: Via GitHub CLI
+7. Click **Database** in the left sidebar.
 
-```bash
-# Install gh if you haven't already
-# https://cli.github.com/
+8. Find the **Connection string** section. Copy the **URI** format.
+   It looks like this:
+   ```
+   postgresql://postgres:[password]@db.xxxxxx.supabase.co:5432/postgres?schema=public
+   ```
 
-# Authenticate with GitHub
-git login
+9. Also copy your **Project URL** (e.g., `https://xxxxxx.supabase.co`) and keep this page open.
 
-# Create a new private repository on your account and push
-git repo create hydrent --private --source=. --push
-```
+10. Go to **Project Settings > API**. Copy:
+    - **Project URL** (e.g., `https://xxxxxx.supabase.co`)
+    - **anon public** key (looks like a long string)
+    - **service_role secret** key (click reveal)
 
 ---
 
-## Step 2: Set Up Environment Variables
+## Step 2: Set Up Database Locally
 
-Copy the example environment file and fill in your values:
+Open your terminal inside the project folder and run:
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Create your local .env from the example
 cp .env.example .env
 ```
 
-Edit `.env` with your real credentials:
+Now edit the `.env` file in any text editor. Replace the values:
 
 ```bash
-# Required for Prisma + Supabase
-DATABASE_URL="postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres?schema=public"
-DIRECT_URL="postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres?schema=public"
+# Required: Supabase Connection (paste the URI from Step 1, point 8)
+DATABASE_URL="your-supabase-connection-string-here"
+DIRECT_URL="your-supabase-connection-string-here"
 
-# App URL (change after Vercel deploy)
+# Required: Your app URL (use localhost for dev, change after Vercel deploy)
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
-# Supabase (optional for auth/storage)
-NEXT_PUBLIC_SUPABASE_URL="https://[project-id].supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="[your-anon-key]"
-SUPABASE_SERVICE_ROLE_KEY="[your-service-role-key]"
+# Required: Supabase project URL
+NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
 
-# Optional: PostHog analytics
+# Required: Supabase anon key (from API settings)
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key-here"
+
+# Required: Supabase service role key (from API settings -> service_role)
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key-here"
+
+# Optional: PostHog analytics (can leave blank for now)
 NEXT_PUBLIC_POSTHOG_KEY=""
 NEXT_PUBLIC_POSTHOG_HOST="https://app.posthog.com"
 
-# Optional: Sentry error tracking
+# Optional: Sentry error tracking (can leave blank for now)
 SENTRY_DSN=""
 
-# Required: Change this in production!
-RATE_LIMIT_SECRET="change-me-in-production"
+# Required: Change this in production to a random string!
+RATE_LIMIT_SECRET="hydrent-dev-secret-change-me-123"
 ```
 
----
+**Save the file.**
 
-## Step 3: Set Up Supabase (PostgreSQL Database)
-
-1. Go to https://supabase.com/ and create a new project.
-2. In Project Settings > Database, copy the **Connection string** (URI).
-3. Paste it into `DATABASE_URL` and `DIRECT_URL` in your `.env`.
-4. Run migrations:
+Now run the database setup:
 
 ```bash
-# Generate Prisma client
+# Generate the Prisma client
 npm run db:generate
 
-# Run migrations (creates all tables)
+# Push the schema to Supabase (creates all tables)
 npx prisma migrate deploy
 
 # Seed the database with Hyderabad data
 npm run db:seed
 ```
 
-The seed script will populate:
-- Hyderabad city record
-- Zones (West Hyderabad, Central Hyderabad, etc.)
-- Localities (Gachibowli, Kondapur, Madhapur, etc.)
-- Buildings / Societies (My Home Bhooja, Prestige High Fields, etc.)
-- Rent submissions with realistic data
-- Building aliases for search normalization
+If everything works, you will see output like "Created X localities, Y buildings, Z submissions."
 
 ---
 
-## Step 4: Deploy to Vercel
+## Step 3: Deploy to Vercel
 
-### Option A: Vercel CLI (Recommended)
+1. Go to https://vercel.com and log in with your **GitHub account**.
+2. Click **Add New Project** (big button on dashboard).
+3. In **Import Git Repository**, find your `hydrent` repository and click **Import**.
+4. On the **Configure Project** page:
+   - Framework Preset: should auto-detect **Next.js**
+   - Build Command: should auto-detect `prisma generate && next build`
+   - Output Directory: leave default
+   - **Root Directory:** leave default (`.`)
 
-```bash
-# Install Vercel CLI globally
-npm i -g vercel
+5. **IMPORTANT — Add Environment Variables:**
+   Scroll down to **Environment Variables** and add each variable from your `.env` file one by one:
 
-# Login to Vercel
-vercel login
+   | Key | Value (paste exactly from your `.env`) |
+   |-----|----------------------------------------|
+   | `DATABASE_URL` | `your-supabase-connection-string` |
+   | `DIRECT_URL` | `same as above` |
+   | `NEXT_PUBLIC_APP_URL` | `https://hydrent-yourname.vercel.app` (or your Vercel URL) |
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://your-project.supabase.co` |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `your-anon-key` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | `your-service-role-key` |
+   | `RATE_LIMIT_SECRET` | `change-me-in-production` |
 
-# Link your project
-vercel
+6. Click **Deploy**.
+   - Vercel will build the project (~1-3 minutes).
+   - If the build fails, click the error log and check the message — usually a missing environment variable or database connection issue.
 
-# Follow the prompts to link to your GitHub repo.
-# Choose your GitHub repository when prompted.
-```
-
-### Option B: Vercel Dashboard (Web)
-
-1. Go to https://vercel.com/new and import your GitHub repository.
-2. Vercel will auto-detect Next.js.
-3. Add these **Environment Variables** in the Vercel dashboard:
-
-| Variable | Value |
-|----------|-------|
-| `DATABASE_URL` | Your Supabase connection string |
-| `DIRECT_URL` | Same as DATABASE_URL |
-| `NEXT_PUBLIC_APP_URL` | Your Vercel domain (e.g., `https://hydrent.vercel.app`) |
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your Supabase service role key |
-| `RATE_LIMIT_SECRET` | A secure random string |
-
-4. Click **Deploy**.
+7. Once deployed, click **Continue to Dashboard**.
+   - Your site is live at `https://hydrent-[yourname].vercel.app`
 
 ---
 
-## Step 5: Post-Deployment Verification
+## Step 4: Verify Deployment
 
-After deployment, verify these URLs work:
+Click each URL below (replace with your actual domain):
 
 | URL | Expected Result |
 |-----|-----------------|
-| `https://your-domain.com/` | Homepage with rent overview |
-| `https://your-domain.com/api/health` | `{ "ok": true }` |
-| `https://your-domain.com/sitemap.xml` | XML sitemap for SEO |
-| `https://your-domain.com/robots.txt` | Robots file |
-| `https://your-domain.com/hyderabad/gachibowli` | Locality report with data |
-| `https://your-domain.com/building/prestige-high-fields` | Building page |
-| `https://your-domain.com/compare/gachibowli-vs-kondapur` | Comparison page |
+| `https://hydrent-yourname.vercel.app/` | Homepage with Hyderabad rent overview |
+| `https://hydrent-yourname.vercel.app/api/health` | `{ "ok": true }` |
+| `https://hydrent-yourname.vercel.app/sitemap.xml` | XML sitemap |
+| `https://hydrent-yourname.vercel.app/robots.txt` | Robots file |
+| `https://hydrent-yourname.vercel.app/hyderabad/gachibowli` | Locality report with real data |
+| `https://hydrent-yourname.vercel.app/building/prestige-high-fields` | Building page |
+| `https://hydrent-yourname.vercel.app/compare/gachibowli-vs-kondapur` | Comparison page |
 
 ---
 
-## Step 6: Continuous Deployment (Auto-Deploy on Push)
+## Common Issues & Fixes
 
-Once linked, every `git push` to `main` will auto-deploy:
+| Issue | Fix |
+|-------|-----|
+| Build fails with "DATABASE_URL not found" | Add env vars in Vercel project settings and redeploy |
+| "Connection refused" to database | Make sure `DATABASE_URL` uses port `5432` not `6543` for Prisma |
+| Seed script fails | Ensure `DATABASE_URL` and `DIRECT_URL` are both set in `.env` |
+| OpenStreetMap map is blank | Tiles load client-side; check browser dev tools for blocked requests |
+| Admin page is public | Add auth (NextAuth/Clerk) for production (optional for demo) |
+
+---
+
+## Continuous Deployment (Auto-Update)
+
+Once Vercel is linked to your GitHub repo, every `git push` auto-deploys:
 
 ```bash
-# Make any change, then:
 git add .
-git commit -m "feat: update XYZ"
+git commit -m "your update message"
 git push origin main
 # Vercel auto-deploys from GitHub
 ```
 
 ---
 
-## Troubleshooting
-
-### Build Fails
-```bash
-# 1. Verify TypeScript compiles
-npm run typecheck
-
-# 2. Verify build locally
-npm run build
-
-# 3. Check Prisma schema
-npx prisma validate
-```
-
-### Database Connection Error
-- Verify `DATABASE_URL` uses the **Transaction pooler** port (5432) or **Session pooler** port (6543).
-- Ensure your Supabase project is active (not paused).
-- Check IP allowlist in Supabase Dashboard > Database > IPv4.
-
-### Map Tiles Not Loading
-- OpenStreetMap tiles are free but have usage limits.
-- For production, consider self-hosting tile server or using free Mapbox tier.
-
----
-
-## Optional: Production Hardening
-
-1. **Enable NextAuth or Clerk** for admin route protection.
-2. **Add Sentry DSN** for error tracking.
-3. **Configure PostHog** for product analytics.
-4. **Set up a cron job** (Vercel Cron) to recalculate trend aggregates daily.
-5. **Enable row-level security** in Supabase before accepting public submissions.
-
----
-
-## Quick Reference Commands
+## Quick Commands Reference
 
 ```bash
 # Local development
-npm install
 npm run dev
 
 # Type check
@@ -234,14 +202,3 @@ npm run build
 # Lint
 npm run lint
 ```
-
----
-
-## Next Steps
-
-After deployment:
-
-1. **Submit your sitemap** to Google Search Console.
-2. **Share the project** on LinkedIn, Reddit (r/hyderabad, r/india), and Twitter.
-3. **Collect real rent data** from Hyderabad communities.
-4. **Expand to other cities** by adding new City, Zone, and Locality records.
