@@ -2,25 +2,16 @@ import Link from "next/link";
 import { ArrowUpRight, Building2, FileCheck2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ConfidenceMeter } from "@/components/rent/confidence-meter";
-import { aggregateRent } from "@/lib/analytics/statistics";
-import { getAllLocalitiesWithStats, getSubmissionsForLocality } from "@/lib/data/db";
+import { getAllLocalitiesWithStats } from "@/lib/data/db";
 import { formatINR } from "@/lib/utils";
 
-function timeAgo(date: Date) {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  const diffDay = Math.floor(diffHr / 24);
-  return `${diffDay}d ago`;
-}
-
 export async function LocalityGrid() {
-  const localitiesWithStats = await getAllLocalitiesWithStats();
+  let localitiesWithStats: import("@/lib/data/db").LocalityWithStats[] = [];
+  try {
+    localitiesWithStats = await getAllLocalitiesWithStats();
+  } catch {
+    // Database unavailable - show empty state
+  }
 
   if (localitiesWithStats.length === 0) {
     return (
@@ -34,7 +25,6 @@ export async function LocalityGrid() {
     );
   }
 
-  // Sort: has data + confidence 70+ first, then 40-70, then below 40, then no data last
   const sorted = [...localitiesWithStats].sort((a, b) => {
     const aHasData = a.submissionCount > 0;
     const bHasData = b.submissionCount > 0;
@@ -46,14 +36,12 @@ export async function LocalityGrid() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {sorted.map(async (locality) => {
-        const submissions = await getSubmissionsForLocality(locality.slug);
-        const aggregate = aggregateRent(submissions, { label: locality.name });
-        const hasData = aggregate.sampleSize > 0;
+      {sorted.map((locality) => {
+        const hasData = locality.submissionCount > 0;
         const confidenceTier = hasData
-          ? aggregate.confidenceScore >= 70
+          ? locality.confidenceScore >= 70
             ? "high"
-            : aggregate.confidenceScore >= 40
+            : locality.confidenceScore >= 40
               ? "medium"
               : "low"
           : "none";
@@ -89,29 +77,21 @@ export async function LocalityGrid() {
                               : "warning"
                         }
                       >
-                        {aggregate.confidenceScore}/100
+                        {locality.confidenceScore}/100
                       </Badge>
                       <span className="text-xs text-muted-foreground">
-                        {aggregate.sampleSize} submission{aggregate.sampleSize !== 1 ? "s" : ""}
+                        {locality.submissionCount} submission{locality.submissionCount !== 1 ? "s" : ""}
                       </span>
                     </div>
-                    <p className="mt-4 text-2xl font-semibold tracking-normal">
-                      {formatINR(aggregate.median)}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {formatINR(aggregate.p25)} - {formatINR(aggregate.p75)} central range
-                    </p>
-                    <div className="mt-4">
-                      <ConfidenceMeter
-                        compact
-                        score={aggregate.confidenceScore}
-                        level={aggregate.confidenceLevel}
-                      />
-                    </div>
-                    {submissions.length > 0 && (
-                      <p className="mt-3 text-xs text-muted-foreground">
-                        Updated {timeAgo(new Date(Math.max(...submissions.map((s) => new Date(s.submittedAt).getTime()))))}
-                      </p>
+                    {locality.median2BHK && (
+                      <>
+                        <p className="mt-4 text-2xl font-semibold tracking-normal">
+                          {formatINR(locality.median2BHK)}
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          2BHK median rent
+                        </p>
+                      </>
                     )}
                     <div className="mt-4">
                       <Badge variant="outline" className="gap-1">
