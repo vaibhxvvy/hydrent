@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -31,6 +32,7 @@ export default function RootLayout({
           </div>
           <OnboardingTour />
         </TooltipProvider>
+        <Analytics />
       </body>
     </html>
   );
