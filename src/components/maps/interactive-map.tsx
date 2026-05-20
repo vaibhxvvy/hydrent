@@ -7,6 +7,19 @@ import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } fr
 import L from "leaflet";
 import { formatINR } from "@/lib/utils";
 
+interface BHKBreakdownItem {
+  bhk: string;
+  count: number;
+  minRent: number;
+  maxRent: number;
+  medianRent: number | null;
+}
+
+interface FurnishingBreakdownItem {
+  furnishing: string;
+  count: number;
+}
+
 interface LocalityData {
   id: string;
   name: string;
@@ -17,6 +30,12 @@ interface LocalityData {
   submissionCount: number;
   confidenceScore: number;
   median2BHK: number | null;
+  bhkBreakdown: BHKBreakdownItem[];
+  furnishingBreakdown: FurnishingBreakdownItem[];
+  avgTrustScore: number;
+  avgRent: number;
+  minRent: number;
+  maxRent: number;
 }
 
 const BHK_OPTIONS = ["1BHK", "2BHK", "3BHK", "4BHK"];
@@ -51,7 +70,7 @@ function LocalityMarkers({ localities, onLocalityClick }: {
         <CircleMarker
           key={loc.id}
           center={[loc.lat, loc.lng]}
-          radius={hasData ? 10 : 7}
+          radius={hasData ? 12 : 7}
           pathOptions={{
             fillColor: color,
             color: "#ffffff",
@@ -63,7 +82,7 @@ function LocalityMarkers({ localities, onLocalityClick }: {
           {hasData && loc.confidenceScore >= 70 && (
             <CircleMarker
               center={[loc.lat, loc.lng]}
-              radius={16}
+              radius={18}
               pathOptions={{
                 color: color,
                 weight: 1,
@@ -73,6 +92,57 @@ function LocalityMarkers({ localities, onLocalityClick }: {
               }}
               interactive={false}
             />
+          )}
+          {hasData && (
+            <Popup>
+              <div className="min-w-[200px] font-sans">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-bold text-base">{loc.name}</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+                    loc.confidenceScore >= 70 ? "bg-green-100 text-green-800" :
+                    loc.confidenceScore >= 40 ? "bg-yellow-100 text-yellow-800" :
+                    "bg-red-100 text-red-800"
+                  }`}>
+                    {loc.confidenceScore}
+                  </span>
+                </div>
+                {loc.bhkBreakdown.length > 0 && (
+                  <div className="space-y-1 mb-2">
+                    {loc.bhkBreakdown.map((b) => (
+                      <div key={b.bhk} className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-gray-700">{b.bhk}</span>
+                        <span className="text-gray-500">
+                          ₹{b.minRent.toLocaleString()} – ₹{b.maxRent.toLocaleString()}
+                        </span>
+                        <span className="text-gray-400 ml-2">({b.count})</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="border-t border-gray-200 pt-1.5 text-xs text-gray-500 space-y-0.5">
+                  {loc.avgTrustScore > 0 && (
+                    <div className="flex justify-between">
+                      <span>Trust score</span>
+                      <span className="font-medium">{loc.avgTrustScore}/100</span>
+                    </div>
+                  )}
+                  {loc.furnishingBreakdown.length > 0 && (
+                    <div className="flex justify-between">
+                      <span>Furnishing</span>
+                      <span className="font-medium">
+                        {loc.furnishingBreakdown.map((f) =>
+                          `${f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"}`
+                        ).join(", ")}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Submissions</span>
+                    <span className="font-medium">{loc.submissionCount}</span>
+                  </div>
+                </div>
+              </div>
+            </Popup>
           )}
         </CircleMarker>
       ))}
@@ -229,6 +299,8 @@ function MapContent({ localities, onClose, standalone }: {
         scrollWheelZoom={true}
         className={`w-full ${standalone ? "h-screen" : "h-[520px]"} rounded-2xl max-md:h-[400px]`}
         zoomControl={false}
+        maxBounds={[[17.0, 78.0], [17.8, 78.9]] as [[number, number], [number, number]]}
+        maxBoundsViscosity={1.0}
       >
         <TileLayer
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
@@ -247,11 +319,11 @@ function MapContent({ localities, onClose, standalone }: {
         <ZoomControls />
       </MapContainer>
 
-      {/* FAB - My Location */}
+      {/* FAB - Reset to Hyderabad view */}
       <button
         onClick={() => {
           setMapCenter([17.385, 78.4867]);
-          setMapZoom(11);
+          setMapZoom(12);
         }}
         className="absolute bottom-4 left-4 z-[1000] flex size-12 items-center justify-center rounded-2xl bg-[#1a221a] border border-[#2d3f2d] text-[#22c55e] shadow-level-3 hover:bg-[#222d22] transition-all active:scale-90"
         aria-label="Reset view"
@@ -275,27 +347,67 @@ function MapContent({ localities, onClose, standalone }: {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
+
             {selectedLocality.submissionCount > 0 ? (
-              <div className="mt-4 flex items-center gap-4 text-sm">
-                {selectedLocality.median2BHK && (
+              <div className="mt-4">
+                {/* Key metrics row */}
+                <div className="flex items-center gap-3 text-sm mb-3">
+                  {selectedLocality.median2BHK && (
+                    <div className="bg-[#1a221a] rounded-xl px-4 py-2.5 flex-1">
+                      <p className="text-[#4b7a4b] text-xs">2BHK median</p>
+                      <p className="font-mono text-lg font-bold text-[#22c55e] mt-0.5">{formatINR(selectedLocality.median2BHK)}</p>
+                    </div>
+                  )}
                   <div className="bg-[#1a221a] rounded-xl px-4 py-2.5 flex-1">
-                    <p className="text-[#4b7a4b] text-xs">2BHK median</p>
-                    <p className="font-mono text-lg font-bold text-[#22c55e] mt-0.5">{formatINR(selectedLocality.median2BHK)}</p>
+                    <p className="text-[#4b7a4b] text-xs">Confidence</p>
+                    <p className="font-mono text-lg font-bold text-[#f0fdf4] mt-0.5">{selectedLocality.confidenceScore}/100</p>
+                  </div>
+                  {selectedLocality.avgTrustScore > 0 && (
+                    <div className="bg-[#1a221a] rounded-xl px-4 py-2.5 flex-1">
+                      <p className="text-[#4b7a4b] text-xs">Trust</p>
+                      <p className="font-mono text-lg font-bold text-[#22c55e] mt-0.5">{selectedLocality.avgTrustScore}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* BHK breakdown */}
+                {selectedLocality.bhkBreakdown.length > 0 && (
+                  <div className="bg-[#1a221a] rounded-xl p-3 mb-3">
+                    <p className="text-[#4b7a4b] text-xs mb-2">Rent by BHK</p>
+                    <div className="space-y-1.5">
+                      {selectedLocality.bhkBreakdown.map((b) => (
+                        <div key={b.bhk} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center size-6 rounded-md bg-[#0a0f0a] text-xs font-bold text-[#22c55e]">{b.bhk.replace("BHK","")}</span>
+                            <span className="text-[#4b7a4b] text-xs">({b.count})</span>
+                          </div>
+                          <span className="font-mono text-[#f0fdf4] font-medium">
+                            ₹{b.minRent.toLocaleString()} – ₹{b.maxRent.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
-                <div className="bg-[#1a221a] rounded-xl px-4 py-2.5 flex-1">
-                  <p className="text-[#4b7a4b] text-xs">Confidence</p>
-                  <p className="font-mono text-lg font-bold text-[#f0fdf4] mt-0.5">{selectedLocality.confidenceScore}/100</p>
-                </div>
+
+                {/* Furnishing + trust summary */}
+                {selectedLocality.furnishingBreakdown.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs text-[#4b7a4b] mb-1">
+                    {selectedLocality.furnishingBreakdown.map((f) => (
+                      <span key={f.furnishing} className="bg-[#1a221a] rounded-lg px-2.5 py-1">
+                        {f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"} ({f.count})
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <p className="mt-3 text-sm text-[#4b7a4b]">No data yet. Be the first to submit.</p>
             )}
+
             <div className="mt-4 flex gap-2">
               <button
-                onClick={() => {
-                  router.push(`/hyderabad/${selectedLocality.slug}`);
-                }}
+                onClick={() => router.push(`/hyderabad/${selectedLocality.slug}`)}
                 className="flex-1 rounded-xl bg-[#22c55e] py-2.5 text-sm font-semibold text-[#0a0f0a] hover:bg-[#16a34a] transition-all active:scale-[0.97]"
               >
                 View full report

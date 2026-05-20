@@ -12,10 +12,29 @@ import type {
   Amenity,
 } from "@/lib/types";
 
+export type BHKBreakdownItem = {
+  bhk: string;
+  count: number;
+  minRent: number;
+  maxRent: number;
+  medianRent: number | null;
+};
+
+export type FurnishingBreakdownItem = {
+  furnishing: string;
+  count: number;
+};
+
 export type LocalityWithStats = Locality & {
   submissionCount: number;
   confidenceScore: number;
   median2BHK: number | null;
+  bhkBreakdown: BHKBreakdownItem[];
+  furnishingBreakdown: FurnishingBreakdownItem[];
+  avgTrustScore: number;
+  avgRent: number;
+  minRent: number;
+  maxRent: number;
 };
 
 export type DbLocalityStats = {
@@ -108,6 +127,36 @@ export async function getAllLocalitiesWithStats(): Promise<LocalityWithStats[]> 
         ))
       : 0;
 
+    const bhkGroups = new Map<string, SubmissionRow[]>();
+    for (const s of locSubmissions) {
+      if (!bhkGroups.has(s.bhk)) bhkGroups.set(s.bhk, []);
+      bhkGroups.get(s.bhk)!.push(s);
+    }
+    const bhkBreakdown: BHKBreakdownItem[] = Array.from(bhkGroups.entries()).map(([bhk, subs]) => {
+      const rents = subs.map((s) => s.effectiveMonthlyCost).sort((a, b) => a - b);
+      const minRent = rents.length > 0 ? rents[0]! : 0;
+      const maxRent = rents.length > 0 ? rents[rents.length - 1]! : 0;
+      const medianRent: number | null = rents.length > 0 ? rents[Math.floor(rents.length / 2)]! : null;
+      return { bhk, count: subs.length, minRent, maxRent, medianRent };
+    }).sort((a, b) => a.bhk.localeCompare(b.bhk));
+
+    const furnGroups = new Map<string, number>();
+    for (const s of locSubmissions) {
+      const key = s.furnishing;
+      furnGroups.set(key, (furnGroups.get(key) || 0) + 1);
+    }
+    const furnishingBreakdown = Array.from(furnGroups.entries()).map(([furnishing, count]) => ({
+      furnishing, count,
+    }));
+
+    const allRents = locSubmissions.map((s) => s.effectiveMonthlyCost);
+    const avgTrustScore = locSubmissions.length > 0
+      ? Math.round(locSubmissions.reduce((sum, s) => sum + Number(s.trustScore), 0) / locSubmissions.length)
+      : 0;
+    const avgRent = allRents.length > 0
+      ? Math.round(allRents.reduce((a, b) => a + b, 0) / allRents.length)
+      : 0;
+
     return {
       id: l.id,
       name: l.name,
@@ -122,13 +171,19 @@ export async function getAllLocalitiesWithStats(): Promise<LocalityWithStats[]> 
       submissionCount: locSubmissions.length,
       confidenceScore,
       median2BHK,
+      bhkBreakdown,
+      furnishingBreakdown,
+      avgTrustScore,
+      avgRent,
+      minRent: allRents.length > 0 ? Math.min(...allRents) : 0,
+      maxRent: allRents.length > 0 ? Math.max(...allRents) : 0,
     };
   });
 }
 
 export async function getAllLocalities(): Promise<Locality[]> {
   const withStats = await getAllLocalitiesWithStats();
-  return withStats.map(({ submissionCount, confidenceScore, median2BHK, ...loc }) => loc);
+  return withStats.map(({ submissionCount, confidenceScore, median2BHK, bhkBreakdown, furnishingBreakdown, avgTrustScore, avgRent, minRent, maxRent, ...loc }) => loc);
 }
 
 export async function getLocalityBySlug(slug: string): Promise<Locality | null> {

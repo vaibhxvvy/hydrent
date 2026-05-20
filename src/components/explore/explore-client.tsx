@@ -5,6 +5,11 @@ import { useState, useMemo } from "react";
 import { ArrowLeft, SlidersHorizontal, Filter, ArrowUpDown } from "lucide-react";
 import { InteractiveMap } from "@/components/maps/interactive-map";
 
+interface FurnishingBreakdownItem {
+  furnishing: string;
+  count: number;
+}
+
 interface LocalityData {
   id: string;
   name: string;
@@ -15,6 +20,12 @@ interface LocalityData {
   submissionCount: number;
   confidenceScore: number;
   median2BHK: number | null;
+  bhkBreakdown: Array<{ bhk: string; count: number; minRent: number; maxRent: number; medianRent: number | null }>;
+  furnishingBreakdown: FurnishingBreakdownItem[];
+  avgTrustScore: number;
+  avgRent: number;
+  minRent: number;
+  maxRent: number;
 }
 
 const BHK_FILTERS = ["All", "1BHK", "2BHK", "3BHK", "4BHK"];
@@ -28,6 +39,11 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
 
   const sortedLocalities = useMemo(() => {
     let list = [...localities];
+    if (bhkFilter !== "All") {
+      list = list.filter((l) =>
+        l.bhkBreakdown.some((b) => b.bhk === bhkFilter && b.count > 0)
+      );
+    }
     if (filteredLocality) {
       list = list.filter((l) => l.slug === filteredLocality);
     }
@@ -37,12 +53,12 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
       return a.name.localeCompare(b.name);
     });
     return list;
-  }, [localities, sortBy, filteredLocality]);
+  }, [localities, sortBy, filteredLocality, bhkFilter]);
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0a0f0a]">
       {/* Full-screen map */}
-      <InteractiveMap localities={localities} standalone={true} />
+      <InteractiveMap localities={sortedLocalities} standalone={true} />
 
       {/* Back button — top-left corner */}
       <button

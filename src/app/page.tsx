@@ -48,6 +48,12 @@ export default async function HomePage() {
     submissionCount: loc.submissionCount,
     confidenceScore: loc.confidenceScore,
     median2BHK: loc.median2BHK,
+    bhkBreakdown: loc.bhkBreakdown,
+    furnishingBreakdown: loc.furnishingBreakdown,
+    avgTrustScore: loc.avgTrustScore,
+    avgRent: loc.avgRent,
+    minRent: loc.minRent,
+    maxRent: loc.maxRent,
   }));
 
   const content = (

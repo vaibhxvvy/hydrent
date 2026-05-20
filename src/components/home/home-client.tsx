@@ -17,6 +17,12 @@ interface MapLocality {
   submissionCount: number;
   confidenceScore: number;
   median2BHK: number | null;
+  bhkBreakdown: Array<{ bhk: string; count: number; minRent: number; maxRent: number; medianRent: number | null }>;
+  furnishingBreakdown: Array<{ furnishing: string; count: number }>;
+  avgTrustScore: number;
+  avgRent: number;
+  minRent: number;
+  maxRent: number;
 }
 
 export function HomeClient({ children, mapLocalities }: {
