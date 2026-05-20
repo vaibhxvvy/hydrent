@@ -75,28 +75,28 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="fixed left-4 top-4 z-[1001] flex size-10 items-center justify-center rounded-full border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/80 text-[var(--md-sys-color-on-surface)] backdrop-blur-md hover:bg-[var(--md-sys-color-surface-container-high)] transition-all active:scale-90"
+        className="fixed left-3 sm:left-4 top-3 sm:top-4 z-[1001] flex size-10 items-center justify-center rounded-[--radius-card] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/80 text-[var(--md-sys-color-on-surface)] backdrop-blur-md hover:bg-[var(--md-sys-color-surface-container-high)] transition-all active:scale-90"
         aria-label="Go back"
       >
         <ArrowLeft size={18} />
       </button>
 
       {/* Notification Island Filter — top-center */}
-      <div ref={panelRef} className="fixed top-3 left-1/2 z-[1001] -translate-x-1/2 w-auto max-w-[90vw] sm:max-w-2xl px-2">
+      <div ref={panelRef} className="fixed top-2 sm:top-3 left-1/2 z-[1001] -translate-x-1/2 w-auto max-w-[94vw] sm:max-w-2xl px-1 sm:px-2">
         {/* Pill (collapsed state) */}
         <div
           onClick={() => !expanded && setExpanded(true)}
-          className={`cursor-pointer flex items-center gap-2 rounded-full border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/90 px-4 py-2 shadow-level-2 backdrop-blur-xl transition-all duration-300 ${
-            expanded ? "rounded-2xl" : "rounded-full hover:bg-[var(--elevation-level-4)]/90"
+          className={`cursor-pointer flex items-center gap-1 sm:gap-2 rounded-full border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/90 px-2 sm:px-4 py-1.5 sm:py-2 shadow-level-2 backdrop-blur-xl transition-all duration-300 ${
+            expanded ? "rounded-[--radius-card]" : "rounded-full hover:bg-[var(--elevation-level-4)]/90"
           }`}
         >
           {/* BHK pills (always visible) */}
-          <div className="flex gap-1">
+          <div className="flex gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
             {BHK_OPTIONS.map((bhk) => (
               <button
                 key={bhk}
                 onClick={(e) => { e.stopPropagation(); setBhkFilter(bhk); }}
-                className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all whitespace-nowrap ${
+                className={`rounded-full px-1.5 sm:px-2.5 py-1 text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap ${
                   bhkFilter === bhk
                     ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
                     : "text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
@@ -107,16 +107,16 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
             ))}
           </div>
 
-          <div className="h-4 w-px bg-[var(--md-sys-color-outline)]" />
+          <div className="h-4 w-px bg-[var(--md-sys-color-outline)] flex-shrink-0" />
 
           {/* Active filter badge */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 sm:gap-1.5">
             {activeFilterCount > 0 && (
-              <span className="flex size-5 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[10px] font-bold text-[var(--md-sys-color-on-primary)]">
+              <span className="flex size-4 sm:size-5 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[8px] sm:text-[10px] font-bold text-[var(--md-sys-color-on-primary)]">
                 {activeFilterCount}
               </span>
             )}
-            <span className="text-xs text-[var(--md-sys-color-on-surface-variant)] hidden sm:inline">
+            <span className="text-[10px] sm:text-xs text-[var(--md-sys-color-on-surface-variant)] hidden sm:inline">
               {filteredLocalities.length} of {localities.length}
             </span>
           </div>
@@ -124,47 +124,47 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
           {/* Expand toggle */}
           <button
             onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
-            className="rounded-full p-1 text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-all"
+            className="rounded-full p-0.5 sm:p-1 text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-all"
           >
-            <ChevronDown className={`size-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+            <ChevronDown className={`size-3 sm:size-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
           </button>
         </div>
 
         {/* Expanded panel */}
         {expanded && (
-          <div className="mt-2 animate-slide-down rounded-2xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/95 p-4 shadow-level-3 backdrop-blur-xl">
+          <div className="mt-2 animate-slide-down rounded-[--radius-card] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-3)]/95 p-3 sm:p-4 shadow-level-3 backdrop-blur-xl">
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-[var(--md-sys-color-on-surface-variant)]">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <span className="text-[10px] sm:text-xs text-[var(--md-sys-color-on-surface-variant)]">
                 <span className="font-mono text-[var(--md-sys-color-on-surface)]">{filteredLocalities.length}</span> of {localities.length} localities
-                <span className="ml-2 text-[var(--md-sys-color-primary)]">
+                <span className="ml-1 sm:ml-2 text-[var(--md-sys-color-primary)]">
                   {filteredLocalities.filter((l) => l.submissionCount > 0).length} with data
                 </span>
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 {activeFilterCount > 0 && (
-                  <button onClick={clearAllFilters} className="flex items-center gap-1 rounded-full bg-[var(--md-sys-color-surface-container-high)] px-2.5 py-1 text-xs text-[var(--md-sys-color-on-surface)] hover:brightness-110 transition-all">
-                    <X size={11} />
+                  <button onClick={clearAllFilters} className="flex items-center gap-1 rounded-full bg-[var(--md-sys-color-surface-container-high)] px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs text-[var(--md-sys-color-on-surface)] hover:brightness-110 transition-all">
+                    <X size={10} />
                     Clear
                   </button>
                 )}
                 <button onClick={() => setExpanded(false)} className="rounded-full p-1 text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]">
-                  <ChevronDown className="size-3.5 rotate-180" />
+                  <ChevronDown className="size-3 sm:size-3.5 rotate-180" />
                 </button>
               </div>
             </div>
 
             {/* Filter row */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Furnishing */}
               <div className="flex items-center gap-1">
-                <span className="text-[10px] font-medium text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">Furnishing</span>
-                <div className="flex gap-1">
+                <span className="text-[9px] sm:text-[10px] font-medium text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">Furnishing</span>
+                <div className="flex gap-0.5 sm:gap-1">
                   {FURNISHING_OPTIONS.map((f) => (
                     <button
                       key={f}
                       onClick={() => setFurnishingFilter(f)}
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all ${
+                      className={`rounded-full px-1.5 sm:px-2.5 py-1 text-[10px] sm:text-xs font-medium transition-all ${
                         furnishingFilter === f
                           ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
                           : "text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
@@ -176,15 +176,15 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
                 </div>
               </div>
 
-              <div className="h-4 w-px bg-[var(--md-sys-color-outline)]" />
+              <div className="h-3 sm:h-4 w-px bg-[var(--md-sys-color-outline)]" />
 
               {/* Sort */}
               <div className="flex items-center gap-1">
-                <span className="text-[10px] font-medium text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">Sort</span>
+                <span className="text-[9px] sm:text-[10px] font-medium text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">Sort</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none rounded-full border border-[var(--md-sys-color-outline)] bg-transparent px-2.5 py-1 text-xs text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] cursor-pointer"
+                  className="appearance-none rounded-full border border-[var(--md-sys-color-outline)] bg-transparent px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] cursor-pointer"
                 >
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -194,11 +194,11 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
             </div>
 
             {/* Locality filter */}
-            <div className="mt-3 pt-3 border-t border-[var(--md-sys-color-outline)]">
-              <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
+            <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-[var(--md-sys-color-outline)]">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5 max-h-24 sm:max-h-28 overflow-y-auto">
                 <button
                   onClick={() => setFilteredLocality(null)}
-                  className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all ${
+                  className={`rounded-full px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-medium transition-all ${
                     !filteredLocality ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" : "text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                   }`}
                 >All</button>
@@ -206,7 +206,7 @@ export function ExploreClient({ localities }: { localities: LocalityData[] }) {
                   <button
                     key={loc.id}
                     onClick={() => { setFilteredLocality(loc.slug); setExpanded(false); }}
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all ${
+                    className={`rounded-full px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-medium transition-all ${
                       filteredLocality === loc.slug ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" : "text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
                     }`}
                   >{loc.name}</button>
