@@ -95,13 +95,13 @@ function LocalityMarkers({ localities, onLocalityClick }: {
           )}
           {hasData && (
             <Popup>
-              <div className="min-w-[200px] font-sans">
+              <div className="min-w-[200px] font-sans text-[#0a0f0a]">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="font-bold text-base">{loc.name}</span>
-                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
-                    loc.confidenceScore >= 70 ? "bg-green-100 text-green-800" :
-                    loc.confidenceScore >= 40 ? "bg-yellow-100 text-yellow-800" :
-                    "bg-red-100 text-red-800"
+                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium text-white ${
+                    loc.confidenceScore >= 70 ? "bg-[#22c55e]" :
+                    loc.confidenceScore >= 40 ? "bg-[#eab308] text-[#0a0f0a]" :
+                    "bg-[#ef4444]"
                   }`}>
                     {loc.confidenceScore}
                   </span>
@@ -110,26 +110,26 @@ function LocalityMarkers({ localities, onLocalityClick }: {
                   <div className="space-y-1 mb-2">
                     {loc.bhkBreakdown.map((b) => (
                       <div key={b.bhk} className="flex items-center justify-between text-xs">
-                        <span className="font-medium text-gray-700">{b.bhk}</span>
-                        <span className="text-gray-500">
-                          ₹{b.minRent.toLocaleString()} – ₹{b.maxRent.toLocaleString()}
+                        <span className="font-medium text-[#1a221a]">{b.bhk}</span>
+                        <span className="text-[#4b7a4b]">
+                          {formatINR(b.minRent)} – {formatINR(b.maxRent)}
                         </span>
-                        <span className="text-gray-400 ml-2">({b.count})</span>
+                        <span className="text-[#6b7280] ml-2">({b.count})</span>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="border-t border-gray-200 pt-1.5 text-xs text-gray-500 space-y-0.5">
+                <div className="border-t border-[#2d3f2d] pt-1.5 text-xs text-[#4b7a4b] space-y-0.5">
                   {loc.avgTrustScore > 0 && (
                     <div className="flex justify-between">
                       <span>Trust score</span>
-                      <span className="font-medium">{loc.avgTrustScore}/100</span>
+                      <span className="font-medium text-[#0a0f0a]">{loc.avgTrustScore}/100</span>
                     </div>
                   )}
                   {loc.furnishingBreakdown.length > 0 && (
                     <div className="flex justify-between">
                       <span>Furnishing</span>
-                      <span className="font-medium">
+                      <span className="font-medium text-[#0a0f0a]">
                         {loc.furnishingBreakdown.map((f) =>
                           `${f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"}`
                         ).join(", ")}
@@ -138,7 +138,7 @@ function LocalityMarkers({ localities, onLocalityClick }: {
                   )}
                   <div className="flex justify-between">
                     <span>Submissions</span>
-                    <span className="font-medium">{loc.submissionCount}</span>
+                    <span className="font-medium text-[#0a0f0a]">{loc.submissionCount}</span>
                   </div>
                 </div>
               </div>
@@ -192,7 +192,7 @@ function UserPin({ position }: { position: PinState }) {
       }}
     >
       <Popup>
-        <div className="text-center text-sm font-medium text-gray-900">📍 Your pin</div>
+        <div className="text-center text-sm font-medium text-[#0a0f0a]">📍 Your pin</div>
       </Popup>
     </CircleMarker>
   );
@@ -334,7 +334,7 @@ function MapContent({ localities, onClose, standalone }: {
       {/* Selected locality popup */}
       {selectedLocality && !showSubmit && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000] mx-auto max-w-md animate-slide-up">
-          <div className="rounded-2xl border border-[#1f2b1f] bg-[#111811] p-5 shadow-level-3 backdrop-blur-xl bg-opacity-95">
+          <div className="rounded-2xl border border-[#1f2b1f] bg-[#111811]/95 p-5 shadow-level-3 backdrop-blur-xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -430,7 +430,7 @@ function MapContent({ localities, onClose, standalone }: {
       {/* Quick submit bottom sheet */}
       {showSubmit && pin && !submitted && (
         <div className="absolute bottom-0 left-0 right-0 z-[1000] animate-slide-up">
-          <div className="rounded-t-3xl border-t border-[#1f2b1f] bg-[#111811] p-5 pb-8 shadow-level-5 backdrop-blur-xl bg-opacity-95">
+          <div className="rounded-t-3xl border-t border-[#1f2b1f] bg-[#111811]/95 p-5 pb-8 shadow-level-5 backdrop-blur-xl">
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#2d3f2d]" />
 
             {submitStep === 0 && (
@@ -466,7 +466,7 @@ function MapContent({ localities, onClose, standalone }: {
                 <button
                   onClick={() => setSubmitStep(1)}
                   disabled={!bhk || rentAmount < 1000}
-                  className="w-full rounded-xl bg-[#22c55e] py-3.5 text-sm font-bold text-[#0a0f0a] hover:bg-[#16a34a] transition-all active:scale-[0.97] disabled:opacity-40"
+                  className="w-full rounded-xl bg-[#22c55e] py-3.5 text-sm font-bold text-[#0a0f0a] hover:bg-[#16a34a] transition-all active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -506,7 +506,7 @@ function MapContent({ localities, onClose, standalone }: {
                   <button
                     onClick={handleSubmitRent}
                     disabled={submitting}
-                    className="flex-1 rounded-xl bg-[#22c55e] py-3.5 text-sm font-bold text-[#0a0f0a] hover:bg-[#16a34a] transition-all active:scale-[0.97] disabled:opacity-40"
+                    className="flex-1 rounded-xl bg-[#22c55e] py-3.5 text-sm font-bold text-[#0a0f0a] hover:bg-[#16a34a] transition-all active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {submitting ? "Submitting..." : "Submit rent ✓"}
                   </button>

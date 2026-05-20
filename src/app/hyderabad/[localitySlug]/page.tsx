@@ -102,7 +102,7 @@ export default async function LocalityPage({
   });
 
   // Recent submissions (last 10)
-  const recentSubmissions = submissions.slice(0, 10);
+  const recentSubmissions = submissions.slice(0, 50);
 
   // Nearby localities (3 closest by distance)
   const nearbyLocalities = allLocalities
@@ -278,10 +278,10 @@ export default async function LocalityPage({
               </div>
             ))}
           </div>
-          {submissions.length > 10 && (
-            <button className="mt-3 w-full rounded-lg border border-[#2d3f2d] py-2 text-sm text-[#86efac] hover:bg-[#1a221a] transition-colors">
-              Show more ({submissions.length - 10} remaining)
-            </button>
+          {submissions.length > 50 && (
+            <a href={`/hyderabad/${localitySlug}?all=true`} className="mt-3 flex w-full items-center justify-center rounded-lg border border-[#2d3f2d] py-2 text-sm text-[#86efac] hover:bg-[#1a221a] transition-colors">
+              Show all {submissions.length} submissions
+            </a>
           )}
         </section>
       )}

@@ -138,14 +138,14 @@ export default async function ComparePage({
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       leftAggregate.confidenceScore >= 70 ? "bg-[#22c55e] text-[#0a0f0a]" : leftAggregate.confidenceScore >= 40 ? "bg-[#eab308] text-[#0a0f0a]" : "bg-[#ef4444] text-white"
                     }`}>
-                      {leftAggregate.confidenceScore}/100 🟡
+                      {leftAggregate.confidenceScore}/100 {leftAggregate.confidenceScore >= 70 ? "🟢" : leftAggregate.confidenceScore >= 40 ? "🟡" : "🔴"}
                     </span>
                   </td>
                   <td className="px-5 py-4 text-right">
                     <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       rightAggregate.confidenceScore >= 70 ? "bg-[#22c55e] text-[#0a0f0a]" : rightAggregate.confidenceScore >= 40 ? "bg-[#eab308] text-[#0a0f0a]" : "bg-[#ef4444] text-white"
                     }`}>
-                      {rightAggregate.confidenceScore}/100 🟡
+                      {rightAggregate.confidenceScore}/100 {rightAggregate.confidenceScore >= 70 ? "🟢" : rightAggregate.confidenceScore >= 40 ? "🟡" : "🔴"}
                     </span>
                   </td>
                 </tr>

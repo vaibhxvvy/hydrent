@@ -51,37 +51,37 @@ function Markers({ localities }: { localities: LocalityMarker[] }) {
           <Popup>
             <div className="min-w-[180px] space-y-2 font-sans">
               <div>
-                <p className="font-semibold text-base text-gray-900">{loc.name}</p>
-                <p className="text-xs text-gray-500">{loc.zone}</p>
+                <p className="font-semibold text-base text-[#0a0f0a]">{loc.name}</p>
+                <p className="text-xs text-[#4b7a4b]">{loc.zone}</p>
               </div>
               {hasData ? (
                 <>
                   {loc.median2BHK && (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xs text-gray-500">2BHK median:</span>
-                      <span className="font-semibold">{formatINR(loc.median2BHK)}/mo</span>
+                      <span className="text-xs text-[#4b7a4b]">2BHK median:</span>
+                      <span className="font-semibold text-[#0a0f0a]">{formatINR(loc.median2BHK)}/mo</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Confidence:</span>
-                    <span className="rounded-full px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: color }}>
+                    <span className="text-xs text-[#4b7a4b]">Confidence:</span>
+                    <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: color, color: color === "#eab308" ? "#0a0f0a" : "#fff" }}>
                       {loc.confidenceScore}/100
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">{loc.submissionCount} signals</p>
+                  <p className="text-xs text-[#4b7a4b]">{loc.submissionCount} signals</p>
                   <div className="flex gap-2 pt-1">
-                    <Link href={`/hyderabad/${loc.slug}`} className="rounded bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700">
+                    <Link href={`/hyderabad/${loc.slug}`} className="rounded bg-[#22c55e] px-3 py-1.5 text-xs font-medium text-[#0a0f0a] hover:bg-[#16a34a]">
                       View report
                     </Link>
-                    <Link href="/submit" className="rounded border border-gray-300 px-3 py-1.5 text-xs font-medium hover:bg-gray-100">
+                    <Link href="/submit" className="rounded border border-[#2d3f2d] px-3 py-1.5 text-xs font-medium text-[#86efac] hover:bg-[#1a221a]">
                       Submit rent
                     </Link>
                   </div>
                 </>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-500">No data yet for {loc.name}</p>
-                  <Link href="/submit" className="inline-block rounded bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700">
+                  <p className="text-sm text-[#4b7a4b]">No data yet for {loc.name}</p>
+                  <Link href="/submit" className="inline-block rounded bg-[#22c55e] px-3 py-1.5 text-xs font-medium text-[#0a0f0a] hover:bg-[#16a34a]">
                     Submit →
                   </Link>
                 </div>
