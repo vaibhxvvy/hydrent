@@ -2,45 +2,45 @@
 @import "leaflet/dist/leaflet.css";
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
 
-  /* Material 3 Dark Scheme */
-  --md-sys-color-primary: #7C9EFF;
-  --md-sys-color-on-primary: #003A75;
-  --md-sys-color-primary-container: #00458D;
-  --md-sys-color-on-primary-container: #D8E2FF;
+  /* Dark Natural Green Scheme — M3 inspired */
+  --md-sys-color-primary: #22C55E;
+  --md-sys-color-on-primary: #0A0F0A;
+  --md-sys-color-primary-container: #1A3A1A;
+  --md-sys-color-on-primary-container: #4ADE80;
 
-  --md-sys-color-secondary: #22C55E;
-  --md-sys-color-on-secondary: #003916;
-  --md-sys-color-secondary-container: #00522A;
-  --md-sys-color-on-secondary-container: #A1F9B5;
+  --md-sys-color-secondary: #34D399;
+  --md-sys-color-on-secondary: #0A0F0A;
+  --md-sys-color-secondary-container: #1A3A2A;
+  --md-sys-color-on-secondary-container: #86EFAC;
 
   --md-sys-color-tertiary: #F59E0B;
   --md-sys-color-on-tertiary: #412D00;
   --md-sys-color-tertiary-container: #5E4200;
   --md-sys-color-on-tertiary-container: #FFDEA1;
 
-  --md-sys-color-error: #FFB4AB;
+  --md-sys-color-error: #FF8A80;
   --md-sys-color-on-error: #690005;
   --md-sys-color-error-container: #93000A;
   --md-sys-color-on-error-container: #FFDAD6;
 
-  --md-sys-color-background: #0B0F14;
-  --md-sys-color-on-background: #E2E2E9;
-  --md-sys-color-surface: #121821;
-  --md-sys-color-on-surface: #E2E2E9;
-  --md-sys-color-surface-dim: #0B0F14;
-  --md-sys-color-surface-bright: #323842;
-  --md-sys-color-surface-container-lowest: #060A0F;
-  --md-sys-color-surface-container-low: #0F131C;
-  --md-sys-color-surface-container: #131721;
-  --md-sys-color-surface-container-high: #1E222C;
-  --md-sys-color-surface-container-highest: #292D37;
+  --md-sys-color-background: #080C0A;
+  --md-sys-color-on-background: #E8EDE9;
+  --md-sys-color-surface: #0F1411;
+  --md-sys-color-on-surface: #E8EDE9;
+  --md-sys-color-surface-dim: #080C0A;
+  --md-sys-color-surface-bright: #2A302C;
+  --md-sys-color-surface-container-lowest: #040806;
+  --md-sys-color-surface-container-low: #0C110E;
+  --md-sys-color-surface-container: #101512;
+  --md-sys-color-surface-container-high: #1A1F1C;
+  --md-sys-color-surface-container-highest: #252A27;
 
-  --md-sys-color-on-surface-variant: #C2C6D0;
-  --md-sys-color-outline: rgba(255, 255, 255, 0.08);
-  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.12);
+  --md-sys-color-on-surface-variant: #BEC3BF;
+  --md-sys-color-outline: rgba(255, 255, 255, 0.06);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.10);
 
   /* Tailwind semantic aliases */
   --color-background: var(--md-sys-color-background);
@@ -53,7 +53,7 @@
   --color-primary-foreground: var(--md-sys-color-on-primary);
   --color-primary-container: var(--md-sys-color-primary-container);
   --color-on-primary-container: var(--md-sys-color-on-primary-container);
-  --color-secondary: #22C55E;
+  --color-secondary: var(--md-sys-color-secondary);
   --color-secondary-foreground: var(--md-sys-color-on-secondary);
   --color-tertiary: var(--md-sys-color-tertiary);
   --color-muted: var(--md-sys-color-surface-container-high);
@@ -76,31 +76,31 @@
   --color-trust-medium: #F59E0B;
   --color-trust-low: var(--md-sys-color-error);
 
-  /* M3 Shape tokens */
+  /* Shape tokens — rounded */
   --radius: 0.75rem;
-  --radius-sm: calc(var(--radius) * 0.5);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) * 1.25);
-  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
   --radius-card: 16px;
-  --radius-button: 20px;
+  --radius-button: 999px;
   --radius-pill: 999px;
   --radius-input: 12px;
 
-  /* M3 Elevation via color ONLY — no shadows for elevation layers */
+  /* Elevation */
   --elevation-level-0: var(--md-sys-color-surface-dim);
   --elevation-level-1: var(--md-sys-color-surface-container-low);
   --elevation-level-2: var(--md-sys-color-surface-container);
   --elevation-level-3: var(--md-sys-color-surface-container-high);
   --elevation-level-4: var(--md-sys-color-surface-container-highest);
-  --elevation-level-5: #323842;
+  --elevation-level-5: var(--md-sys-color-surface-bright);
 
-  /* Shadows (minimal, for depth accents only) */
+  /* Shadows */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 30px rgba(124, 158, 255, 0.08);
+  --shadow-glow: 0 0 30px rgba(34, 197, 94, 0.08);
 
-  /* Motion tokens */
+  /* Motion */
   --motion-duration-short: 150ms;
   --motion-duration-medium: 300ms;
   --motion-duration-long: 500ms;
@@ -118,9 +118,11 @@ body {
   background: var(--md-sys-color-background);
   color: var(--md-sys-color-on-background);
   font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::selection { background: rgba(124, 158, 255, 0.3); color: #E2E2E9; }
+::selection { background: rgba(34, 197, 94, 0.3); color: #E8EDE9; }
 
 .leaflet-container { min-height: 100%; font: inherit; background: var(--md-sys-color-surface-dim); }
 .leaflet-control-attribution { font-size: 10px; color: var(--md-sys-color-outline); }
@@ -129,24 +131,32 @@ body {
 .focus-ring { outline: 2px solid transparent; outline-offset: 2px; }
 .focus-ring:focus-visible { outline-color: var(--md-sys-color-primary); }
 
-/* M3 Motion Keyframes */
+/* Motion Keyframes */
 @keyframes fade-in-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fade-in-scale { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
 @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes slide-down { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(124, 158, 255, 0.1); } 50% { box-shadow: 0 0 40px rgba(124, 158, 255, 0.2); } }
+@keyframes slide-from-top { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); } 50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); } }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes checkmark { 0% { stroke-dashoffset: 100; } 100% { stroke-dashoffset: 0; } }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+@keyframes slide-to-top {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-120%); opacity: 0; }
+}
 
 /* Utility animation classes */
 .animate-fade-in-up { animation: fade-in-up 0.4s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-fade-in-scale { animation: fade-in-scale 0.3s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-slide-up { animation: slide-up 0.35s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-slide-down { animation: slide-down 0.25s var(--motion-easing-emphasized-decelerate) forwards; }
+.animate-slide-from-top { animation: slide-from-top 0.3s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-checkmark { stroke-dasharray: 100; animation: checkmark 0.6s ease-out forwards; }
+.animate-slide-to-top { animation: slide-to-top 0.35s var(--motion-easing-emphasized-accelerate) forwards; }
 
 .stagger-1 { animation-delay: 50ms; animation-fill-mode: both; }
 .stagger-2 { animation-delay: 100ms; animation-fill-mode: both; }
@@ -160,19 +170,22 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* M3 scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--md-sys-color-outline); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--md-sys-color-outline-variant); }
 
-/* Leaflet popup M3 overrides */
+/* Leaflet popup overrides */
 .leaflet-popup-content-wrapper {
   border-radius: 16px !important;
   background: var(--md-sys-color-surface-container-high) !important;
   color: var(--md-sys-color-on-surface) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5) !important;
 }
 .leaflet-popup-tip {
   background: var(--md-sys-color-surface-container-high) !important;
+}
+.leaflet-popup-close-button {
+  color: var(--md-sys-color-on-surface-variant) !important;
 }

@@ -70,24 +70,24 @@ function LocalityMarkers({ localities, onLocalityClick }: {
         <CircleMarker
           key={loc.id}
           center={[loc.lat, loc.lng]}
-          radius={hasData ? 12 : 7}
+          radius={hasData ? 6 : 4}
           pathOptions={{
             fillColor: color,
             color: "#ffffff",
-            weight: 2.5,
-            fillOpacity: hasData ? 0.8 : 0.3,
+            weight: 2,
+            fillOpacity: hasData ? 0.9 : 0.3,
           }}
           eventHandlers={{ click: () => onLocalityClick(loc) }}
         >
           {hasData && loc.confidenceScore >= 70 && (
             <CircleMarker
               center={[loc.lat, loc.lng]}
-              radius={18}
+              radius={10}
               pathOptions={{
                 color: color,
                 weight: 1,
-                opacity: 0.2,
-                fillOpacity: 0.08,
+                opacity: 0.25,
+                fillOpacity: 0.1,
                 fillColor: color,
               }}
               interactive={false}
@@ -95,51 +95,46 @@ function LocalityMarkers({ localities, onLocalityClick }: {
           )}
           {hasData && (
             <Popup>
-              <div className="min-w-[200px] font-sans text-[var(--md-sys-color-on-surface)]">
+              <div className="min-w-[220px] font-sans">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-bold text-base">{loc.name}</span>
-                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium text-white ${
-                    loc.confidenceScore >= 70 ? "bg-[var(--md-sys-color-primary)]" :
-                    loc.confidenceScore >= 40 ? "bg-[#eab308] text-[var(--md-sys-color-on-surface)]" :
-                    "bg-[#ef4444]"
+                  <span className="font-bold text-base text-[var(--md-sys-color-on-surface)]">{loc.name}</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                    loc.confidenceScore >= 70 ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" :
+                    loc.confidenceScore >= 40 ? "bg-[#F59E0B] text-[#0A0F0A]" :
+                    "bg-[#FF8A80] text-[#690005]"
                   }`}>
                     {loc.confidenceScore}
                   </span>
                 </div>
                 {loc.bhkBreakdown.length > 0 && (
-                  <div className="space-y-1 mb-2">
-                    {loc.bhkBreakdown.map((b) => (
+                  <div className="space-y-1.5 mb-2">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--md-sys-color-on-surface-variant)]">BHK Ranges</p>
+                    {loc.bhkBreakdown.filter((b) => b.count > 0).slice(0, 3).map((b) => (
                       <div key={b.bhk} className="flex items-center justify-between text-xs">
-                        <span className="font-medium text-[var(--md-sys-color-surface-container-high)]">{b.bhk}</span>
-                        <span className="text-[var(--md-sys-color-on-surface-variant)]">
+                        <span className="font-semibold text-[var(--md-sys-color-primary)]">{b.bhk}</span>
+                        <span className="text-[var(--md-sys-color-on-surface)] font-mono">
                           {formatINR(b.minRent)} – {formatINR(b.maxRent)}
                         </span>
-                        <span className="text-[#6b7280] ml-2">({b.count})</span>
+                        <span className="text-[var(--md-sys-color-on-surface-variant)]">({b.count})</span>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="border-t border-[var(--md-sys-color-outline)] pt-1.5 text-xs text-[var(--md-sys-color-on-surface-variant)] space-y-0.5">
-                  {loc.avgTrustScore > 0 && (
-                    <div className="flex justify-between">
-                      <span>Trust score</span>
-                      <span className="font-medium text-[var(--md-sys-color-on-surface)]">{loc.avgTrustScore}/100</span>
-                    </div>
-                  )}
-                  {loc.furnishingBreakdown.length > 0 && (
-                    <div className="flex justify-between">
-                      <span>Furnishing</span>
-                      <span className="font-medium text-[var(--md-sys-color-on-surface)]">
-                        {loc.furnishingBreakdown.map((f) =>
-                          `${f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"}`
-                        ).join(", ")}
-                      </span>
-                    </div>
-                  )}
+                <div className="border-t border-[var(--md-sys-color-outline)] pt-2 text-xs text-[var(--md-sys-color-on-surface-variant)] space-y-1">
                   <div className="flex justify-between">
-                    <span>Submissions</span>
+                    <span>Trust</span>
+                    <span className="font-medium text-[var(--md-sys-color-on-surface)]">{loc.avgTrustScore}/100</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Signals</span>
                     <span className="font-medium text-[var(--md-sys-color-on-surface)]">{loc.submissionCount}</span>
                   </div>
+                  {loc.median2BHK && (
+                    <div className="flex justify-between">
+                      <span>2BHK median</span>
+                      <span className="font-medium text-[var(--md-sys-color-primary)]">{formatINR(loc.median2BHK)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </Popup>
@@ -207,6 +202,8 @@ function MapContent({ localities, onClose, standalone }: {
 }) {
   const router = useRouter();
   const [selectedLocality, setSelectedLocality] = useState<LocalityData | null>(null);
+  const [exitingLocality, setExitingLocality] = useState(false);
+  const [cachedLocality, setCachedLocality] = useState<LocalityData | null>(null);
   const [pin, setPin] = useState<PinState | null>(null);
   const [showSubmit, setShowSubmit] = useState(false);
   const [submitStep, setSubmitStep] = useState(0);
@@ -218,20 +215,38 @@ function MapContent({ localities, onClose, standalone }: {
   const [mapCenter, setMapCenter] = useState<[number, number]>([17.385, 78.4867]);
   const [mapZoom, setMapZoom] = useState(11);
 
+  const animateOutLocality = useCallback((cb?: () => void) => {
+    if (selectedLocality) {
+      setCachedLocality(selectedLocality);
+      setExitingLocality(true);
+      setTimeout(() => {
+        setSelectedLocality(null);
+        setCachedLocality(null);
+        setExitingLocality(false);
+        cb?.();
+      }, 350);
+    } else {
+      cb?.();
+    }
+  }, [selectedLocality]);
+
   const handleMapClick = useCallback((lat: number, lng: number) => {
     setPin({ lat, lng });
-    setSelectedLocality(null);
+    if (selectedLocality) {
+      animateOutLocality();
+    } else {
+      setSelectedLocality(null);
+    }
     setShowSubmit(true);
     setSubmitStep(0);
     setSubmitted(false);
-    // Try to find nearest locality
     const nearest = localities.reduce((best, loc) => {
       const dist = Math.sqrt((loc.lat - lat) ** 2 + (loc.lng - lng) ** 2);
       return dist < best.dist ? { loc, dist } : best;
     }, { loc: localities[0], dist: Infinity });
     setMapCenter([lat, lng]);
     setMapZoom(14);
-  }, [localities]);
+  }, [localities, selectedLocality, animateOutLocality]);
 
   const handleSubmitRent = async () => {
     setSubmitting(true);
@@ -332,50 +347,50 @@ function MapContent({ localities, onClose, standalone }: {
       </button>
 
       {/* Selected locality popup */}
-      {selectedLocality && !showSubmit && (
-        <div className="absolute bottom-4 left-4 right-4 z-[1000] mx-auto max-w-md animate-slide-up">
+      {(selectedLocality || cachedLocality) && !showSubmit && (
+        <div className={`absolute bottom-4 left-4 right-4 z-[1000] mx-auto max-w-md ${exitingLocality ? "animate-slide-to-top" : "animate-slide-up"}`}>
           <div className="rounded-2xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)]/95 p-5 shadow-level-3 backdrop-blur-xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className={`size-2.5 rounded-full ${selectedLocality.submissionCount > 0 ? "bg-[var(--md-sys-color-primary)]" : "bg-[#6b7280]"}`} />
-                  <h3 className="font-bold text-[var(--md-sys-color-on-surface)] text-lg">{selectedLocality.name}</h3>
+                  <span className={`size-2.5 rounded-full ${(selectedLocality || cachedLocality)!.submissionCount > 0 ? "bg-[var(--md-sys-color-primary)]" : "bg-[#6b7280]"}`} />
+                  <h3 className="font-bold text-[var(--md-sys-color-on-surface)] text-lg">{(selectedLocality || cachedLocality)!.name}</h3>
                 </div>
-                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] mt-0.5">{selectedLocality.zone}</p>
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] mt-0.5">{(selectedLocality || cachedLocality)!.zone}</p>
               </div>
-              <button onClick={() => setSelectedLocality(null)} className="text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] size-8 flex items-center justify-center rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors" aria-label="Close">
+              <button onClick={() => animateOutLocality()} className="text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] size-8 flex items-center justify-center rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors" aria-label="Close">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
 
-            {selectedLocality.submissionCount > 0 ? (
+            {(selectedLocality || cachedLocality)!.submissionCount > 0 ? (
               <div className="mt-4">
                 {/* Key metrics row */}
                 <div className="flex items-center gap-3 text-sm mb-3">
-                  {selectedLocality.median2BHK && (
+                  {(selectedLocality || cachedLocality)!.median2BHK && (
                     <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-xl px-4 py-2.5 flex-1">
                       <p className="text-[var(--md-sys-color-on-surface-variant)] text-xs">2BHK median</p>
-                      <p className="font-mono text-lg font-bold text-[var(--md-sys-color-primary)] mt-0.5">{formatINR(selectedLocality.median2BHK)}</p>
+                      <p className="font-mono text-lg font-bold text-[var(--md-sys-color-primary)] mt-0.5">{formatINR((selectedLocality || cachedLocality)!.median2BHK!)}</p>
                     </div>
                   )}
                   <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-xl px-4 py-2.5 flex-1">
                     <p className="text-[var(--md-sys-color-on-surface-variant)] text-xs">Confidence</p>
-                    <p className="font-mono text-lg font-bold text-[var(--md-sys-color-on-surface)] mt-0.5">{selectedLocality.confidenceScore}/100</p>
+                    <p className="font-mono text-lg font-bold text-[var(--md-sys-color-on-surface)] mt-0.5">{(selectedLocality || cachedLocality)!.confidenceScore}/100</p>
                   </div>
-                  {selectedLocality.avgTrustScore > 0 && (
+                  {(selectedLocality || cachedLocality)!.avgTrustScore > 0 && (
                     <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-xl px-4 py-2.5 flex-1">
                       <p className="text-[var(--md-sys-color-on-surface-variant)] text-xs">Trust</p>
-                      <p className="font-mono text-lg font-bold text-[var(--md-sys-color-primary)] mt-0.5">{selectedLocality.avgTrustScore}</p>
+                      <p className="font-mono text-lg font-bold text-[var(--md-sys-color-primary)] mt-0.5">{(selectedLocality || cachedLocality)!.avgTrustScore}</p>
                     </div>
                   )}
                 </div>
 
                 {/* BHK breakdown */}
-                {selectedLocality.bhkBreakdown.length > 0 && (
+                {(selectedLocality || cachedLocality)!.bhkBreakdown.length > 0 && (
                   <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-xl p-3 mb-3">
                     <p className="text-[var(--md-sys-color-on-surface-variant)] text-xs mb-2">Rent by BHK</p>
                     <div className="space-y-1.5">
-                      {selectedLocality.bhkBreakdown.map((b) => (
+                      {(selectedLocality || cachedLocality)!.bhkBreakdown.map((b) => (
                         <div key={b.bhk} className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
                             <span className="inline-flex items-center justify-center size-6 rounded-md bg-[var(--md-sys-color-background)] text-xs font-bold text-[var(--md-sys-color-primary)]">{b.bhk.replace("BHK","")}</span>
@@ -391,9 +406,9 @@ function MapContent({ localities, onClose, standalone }: {
                 )}
 
                 {/* Furnishing + trust summary */}
-                {selectedLocality.furnishingBreakdown.length > 0 && (
+                {(selectedLocality || cachedLocality)!.furnishingBreakdown.length > 0 && (
                   <div className="flex items-center gap-2 text-xs text-[var(--md-sys-color-on-surface-variant)] mb-1">
-                    {selectedLocality.furnishingBreakdown.map((f) => (
+                    {(selectedLocality || cachedLocality)!.furnishingBreakdown.map((f) => (
                       <span key={f.furnishing} className="bg-[var(--md-sys-color-surface-container-high)] rounded-lg px-2.5 py-1">
                         {f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"} ({f.count})
                       </span>
@@ -407,16 +422,20 @@ function MapContent({ localities, onClose, standalone }: {
 
             <div className="mt-4 flex gap-2">
               <button
-                onClick={() => router.push(`/hyderabad/${selectedLocality.slug}`)}
+                onClick={() => animateOutLocality(() => router.push(`/hyderabad/${(selectedLocality || cachedLocality)!.slug}`))}
                 className="flex-1 rounded-xl bg-[var(--md-sys-color-primary)] py-2.5 text-sm font-semibold text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-all active:scale-[0.97]"
               >
                 View full report
               </button>
               <button
                 onClick={() => {
-                  setShowSubmit(true);
-                  setPin({ lat: selectedLocality.lat, lng: selectedLocality.lng });
-                  setSubmitStep(0);
+                  animateOutLocality(() => {
+                    if (selectedLocality || cachedLocality) {
+                      setPin({ lat: (selectedLocality || cachedLocality)!.lat, lng: (selectedLocality || cachedLocality)!.lng });
+                      setShowSubmit(true);
+                      setSubmitStep(0);
+                    }
+                  });
                 }}
                 className="flex-1 rounded-xl border border-[var(--md-sys-color-outline)] py-2.5 text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-all active:scale-[0.97]"
               >

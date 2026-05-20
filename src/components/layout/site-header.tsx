@@ -6,8 +6,8 @@ import { Menu, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const nav = [
-  { href: "/hyderabad/gachibowli", label: "Localities" },
-  { href: "/compare/gachibowli-vs-kondapur", label: "Compare" },
+  { href: "/localities", label: "Localities" },
+  { href: "/compare", label: "Compare" },
   { href: "/how-data-works", label: "How it works" },
 ];
 
@@ -17,11 +17,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-dim)]/92 backdrop-blur-lg">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-normal">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-[var(--md-sys-color-primary)] text-xs font-bold text-[var(--md-sys-color-on-primary)]">
-            H
-          </span>
-          <span className="text-base text-[var(--md-sys-color-on-surface)]">HydRent</span>
+        <Link href="/" className="flex items-center gap-1.5 font-semibold tracking-tight text-lg text-[var(--md-sys-color-on-surface)] hover:text-[var(--md-sys-color-primary)] transition-colors">
+          HydRent
         </Link>
 
         <nav className="hidden items-center gap-0.5 md:flex" aria-label="Primary navigation">
