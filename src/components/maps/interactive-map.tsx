@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { CircleMarker, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import MarkerClusterGroup from "leaflet.markercluster";
 import { formatINR } from "@/lib/utils";
 
 interface BHKBreakdownItem {
@@ -48,14 +49,14 @@ interface PinState {
 function createRentIcon(avgRent: number, confidence: number, hasData: boolean): L.DivIcon {
   const isHigh = hasData && confidence >= 70;
   const isMid = hasData && confidence >= 40;
-  const bg = isHigh ? "#22C55E" : isMid ? "#F59E0B" : hasData ? "#FF8A80" : "#6b7280";
+  const bg = isHigh ? "#14B8A6" : isMid ? "#F59E0B" : hasData ? "#FF8A80" : "#6b7280";
   const textColor = isHigh ? "#0A0F0A" : isMid ? "#0A0F0A" : "#FFFFFF";
   const label = hasData && avgRent > 0 ? `₹${(avgRent / 1000).toFixed(0)}k` : "—";
   return L.divIcon({
     className: "rent-pin",
-    html: `<div style="background:${bg};color:${textColor};padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;font-family:system-ui;white-space:nowrap;border:2.5px solid rgba(255,255,255,0.9);box-shadow:0 3px 12px rgba(0,0,0,0.35);display:flex;align-items:center;gap:2px;cursor:pointer;line-height:1.15">${label}</div>`,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
+    html: `<div style="background:${bg};color:${textColor};padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;font-family:system-ui;white-space:nowrap;border:2.5px solid rgba(255,255,255,0.9);box-shadow:0 3px 12px rgba(0,0,0,0.35);display:flex;align-items:center;gap:2px;line-height:1.15">${label}</div>`,
+    iconSize: undefined,
+    iconAnchor: undefined,
   });
 }
 
@@ -64,27 +65,51 @@ function LocalityMarkers({ localities, onLocalityClick, hidden }: {
   onLocalityClick: (loc: LocalityData) => void;
   hidden: boolean;
 }) {
-  const markers = useMemo(() => {
-    return localities.map((loc) => {
-      const hasData = loc.submissionCount > 0;
-      return { loc, hasData };
+  const map = useMap();
+  const onClickRef = useRef(onLocalityClick);
+  onClickRef.current = onLocalityClick;
+
+  useEffect(() => {
+    if (hidden) {
+      map.eachLayer((layer) => {
+        if (layer instanceof L.MarkerClusterGroup) {
+          map.removeLayer(layer);
+        }
+      });
+      return;
+    }
+
+    const cluster = L.markerClusterGroup({
+      chunkedLoading: true,
+      maxClusterRadius: 60,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 15,
     });
-  }, [localities]);
 
-  if (hidden) return null;
+    localities.forEach((loc) => {
+      const hasData = loc.submissionCount > 0;
+      const marker = L.marker([loc.lat, loc.lng], {
+        icon: createRentIcon(loc.avgRent, loc.confidenceScore, hasData),
+      });
+      marker.bindTooltip(loc.name, {
+        direction: "top",
+        offset: L.point(0, -8),
+        className: "rent-pin-tooltip",
+      });
+      marker.on("click", () => onClickRef.current(loc));
+      cluster.addLayer(marker);
+    });
 
-  return (
-    <>
-      {markers.map(({ loc, hasData }) => (
-        <Marker
-          key={loc.id}
-          position={[loc.lat, loc.lng]}
-          icon={createRentIcon(loc.avgRent, loc.confidenceScore, hasData)}
-          eventHandlers={{ click: () => onLocalityClick(loc) }}
-        />
-      ))}
-    </>
-  );
+    map.addLayer(cluster);
+
+    return () => {
+      map.removeLayer(cluster);
+    };
+  }, [localities, map, hidden]);
+
+  return null;
 }
 
 function ClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number) => void }) {
@@ -122,7 +147,7 @@ function UserPin({ position }: { position: PinState }) {
       center={[position.lat, position.lng]}
       radius={12}
       pathOptions={{
-        fillColor: "#22c55e",
+        fillColor: "#14B8A6",
         color: "#ffffff",
         weight: 3,
         fillOpacity: 0.9,
@@ -523,7 +548,7 @@ function MapContent({ localities, onClose, standalone }: {
                     <input
                       type="number" value={rentAmount}
                       onChange={(e) => setRentAmount(Number(e.target.value))}
-                      className="w-full h-13 rounded-[--radius-input] border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-background)] pl-10 pr-4 font-mono text-xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)] transition-all"
+                      className="w-full h-13 rounded-[--radius-input] border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-background)] pl-10 pr-4 font-mono text-xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)] transition-all"
                     />
                   </div>
                 </div>

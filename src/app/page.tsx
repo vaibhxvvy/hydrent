@@ -104,7 +104,7 @@ export default async function HomePage() {
           </div>
           <LocalityMap localities={mapLocalities} />
           <div className="mt-2 flex items-center gap-3 text-[11px] text-[var(--md-sys-color-on-surface-variant)]">
-            <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-[#22c55e]" /> High confidence</span>
+            <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-[#14B8A6]" /> High confidence</span>
             <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-[#eab308]" /> Medium</span>
             <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-[#ef4444]" /> Low</span>
             <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-[#6b7280]" /> No data</span>

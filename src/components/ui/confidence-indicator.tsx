@@ -9,7 +9,7 @@ interface ConfidenceIndicatorProps {
 }
 
 function getLevel(score: number) {
-  if (score >= 70) return { label: "High", color: "#22C55E", icon: ShieldCheck };
+  if (score >= 70) return { label: "High", color: "#14B8A6", icon: ShieldCheck };
   if (score >= 40) return { label: "Medium", color: "#F59E0B", icon: TriangleAlert };
   return { label: "Low", color: "#FFB4AB", icon: HelpCircle };
 }

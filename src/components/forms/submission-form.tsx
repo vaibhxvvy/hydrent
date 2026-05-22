@@ -191,7 +191,7 @@ export function SubmissionForm() {
               <select
                 value={locality}
                 onChange={(e) => setLocality(e.target.value)}
-                className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-10 pr-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)] appearance-none"
+                className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-10 pr-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)] appearance-none"
               >
                 <option value="" className="bg-[var(--elevation-level-1)]">Select your locality</option>
                 {localities.map((l) => (
@@ -203,7 +203,7 @@ export function SubmissionForm() {
               value={microLocality}
               onChange={(e) => setMicroLocality(e.target.value)}
               placeholder="Micro-locality / building name (optional)"
-              className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+              className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
             />
           </div>
         )}
@@ -249,7 +249,7 @@ export function SubmissionForm() {
                       value={rentAmount}
                       onChange={(e) => setRentAmount(Number(e.target.value.replace(/[^0-9]/g, '')))}
                       autoComplete="off"
-                      className="h-14 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-12 pr-4 font-mono text-2xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                      className="h-14 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-12 pr-4 font-mono text-2xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                     />
                   </div>
             </div>
@@ -288,7 +288,7 @@ export function SubmissionForm() {
                   onChange={(e) => setMaintenanceAmount(Number(e.target.value.replace(/[^0-9]/g, '')))}
                   placeholder="Maintenance amount"
                   autoComplete="off"
-                  className="mt-3 h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="mt-3 h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                 />
               )}
             </div>
@@ -328,7 +328,7 @@ export function SubmissionForm() {
                   value={securityDeposit}
                   onChange={(e) => setSecurityDeposit(Number(e.target.value.replace(/[^0-9]/g, '')))}
                   autoComplete="off"
-                  className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                 />
               </div>
               <div>
@@ -339,7 +339,7 @@ export function SubmissionForm() {
                   value={moveInDate}
                   onChange={(e) => setMoveInDate(e.target.value)}
                   max={new Date().toISOString().split('T')[0]}
-                  className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                  className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                 />
               </div>
             </div>
@@ -419,7 +419,7 @@ export function SubmissionForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Never shown publicly"
-                className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
               />
             </div>
           </div>

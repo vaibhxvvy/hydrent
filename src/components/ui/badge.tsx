@@ -10,7 +10,7 @@ const badgeVariants = cva(
         default: "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]",
         secondary: "bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)]",
         outline: "border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-on-surface)]",
-        trust: "bg-[rgba(34,197,94,0.12)] text-[#22C55E] border border-[rgba(34,197,94,0.2)]",
+        trust: "bg-[rgba(20,184,166,0.12)] text-[#14B8A6] border border-[rgba(20,184,166,0.2)]",
         warning: "bg-[rgba(245,158,11,0.12)] text-[#F59E0B] border border-[rgba(245,158,11,0.2)]",
         muted: "bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)]",
       },

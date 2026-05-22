@@ -11,7 +11,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="mt-6 inline-flex items-center rounded-full bg-[#22c55e] px-5 py-2.5 text-sm font-medium text-[#0a0f0a] hover:bg-[#16a34a] transition-colors"
+        className="mt-6 inline-flex items-center rounded-full bg-[#14B8A6] px-5 py-2.5 text-sm font-medium text-[#0a0f0a] hover:bg-[#0D9488] transition-colors"
       >
         Back to city overview
       </Link>

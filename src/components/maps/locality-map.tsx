@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { CircleMarker, Popup, TileLayer, useMap } from "react-leaflet";
+import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from "react-leaflet";
 import { formatINR } from "@/lib/utils";
 
 interface BHKBreakdownItem {
@@ -39,8 +39,8 @@ interface LocalityMarker {
 
 function getConfidenceColor(confidence: number, hasData: boolean): string {
   if (!hasData) return "#6b7280";
-  if (confidence >= 70) return "#22c55e";
-  if (confidence >= 40) return "#eab308";
+  if (confidence >= 70) return "#14B8A6";
+  if (confidence >= 40) return "#F59E0B";
   return "#ef4444";
 }
 
@@ -147,10 +147,6 @@ function ZoomControl() {
 }
 
 function MapInner({ localities }: { localities: LocalityMarker[] }) {
-  const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
-
-  if (typeof window === "undefined") return null;
-
   return (
     <MapContainer
       center={[17.385, 78.4867]}

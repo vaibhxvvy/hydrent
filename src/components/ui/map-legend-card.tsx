@@ -6,7 +6,7 @@ export function MapLegendCard() {
       <p className="mb-2 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">Confidence</p>
       <div className="flex flex-col gap-1.5">
         {[
-          { color: "#22C55E", label: "High (70+)" },
+          { color: "#14B8A6", label: "High (70+)" },
           { color: "#F59E0B", label: "Medium (40-69)" },
           { color: "#FFB4AB", label: "Low (< 40)" },
           { color: "#6B7280", label: "No data" },

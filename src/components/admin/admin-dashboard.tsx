@@ -350,7 +350,7 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
             </button>
 
             {scraperResult && (
-              <div className="mt-4 rounded-lg border border-[#22c55e]/30 bg-[var(--md-sys-color-surface-container-high)] p-3 text-sm text-[var(--md-sys-color-on-surface-variant)]">
+              <div className="mt-4 rounded-lg border border-[var(--md-sys-color-primary)]/30 bg-[var(--md-sys-color-surface-container-high)] p-3 text-sm text-[var(--md-sys-color-on-surface-variant)]">
                 {scraperResult}
               </div>
             )}
@@ -394,7 +394,7 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
                 <p className="font-medium text-[var(--md-sys-color-on-surface)]">Min submissions to show on homepage</p>
                 <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">Current: 1</p>
               </div>
-              <input type="number" defaultValue={1} min={0} max={10} className="w-20 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface)] outline-none focus:border-[#22c55e]" />
+              <input type="number" defaultValue={1} min={0} max={10} className="w-20 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)]" />
             </div>
           </div>
 
@@ -404,7 +404,7 @@ export function AdminDashboard({ submissions, localities }: { submissions: Submi
                 <p className="font-medium text-[var(--md-sys-color-on-surface)]">Admin email for notifications</p>
                 <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">labusepc@gmail.com</p>
               </div>
-              <input type="email" defaultValue="labusepc@gmail.com" className="w-64 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface)] outline-none focus:border-[#22c55e]" />
+              <input type="email" defaultValue="labusepc@gmail.com" className="w-64 rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-on-primary)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)]" />
             </div>
           </div>
         </div>

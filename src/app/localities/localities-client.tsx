@@ -68,7 +68,7 @@ export function LocalitiesClient({ localities: raw }: { localities: LocalityWith
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search localities..."
-            className="h-11 w-full rounded-[--radius-input] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-9 pr-4 text-sm text-[var(--md-sys-color-on-surface)] placeholder:text-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_2px_rgba(34,197,94,0.15)] transition-all"
+            className="h-11 w-full rounded-[--radius-input] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-9 pr-4 text-sm text-[var(--md-sys-color-on-surface)] placeholder:text-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_2px_rgba(20,184,166,0.15)] transition-all"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)]">
@@ -129,7 +129,7 @@ export function LocalitiesClient({ localities: raw }: { localities: LocalityWith
             const hasData = locality.submissionCount > 0;
             const trustLevel = locality.confidenceScore >= 70 ? "high" : locality.confidenceScore >= 50 ? "medium" : "low";
             const trustColor = trustLevel === "high" ? "var(--md-sys-color-primary)" : trustLevel === "medium" ? "var(--md-sys-color-tertiary)" : "var(--md-sys-color-error)";
-            const trustBg = trustLevel === "high" ? "rgba(34,197,94,0.1)" : trustLevel === "medium" ? "rgba(245,158,11,0.1)" : "rgba(255,138,128,0.1)";
+            const trustBg = trustLevel === "high" ? "rgba(20,184,166,0.1)" : trustLevel === "medium" ? "rgba(245,158,11,0.1)" : "rgba(255,138,128,0.1)";
 
             return (
               <Link
