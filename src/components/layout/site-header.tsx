@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const nav = [
   { href: "/localities", label: "Localities" },
@@ -45,6 +46,7 @@ export function SiteHeader() {
               Submit rent
             </Link>
           </Button>
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
@@ -35,17 +36,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} data-theme="dark">
       <body className="font-sans antialiased">
-        <TooltipProvider delayDuration={150}>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1 animate-fade-in-up">{children}</main>
-            <SiteFooter />
-          </div>
-          <OnboardingTour />
-        </TooltipProvider>
-        <Toaster position="bottom-center" richColors closeButton />
+        <ThemeProvider defaultTheme="dark">
+          <TooltipProvider delayDuration={150}>
+            <div className="flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="flex-1 animate-fade-in-up">{children}</main>
+              <SiteFooter />
+            </div>
+            <OnboardingTour />
+          </TooltipProvider>
+          <Toaster position="bottom-center" richColors closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

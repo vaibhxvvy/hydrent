@@ -4,8 +4,10 @@
 @theme inline {
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", Inter, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", monospace;
+}
 
-  /* Dark Natural Green Scheme — M3 inspired */
+/* ── DARK THEME (default) ── */
+:root {
   --md-sys-color-primary: #22C55E;
   --md-sys-color-on-primary: #0A0F0A;
   --md-sys-color-primary-container: #1A3A1A;
@@ -42,7 +44,6 @@
   --md-sys-color-outline: rgba(255, 255, 255, 0.06);
   --md-sys-color-outline-variant: rgba(255, 255, 255, 0.10);
 
-  /* Tailwind semantic aliases */
   --color-background: var(--md-sys-color-background);
   --color-foreground: var(--md-sys-color-on-background);
   --color-surface: var(--md-sys-color-surface);
@@ -51,32 +52,14 @@
   --color-surface-container-highest: var(--md-sys-color-surface-container-highest);
   --color-primary: var(--md-sys-color-primary);
   --color-primary-foreground: var(--md-sys-color-on-primary);
-  --color-primary-container: var(--md-sys-color-primary-container);
-  --color-on-primary-container: var(--md-sys-color-on-primary-container);
-  --color-secondary: var(--md-sys-color-secondary);
-  --color-secondary-foreground: var(--md-sys-color-on-secondary);
-  --color-tertiary: var(--md-sys-color-tertiary);
   --color-muted: var(--md-sys-color-surface-container-high);
   --color-muted-foreground: var(--md-sys-color-on-surface-variant);
   --color-accent: var(--md-sys-color-primary);
   --color-accent-foreground: var(--md-sys-color-on-primary);
   --color-destructive: var(--md-sys-color-error);
-  --color-destructive-foreground: var(--md-sys-color-on-error);
-  --color-warning: var(--md-sys-color-tertiary);
   --color-border: var(--md-sys-color-outline);
-  --color-border-bright: var(--md-sys-color-outline-variant);
-  --color-input: var(--md-sys-color-surface-container-high);
-  --color-ring: var(--md-sys-color-primary);
-  --color-card: var(--md-sys-color-surface);
-  --color-card-foreground: var(--md-sys-color-on-surface);
-  --color-popover: var(--md-sys-color-surface-container-high);
-  --color-popover-foreground: var(--md-sys-color-on-surface);
-  --color-verified: #22C55E;
-  --color-trust-high: #22C55E;
-  --color-trust-medium: #F59E0B;
-  --color-trust-low: var(--md-sys-color-error);
 
-  /* Shape tokens — super rounded */
+  /* Shape tokens */
   --radius: 1rem;
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
@@ -98,7 +81,6 @@
   /* Shadows */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 30px rgba(34, 197, 94, 0.08);
 
   /* Motion */
   --motion-duration-short: 150ms;
@@ -107,6 +89,49 @@
   --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1.0);
   --motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0);
   --motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15);
+}
+
+/* ── LIGHT THEME overrides ── */
+[data-theme="light"] {
+  --md-sys-color-primary: #1A6B4A;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #A7F5C5;
+  --md-sys-color-on-primary-container: #002114;
+
+  --md-sys-color-secondary: #E8593C;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #FFDAD4;
+  --md-sys-color-on-secondary-container: #5C1504;
+
+  --md-sys-color-tertiary: #1A6B4A;
+  --md-sys-color-on-tertiary: #FFFFFF;
+  --md-sys-color-tertiary-container: #A7F5C5;
+  --md-sys-color-on-tertiary-container: #002114;
+
+  --md-sys-color-error: #DC2626;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FFDAD6;
+  --md-sys-color-on-error-container: #410002;
+
+  --md-sys-color-background: #FAFAF8;
+  --md-sys-color-on-background: #1A1A18;
+  --md-sys-color-surface: #FFFFFF;
+  --md-sys-color-on-surface: #1A1A18;
+  --md-sys-color-surface-dim: #E0E0DA;
+  --md-sys-color-surface-bright: #FAFAF8;
+  --md-sys-color-surface-container-lowest: #FFFFFF;
+  --md-sys-color-surface-container-low: #F3F3EE;
+  --md-sys-color-surface-container: #EDEDE8;
+  --md-sys-color-surface-container-high: #E7E7E2;
+  --md-sys-color-surface-container-highest: #E2E2DD;
+
+  --md-sys-color-on-surface-variant: #6B6B63;
+  --md-sys-color-outline: rgba(26, 26, 24, 0.10);
+  --md-sys-color-outline-variant: rgba(26, 26, 24, 0.20);
+
+  /* Shadows lighter for light mode */
+  --shadow-card: 0 1px 3px rgba(26, 26, 24, 0.06);
+  --shadow-elevated: 0 4px 12px rgba(26, 26, 24, 0.08);
 }
 
 * { border-color: var(--md-sys-color-outline); }
@@ -138,6 +163,7 @@ body {
 }
 
 ::selection { background: rgba(34, 197, 94, 0.3); color: #E8EDE9; }
+[data-theme="light"] ::selection { background: rgba(26, 107, 74, 0.2); color: #1A1A18; }
 
 .leaflet-container { min-height: 100%; font: inherit; background: var(--md-sys-color-surface-dim); }
 .leaflet-control-attribution { font-size: 10px; color: var(--md-sys-color-outline); }
@@ -152,15 +178,9 @@ body {
 @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes slide-down { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes slide-from-top { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); } 50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes checkmark { 0% { stroke-dashoffset: 100; } 100% { stroke-dashoffset: 0; } }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-@keyframes slide-to-top {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(-120%); opacity: 0; }
-}
+@keyframes slide-to-top { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-120%); opacity: 0; } }
 
 /* Utility animation classes */
 .animate-fade-in-up { animation: fade-in-up 0.4s var(--motion-easing-emphasized-decelerate) forwards; }
@@ -168,8 +188,6 @@ body {
 .animate-slide-up { animation: slide-up 0.35s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-slide-down { animation: slide-down 0.25s var(--motion-easing-emphasized-decelerate) forwards; }
 .animate-slide-from-top { animation: slide-from-top 0.3s var(--motion-easing-emphasized-decelerate) forwards; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-float { animation: float 3s ease-in-out infinite; }
 .animate-checkmark { stroke-dasharray: 100; animation: checkmark 0.6s ease-out forwards; }
 .animate-slide-to-top { animation: slide-to-top 0.35s var(--motion-easing-emphasized-accelerate) forwards; }
 
