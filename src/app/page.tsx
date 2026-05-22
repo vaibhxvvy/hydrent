@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck, TrendingUp } from "lucide-react";
+import { ShieldCheck, TrendingUp, ArrowUpRight } from "lucide-react";
 import { RentTrendChart } from "@/components/charts/rent-trend-chart";
 import { LocalityMap } from "@/components/maps/locality-map";
 import { LocalityGrid } from "@/components/rent/locality-grid";
@@ -14,6 +14,7 @@ import { aggregateRent } from "@/lib/analytics/statistics";
 import { getAllLocalities, getAllLocalitiesWithStats, getAllSubmissions, getCityStats, getTrendSeriesForLocality } from "@/lib/data/db";
 import { formatINR, formatNumber } from "@/lib/utils";
 import { HomeClient } from "@/components/home/home-client";
+import { SubmissionCounter } from "@/components/rent/submission-counter";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -58,50 +59,55 @@ export default async function HomePage() {
 
   const content = (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
-      {/* SECTION 1 — HERO + STATS (2-column M3 layout) */}
-      <section className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-center">
-        <div>
-          <div className="mb-4">
-            <Badge variant="outline" className="gap-1.5">
-              <span className="size-1.5 rounded-full bg-[var(--md-sys-color-secondary)]" />
-              Open source · Community verified
-            </Badge>
+      {/* SECTION 1 — HERO + STATS */}
+      <section className="relative overflow-hidden rounded-[--radius-xl] border border-[var(--md-sys-color-outline)] dot-grid p-6 sm:p-8 lg:p-10">
+        <div className="relative z-10 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+          <div>
+            <div className="mb-4">
+              <Badge variant="outline" className="gap-1.5 text-xs">
+                <span className="size-1.5 rounded-full bg-[var(--md-sys-color-secondary)]" />
+                Hyderabad&apos;s rent truth layer
+              </Badge>
+            </div>
+            <h1 className="font-display text-4xl leading-[1.05] text-[var(--md-sys-color-on-surface)] sm:text-5xl lg:text-6xl">
+              What your<br />
+              neighbours<br />
+              <em className="font-display italic text-[var(--md-sys-color-primary)] not-italic">actually pay</em>
+            </h1>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--md-sys-color-on-surface-variant)] sm:text-lg">
+              Hyderabad&apos;s first community-verified rent intelligence platform. Anonymous submissions. Trust-weighted data. No broker inflation.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="gap-2">
+                <Link href="/submit">
+                  Submit your rent
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/localities">
+                  Browse localities
+                </Link>
+              </Button>
+            </div>
+            <div className="mt-6">
+              <StatsBar
+                initial={{
+                  totalSubmissions: cityStats.totalSubmissions,
+                  localitiesWithData: cityStats.localitiesWithData,
+                  closedRentPercentage: cityStats.closedRentPercentage,
+                  lastUpdated: cityStats.lastUpdated.toISOString(),
+                }}
+              />
+            </div>
           </div>
-          <h1 className="text-4xl font-bold leading-tight text-[var(--md-sys-color-on-surface)] sm:text-5xl lg:text-6xl">
-            Real rents.<br />
-            <span className="text-[var(--md-sys-color-primary)]">Not broker quotes.</span>
-          </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--md-sys-color-on-surface-variant)] sm:text-lg">
-            Hyderabad&apos;s first community-verified rent intelligence platform. Anonymous submissions. Trust-weighted data. No broker inflation.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link href="/submit">
-                Submit your rent →
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/explore">
-                Explore localities
-              </Link>
-            </Button>
-          </div>
-          <div className="mt-6">
-            <StatsBar
-              initial={{
-                totalSubmissions: cityStats.totalSubmissions,
-                localitiesWithData: cityStats.localitiesWithData,
-                closedRentPercentage: cityStats.closedRentPercentage,
-                lastUpdated: cityStats.lastUpdated.toISOString(),
-              }}
-            />
-          </div>
-        </div>
 
-        <div className="hidden lg:block">
-          <HeroCards />
+          <div className="hidden lg:block">
+            <HeroCards />
+          </div>
         </div>
       </section>
+      <SubmissionCounter totalSubmissions={cityStats.totalSubmissions} />
 
       {/* SECTION 2 — SEARCH */}
       <section className="mt-8">

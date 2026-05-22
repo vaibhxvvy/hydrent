@@ -3,42 +3,38 @@ import type { Locality } from "@/lib/types";
 import { aggregateRent } from "@/lib/analytics/statistics";
 import { getSubmissionsForLocality, localities } from "@/lib/data/hyderabad";
 import { formatINR } from "@/lib/utils";
-
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://hydrent.vercel.app";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site-config";
 
 export function absoluteUrl(path = "/") {
-  return new URL(path, appUrl).toString();
+  return new URL(path, SITE_URL).toString();
 }
 
 export function baseMetadata(overrides: Metadata = {}): Metadata {
   return {
-    metadataBase: new URL(appUrl),
+    metadataBase: new URL(SITE_URL),
     title: {
-      default: "HydRent - Real Hyderabad rent intelligence",
-      template: "%s | HydRent",
+      default: `${SITE_NAME} - Real Hyderabad rent intelligence`,
+      template: `%s | ${SITE_NAME}`,
     },
-    description:
-      "Community-verified Hyderabad rent intelligence based on real rents people pay, not inflated listing prices.",
-    applicationName: "HydRent",
+    description: SITE_DESCRIPTION,
+    applicationName: SITE_NAME,
     authors: [{ name: "HydRent contributors" }],
     creator: "HydRent contributors",
-    publisher: "HydRent",
+    publisher: SITE_NAME,
     alternates: {
       canonical: absoluteUrl("/"),
     },
     openGraph: {
       type: "website",
-      siteName: "HydRent",
-      title: "HydRent - Real Hyderabad rent intelligence",
-      description:
-        "Trust-weighted rent analytics for Hyderabad localities, micro-markets, and societies.",
+      siteName: SITE_NAME,
+      title: `${SITE_NAME} - Real Hyderabad rent intelligence`,
+      description: SITE_DESCRIPTION,
       url: absoluteUrl("/"),
     },
     twitter: {
       card: "summary_large_image",
-      title: "HydRent - Real Hyderabad rent intelligence",
-      description:
-        "Understand real rent ranges in Hyderabad using community-verified data and transparent statistics.",
+      title: `${SITE_NAME} - Real Hyderabad rent intelligence`,
+      description: SITE_DESCRIPTION,
     },
     ...overrides,
   };
@@ -62,7 +58,7 @@ export function localityMetadata(locality: Locality, path: string): Metadata {
       description,
       url: absoluteUrl(path),
       type: "article",
-      siteName: "HydRent",
+      siteName: SITE_NAME,
     },
     twitter: {
       card: "summary_large_image",
@@ -107,7 +103,7 @@ export function generateLocalityJsonLd(locality: Locality) {
     ],
     creator: {
       "@type": "Organization",
-      name: "HydRent",
+      name: SITE_NAME,
       url: absoluteUrl("/"),
     },
   };

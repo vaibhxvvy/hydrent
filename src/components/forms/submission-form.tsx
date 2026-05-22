@@ -237,17 +237,21 @@ export function SubmissionForm() {
             </div>
 
             {/* Rent input */}
-            <div>
-              <p className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Monthly rent</p>
-              <div className="relative">
-                <IndianRupee className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[var(--md-sys-color-primary)]" />
-                <input
-                  type="number"
-                  value={rentAmount}
-                  onChange={(e) => setRentAmount(Number(e.target.value))}
-                  className="h-14 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-12 pr-4 font-mono text-2xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
-                />
-              </div>
+                <div>
+                  <label htmlFor="monthly-rent" className="mb-3 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Monthly rent</label>
+                  <div className="relative">
+                    <IndianRupee className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[var(--md-sys-color-primary)]" />
+                    <input
+                      id="monthly-rent"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={rentAmount}
+                      onChange={(e) => setRentAmount(Number(e.target.value.replace(/[^0-9]/g, '')))}
+                      autoComplete="off"
+                      className="h-14 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] pl-12 pr-4 font-mono text-2xl font-bold text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
+                    />
+                  </div>
             </div>
 
             {/* Maintenance toggle */}
@@ -277,10 +281,13 @@ export function SubmissionForm() {
               </div>
               {!maintenanceIncluded && (
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={maintenanceAmount}
-                  onChange={(e) => setMaintenanceAmount(Number(e.target.value))}
+                  onChange={(e) => setMaintenanceAmount(Number(e.target.value.replace(/[^0-9]/g, '')))}
                   placeholder="Maintenance amount"
+                  autoComplete="off"
                   className="mt-3 h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               )}
@@ -312,20 +319,26 @@ export function SubmissionForm() {
             {/* Other fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Security deposit</p>
+                <label htmlFor="security-deposit" className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Security deposit</label>
                 <input
-                  type="number"
+                  id="security-deposit"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={securityDeposit}
-                  onChange={(e) => setSecurityDeposit(Number(e.target.value))}
+                  onChange={(e) => setSecurityDeposit(Number(e.target.value.replace(/[^0-9]/g, '')))}
+                  autoComplete="off"
                   className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 font-mono text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Move-in date</p>
+                <label htmlFor="move-in-date" className="mb-2 text-sm font-medium text-[var(--md-sys-color-on-surface)]">Move-in date</label>
                 <input
+                  id="move-in-date"
                   type="date"
                   value={moveInDate}
                   onChange={(e) => setMoveInDate(e.target.value)}
+                  max={new Date().toISOString().split('T')[0]}
                   className="h-12 w-full rounded-lg border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] px-4 text-[var(--md-sys-color-on-surface)] outline-none focus:border-[var(--md-sys-color-primary)] focus:shadow-[0_0_0_3px_rgba(34,197,94,0.15)]"
                 />
               </div>

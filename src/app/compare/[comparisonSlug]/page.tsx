@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { TrendingUp, ArrowLeftRight } from "lucide-react";
+import { TrendingUp, ArrowLeftRight, ChevronDown, ChevronUp, Minus } from "lucide-react";
 import { aggregateRent } from "@/lib/analytics/statistics";
 import { getAllLocalitiesWithStats, getLocalityBySlug, getSubmissionsForLocality } from "@/lib/data/db";
 import { baseMetadata } from "@/lib/seo";
@@ -29,7 +29,7 @@ export async function generateMetadata({
     if (!left || !right) return {};
     return baseMetadata({
       title: `${left.name} vs ${right.name} rent comparison`,
-      description: `Compare affordability, rent ranges, confidence, and commute context between ${left.name} and ${right.name}`,
+      description: `Compare real rent data between ${left.name} and ${right.name} in Hyderabad. Trust-weighted medians, BHK breakdowns, P25/P75 bands.`,
       alternates: { canonical: `/compare/${comparisonSlug}` },
     });
   } catch {
@@ -78,11 +78,11 @@ export default async function ComparePage({
   const bhks = ["1BHK", "2BHK", "3BHK"];
   const leftBhks = bhks.map((bhk) => {
     const subs = leftSubmissions.filter((s) => s.bhk === bhk);
-    return { bhk, count: subs.length, median: aggregateRent(subs, { label: bhk }).median };
+    return { bhk, count: subs.length, median: aggregateRent(subs, { label: bhk }).median, p25: aggregateRent(subs, { label: bhk }).p25, p75: aggregateRent(subs, { label: bhk }).p75 };
   });
   const rightBhks = bhks.map((bhk) => {
     const subs = rightSubmissions.filter((s) => s.bhk === bhk);
-    return { bhk, count: subs.length, median: aggregateRent(subs, { label: bhk }).median };
+    return { bhk, count: subs.length, median: aggregateRent(subs, { label: bhk }).median, p25: aggregateRent(subs, { label: bhk }).p25, p75: aggregateRent(subs, { label: bhk }).p75 };
   });
 
   const cheaperLocality = leftAggregate.median < rightAggregate.median ? left.name : right.name;
@@ -91,12 +91,17 @@ export default async function ComparePage({
 
   const allOther = allLocalities.filter((locality) => ![left.slug, right.slug].includes(locality.slug));
 
-  function isCheaper(side: "left" | "right", value: number, other: number) {
-    return value > 0 && value < other;
+  function renderDelta(value: number, other: number) {
+    if (value <= 0 || other <= 0) return <span className="text-[var(--md-sys-color-on-surface-variant)]">—</span>;
+    const diff = value - other;
+    const isCheaper = diff < 0;
+    return (
+      <span className={`inline-flex items-center gap-0.5 font-mono text-sm font-medium ${isCheaper ? "text-[var(--md-sys-color-primary)]" : "text-[var(--md-sys-color-tertiary)]"}`}>
+        {isCheaper ? <ChevronDown className="size-3" /> : diff > 0 ? <ChevronUp className="size-3" /> : <Minus className="size-3" />}
+        {formatINR(Math.abs(diff))}
+      </span>
+    );
   }
-
-  const leftColor = isCheaper("left", leftAggregate.median, rightAggregate.median) ? "var(--md-sys-color-secondary)" : "var(--md-sys-color-on-surface)";
-  const rightColor = isCheaper("right", rightAggregate.median, leftAggregate.median) ? "var(--md-sys-color-secondary)" : "var(--md-sys-color-on-surface)";
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -108,125 +113,130 @@ export default async function ComparePage({
         </h1>
       </div>
       <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">
-        Trust-weighted comparison · {leftAggregate.sampleSize} vs {rightAggregate.sampleSize} verified signals
+        Rent comparison · {leftAggregate.sampleSize} vs {rightAggregate.sampleSize} verified signals
       </p>
 
       {hasLeftData && hasRightData ? (
         <>
           {/* Key insight banner */}
           <FilledCard className="mt-6">
-            <div className="p-4 flex items-center gap-3">
-              <TrendingUp className="size-5 shrink-0 text-[var(--md-sys-color-primary)]" />
-              <p className="text-sm font-medium text-[var(--md-sys-color-on-surface)]">
-                <span className="text-[var(--md-sys-color-secondary)]">{cheaperLocality}</span> is {percentDiff}% cheaper — median rent {formatINR(delta)} less
-              </p>
+            <div className="p-5 flex items-center gap-4">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)]/10">
+                <TrendingUp className="size-6 text-[var(--md-sys-color-primary)]" />
+              </div>
+              <div>
+                <p className="text-base font-semibold text-[var(--md-sys-color-on-surface)]">
+                  <span className="text-[var(--md-sys-color-primary)]">{cheaperLocality}</span> is <span className="font-bold">{percentDiff}% cheaper</span>
+                </p>
+                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">
+                  Median rent {formatINR(delta)} less per month
+                </p>
+              </div>
             </div>
           </FilledCard>
 
-          {/* Side-by-side ElevatedCard layout */}
+          {/* Side-by-side stat cards */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {/* Left locality card */}
-            <ElevatedCard>
-              <div className="p-5">
-                <h2 className="text-base font-semibold text-[var(--md-sys-color-on-surface)]">{left.name}</h2>
-                <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{left.zone}</p>
+            {[
+              { locality: left, aggregate: leftAggregate, bhks: leftBhks },
+              { locality: right, aggregate: rightAggregate, bhks: rightBhks },
+            ].map(({ locality, aggregate, bhks }) => (
+              <ElevatedCard key={locality.slug}>
+                <div className="p-5">
+                  <h2 className="text-base font-semibold text-[var(--md-sys-color-on-surface)]">{locality.name}</h2>
+                  <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{locality.zone}</p>
 
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">Median rent</p>
-                    <p className="mt-0.5 font-mono text-2xl font-bold" style={{ color: leftColor }}>{formatINR(leftAggregate.median)}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="mt-4 space-y-4">
                     <div>
-                      <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">P25</p>
-                      <p className="font-mono text-sm text-[var(--md-sys-color-on-surface)]">{formatINR(leftAggregate.p25)}</p>
+                      <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">Median rent</p>
+                      <p className="mt-0.5 hero-number">{formatINR(aggregate.median)}</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">P75</p>
-                      <p className="font-mono text-sm text-[var(--md-sys-color-on-surface)]">{formatINR(leftAggregate.p75)}</p>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">P25</p>
+                        <p className="font-mono text-sm text-[var(--md-sys-color-on-surface)]">{formatINR(aggregate.p25)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">P75</p>
+                        <p className="font-mono text-sm text-[var(--md-sys-color-on-surface)]">{formatINR(aggregate.p75)}</p>
+                      </div>
+                    </div>
+
+                    <ConfidenceIndicator score={aggregate.confidenceScore} sampleSize={aggregate.sampleSize} />
+
+                    {/* BHK medians */}
+                    <div className="border-t border-[var(--md-sys-color-outline)] pt-3">
+                      <p className="text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] mb-2">BHK medians</p>
+                      <div className="space-y-1.5">
+                        {bhks.map(({ bhk, count, median }) => (
+                          <div key={bhk} className="flex items-center justify-between text-xs">
+                            <span className="text-[var(--md-sys-color-on-surface-variant)]">{bhk}</span>
+                            <span className="font-mono text-[var(--md-sys-color-on-surface)]">
+                              {count > 0 ? formatINR(median) : "—"}
+                              <span className="text-[var(--md-sys-color-on-surface-variant)] ml-1">({count})</span>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  <ConfidenceIndicator score={leftAggregate.confidenceScore} sampleSize={leftAggregate.sampleSize} />
-
-                  {/* BHK breakdown */}
-                  <div className="border-t border-[var(--md-sys-color-outline)] pt-3">
-                    <p className="text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] mb-2">BHK medians</p>
-                    <div className="space-y-1.5">
-                      {leftBhks.map(({ bhk, count, median }) => (
-                        <div key={bhk} className="flex items-center justify-between text-xs">
-                          <span className="text-[var(--md-sys-color-on-surface-variant)]">{bhk}</span>
-                          <span className="font-mono text-[var(--md-sys-color-on-surface)]">
-                            {count > 0 ? formatINR(median) : "—"}
-                            <span className="text-[var(--md-sys-color-on-surface-variant)] ml-1">({count})</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Link
+                    href={`/hyderabad/${locality.slug}`}
+                    className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[var(--md-sys-color-primary)] hover:gap-1.5 transition-all"
+                  >
+                    View full report →
+                  </Link>
                 </div>
-
-                <Link
-                  href={`/hyderabad/${left.slug}`}
-                  className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[var(--md-sys-color-primary)] hover:gap-1.5 transition-all"
-                >
-                  View full report →
-                </Link>
-              </div>
-            </ElevatedCard>
-
-            {/* Right locality card */}
-            <ElevatedCard>
-              <div className="p-5">
-                <h2 className="text-base font-semibold text-[var(--md-sys-color-on-surface)]">{right.name}</h2>
-                <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{right.zone}</p>
-
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">Median rent</p>
-                    <p className="mt-0.5 font-mono text-2xl font-bold" style={{ color: rightColor }}>{formatINR(rightAggregate.median)}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">P25</p>
-                      <p className="font-mono text-sm text-[var(--md-sys-color-on-surface)]">{formatINR(rightAggregate.p25)}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">P75</p>
-                      <p className="font-mono text-sm text-[var(--md-sys-color-on-surface)]">{formatINR(rightAggregate.p75)}</p>
-                    </div>
-                  </div>
-
-                  <ConfidenceIndicator score={rightAggregate.confidenceScore} sampleSize={rightAggregate.sampleSize} />
-
-                  {/* BHK breakdown */}
-                  <div className="border-t border-[var(--md-sys-color-outline)] pt-3">
-                    <p className="text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] mb-2">BHK medians</p>
-                    <div className="space-y-1.5">
-                      {rightBhks.map(({ bhk, count, median }) => (
-                        <div key={bhk} className="flex items-center justify-between text-xs">
-                          <span className="text-[var(--md-sys-color-on-surface-variant)]">{bhk}</span>
-                          <span className="font-mono text-[var(--md-sys-color-on-surface)]">
-                            {count > 0 ? formatINR(median) : "—"}
-                            <span className="text-[var(--md-sys-color-on-surface-variant)] ml-1">({count})</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  href={`/hyderabad/${right.slug}`}
-                  className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[var(--md-sys-color-primary)] hover:gap-1.5 transition-all"
-                >
-                  View full report →
-                </Link>
-              </div>
-            </ElevatedCard>
+              </ElevatedCard>
+            ))}
           </div>
+
+          {/* BHK Comparison Table with Delta */}
+          <section className="mt-8">
+            <h2 className="mb-4 text-base font-semibold text-[var(--md-sys-color-on-surface)]">BHK Comparison</h2>
+            <div className="overflow-hidden rounded-[--radius-card] border border-[var(--md-sys-color-outline)]">
+              <table className="w-full text-sm">
+                <caption className="sr-only">BHK comparison between {left.name} and {right.name}</caption>
+                <thead>
+                  <tr className="border-b border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-container)]">
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">BHK</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">{left.name}</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">{right.name}</th>
+                    <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-[var(--md-sys-color-on-surface-variant)]">Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bhks.map((bhk, idx) => {
+                    const leftBhk = leftBhks[idx]!;
+                    const rightBhk = rightBhks[idx]!;
+                    return (
+                      <tr key={bhk} className="border-b border-[var(--md-sys-color-outline)] last:border-0 hover:bg-[var(--md-sys-color-surface-container)]/50 transition-colors">
+                        <td className="px-4 py-3 font-medium text-[var(--md-sys-color-on-surface)]">{bhk}</td>
+                        <td className="px-4 py-3 text-right font-mono text-[var(--md-sys-color-on-surface)]">
+                          {leftBhk.count > 0 ? formatINR(leftBhk.median) : "—"}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-[var(--md-sys-color-on-surface)]">
+                          {rightBhk.count > 0 ? formatINR(rightBhk.median) : "—"}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {leftBhk.count > 0 && rightBhk.count > 0
+                            ? renderDelta(leftBhk.median, rightBhk.median)
+                            : <span className="text-[var(--md-sys-color-on-surface-variant)]">—</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-2 text-xs text-[var(--md-sys-color-on-surface-variant)] text-right">
+              <span className="inline-flex items-center gap-1"><ChevronDown className="size-3 text-[var(--md-sys-color-primary)]" /> Cheaper</span>
+              <span className="mx-2">·</span>
+              <span className="inline-flex items-center gap-1"><ChevronUp className="size-3 text-[var(--md-sys-color-tertiary)]" /> More expensive</span>
+            </div>
+          </section>
         </>
       ) : (
         <div className="mt-6 rounded-[--radius-card] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)] p-8 text-center">
@@ -246,11 +256,11 @@ export default async function ComparePage({
       <div className="mt-8">
         <h2 className="text-base font-semibold text-[var(--md-sys-color-on-surface)]">Compare with other localities</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          {allOther.slice(0, 6).map((locality) => (
+          {allOther.slice(0, 12).map((locality) => (
             <Link
               key={locality.slug}
               href={`/compare/${left.slug}-vs-${locality.slug}`}
-              className="rounded-[--radius-pill] border border-[var(--md-sys-color-outline)] px-4 py-1.5 text-sm text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
+              className="rounded-[--radius-pill] border border-[var(--md-sys-color-outline)] px-3 py-1.5 text-xs text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] hover:text-[var(--md-sys-color-on-surface)] transition-colors"
             >
               {locality.name}
             </Link>

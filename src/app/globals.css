@@ -3,6 +3,7 @@
 
 @theme inline {
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", Inter, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", monospace;
 }
 
@@ -181,6 +182,46 @@ body {
 @keyframes checkmark { 0% { stroke-dashoffset: 100; } 100% { stroke-dashoffset: 0; } }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 @keyframes slide-to-top { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-120%); opacity: 0; } }
+
+/* Font utility classes */
+.font-display { font-family: var(--font-display), Georgia, serif; }
+.font-mono { font-family: var(--font-mono), monospace; }
+
+/* Dot-grid decorative background (used in hero) */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+[data-theme="light"] .dot-grid {
+  background-image: radial-gradient(circle, rgba(26, 26, 24, 0.08) 1px, transparent 1px);
+}
+
+/* Hero number — large italic serif for rent amounts in hero */
+.hero-number {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Stat number — monospaced rent figure */
+.stat-number {
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Section label (small caps above a heading) */
+.section-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
 
 /* Utility animation classes */
 .animate-fade-in-up { animation: fade-in-up 0.4s var(--motion-easing-emphasized-decelerate) forwards; }
