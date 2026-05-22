@@ -68,82 +68,51 @@ function Markers({ localities }: { localities: LocalityMarker[] }) {
           }}
         >
           <Popup>
-            <div className="min-w-[220px] space-y-2 font-sans">
-              <div>
-                <p className="font-bold text-base text-[var(--md-sys-color-on-surface)]">{loc.name}</p>
-                <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{loc.zone} · {loc.confidenceScore}/100 confidence</p>
+            <div className="min-w-[200px] space-y-2 font-sans">
+              <div className="flex items-center gap-1.5">
+                <p className="font-bold text-sm text-[var(--md-sys-color-on-surface)]">{loc.name}</p>
+                <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]">· {loc.zone}</span>
               </div>
               {hasData ? (
                 <>
-                  {/* Key metrics */}
-                  <div className="flex items-stretch gap-1.5">
-                    {loc.median2BHK && (
-                      <div className="flex-1 rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-2.5 py-1.5">
-                        <p className="text-[9px] text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">2BHK median</p>
-                        <p className="font-mono text-sm font-bold text-[var(--md-sys-color-primary)]">{formatINR(loc.median2BHK)}</p>
-                      </div>
-                    )}
-                    {loc.avgRent != null && (
-                      <div className="flex-1 rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-2.5 py-1.5">
-                        <p className="text-[9px] text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">Avg rent</p>
-                        <p className="font-mono text-sm font-bold text-[var(--md-sys-color-on-surface)]">{formatINR(loc.avgRent)}</p>
-                      </div>
-                    )}
-                    <div className="flex-1 rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-2.5 py-1.5">
-                      <p className="text-[9px] text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">Signals</p>
-                      <p className="font-mono text-sm font-bold text-[var(--md-sys-color-on-surface)]">{loc.submissionCount}</p>
-                    </div>
-                  </div>
+                  <p className="font-mono text-lg font-bold tracking-tight text-[var(--md-sys-color-on-surface)]">
+                    {loc.median2BHK ? formatINR(loc.median2BHK) : formatINR(loc.avgRent!)}
+                  </p>
+                  <p className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]">
+                    {loc.median2BHK ? "2BHK median" : "Avg rent"} · {loc.submissionCount} signals · {loc.confidenceScore}/100
+                  </p>
 
-                  {/* BHK breakdown */}
-                  {loc.bhkBreakdown && loc.bhkBreakdown.length > 0 && (
-                    <div className="rounded-lg bg-[var(--md-sys-color-surface-container-high)] p-2.5">
-                      <p className="text-[9px] font-medium text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider mb-1.5">Rent by BHK</p>
-                      <div className="space-y-1">
-                        {loc.bhkBreakdown.filter((b) => b.count > 0).map((b) => (
-                          <div key={b.bhk} className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5">
-                              <span className="inline-flex size-5 items-center justify-center rounded bg-[var(--md-sys-color-background)] text-[10px] font-bold text-[var(--md-sys-color-primary)]">{b.bhk.replace("BHK","")}</span>
-                              <span className="text-[var(--md-sys-color-on-surface-variant)]">({b.count})</span>
-                            </div>
-                            <span className="font-mono text-[var(--md-sys-color-on-surface)] font-medium">{formatINR(b.minRent)}–{formatINR(b.maxRent)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Furnishing chips */}
-                  {loc.furnishingBreakdown && loc.furnishingBreakdown.length > 0 && (
+                  {loc.bhkBreakdown && loc.bhkBreakdown.filter((b) => b.count > 0).length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {loc.furnishingBreakdown.map((f) => (
-                        <span key={f.furnishing} className="rounded-full bg-[var(--md-sys-color-surface-container-high)] px-2 py-0.5 text-[10px] text-[var(--md-sys-color-on-surface-variant)]">
-                          {f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"} ({f.count})
-                        </span>
+                      {loc.bhkBreakdown.filter((b) => b.count > 0).map((b) => (
+                        <div key={b.bhk} className="rounded-md bg-[var(--md-sys-color-surface-container-high)] px-2 py-1 text-[10px]">
+                          <span className="font-semibold text-[var(--md-sys-color-on-surface)]">{b.bhk}</span>
+                          <span className="font-mono text-[var(--md-sys-color-primary)] ml-0.5">{formatINR(b.medianRent ?? 0)}</span>
+                        </div>
                       ))}
                     </div>
                   )}
 
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex gap-1.5 pt-0.5">
                     <Link
                       href={`/hyderabad/${loc.slug}`}
-                      className="flex-1 rounded-[--radius-button] bg-[var(--md-sys-color-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--md-sys-color-on-primary)] text-center hover:brightness-110 transition-all"
+                      className="flex-1 rounded-[--radius-button] bg-[var(--md-sys-color-primary)] px-2.5 py-1 text-[10px] font-semibold text-[var(--md-sys-color-on-primary)] text-center hover:brightness-110 transition-all"
                     >
                       View report
                     </Link>
                     <Link
                       href="/submit"
-                      className="flex-1 rounded-[--radius-button] border border-[var(--md-sys-color-outline)] px-3 py-1.5 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] text-center hover:bg-[var(--md-sys-color-surface-container-high)] transition-all"
+                      className="flex-1 rounded-[--radius-button] border border-[var(--md-sys-color-outline)] px-2.5 py-1 text-[10px] font-medium text-[var(--md-sys-color-on-surface-variant)] text-center hover:bg-[var(--md-sys-color-surface-container-high)] transition-all"
                     >
                       Submit rent
                     </Link>
                   </div>
                 </>
               ) : (
-                <div className="space-y-2">
-                  <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">No data yet for {loc.name}</p>
-                  <Link href="/submit" className="block rounded-[--radius-button] bg-[var(--md-sys-color-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--md-sys-color-on-primary)] text-center hover:brightness-110 transition-all">
-                    Submit first rent →
+                <div className="flex items-center gap-2">
+                  <p className="flex-1 text-xs text-[var(--md-sys-color-on-surface-variant)]">No data yet</p>
+                  <Link href="/submit" className="rounded-[--radius-button] bg-[var(--md-sys-color-primary)] px-3 py-1 text-[10px] font-semibold text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-all">
+                    Submit →
                   </Link>
                 </div>
               )}

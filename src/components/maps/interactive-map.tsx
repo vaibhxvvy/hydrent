@@ -53,7 +53,7 @@ function createRentIcon(avgRent: number, confidence: number, hasData: boolean): 
   const label = hasData && avgRent > 0 ? `₹${(avgRent / 1000).toFixed(0)}k` : "—";
   return L.divIcon({
     className: "rent-pin",
-    html: `<div style="background:${bg};color:${textColor};padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;font-family:system-ui;white-space:nowrap;border:2px solid rgba(255,255,255,0.7);box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;gap:2px;cursor:pointer"><span>${label}</span></div>`,
+    html: `<div style="background:${bg};color:${textColor};padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;font-family:system-ui;white-space:nowrap;border:2.5px solid rgba(255,255,255,0.9);box-shadow:0 3px 12px rgba(0,0,0,0.35);display:flex;align-items:center;gap:2px;cursor:pointer;line-height:1.15">${label}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   });
@@ -382,29 +382,31 @@ function MapContent({ localities, onClose, standalone }: {
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2"/></svg>
       </button>
 
-      {/* Selected locality popup - single full popup */}
+      {/* Selected locality popup — compact bengaluru.rent style */}
       {loc && !showSubmit && (
-        <div className={`absolute left-0 right-0 z-[1000] mx-auto px-3 sm:px-4 ${exitingLocality ? "animate-slide-to-top" : "animate-slide-up"} max-w-lg`}
-          style={{ bottom: "max(12px, env(safe-area-inset-bottom))" }}
+        <div className={`absolute left-0 right-0 z-[1000] mx-auto px-2 sm:px-4 ${exitingLocality ? "animate-slide-to-top" : "animate-slide-up"} max-w-sm`}
+          style={{ bottom: "max(8px, env(safe-area-inset-bottom))" }}
         >
-          <div className="rounded-[--radius-card] border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)]/95 p-5 shadow-level-3 backdrop-blur-xl">
-            {/* Header with back button */}
-            <div className="flex items-center gap-2 mb-3">
+          <div className="rounded-2xl border border-[var(--md-sys-color-outline)] bg-[var(--elevation-level-1)]/95 px-4 py-3.5 shadow-level-3 backdrop-blur-xl">
+            {/* Header row */}
+            <div className="flex items-center gap-2 mb-2.5">
               <button
                 onClick={() => animateOutLocality()}
-                className="flex size-8 items-center justify-center rounded-full text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
+                className="flex size-7 items-center justify-center rounded-full text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors shrink-0"
                 aria-label="Back"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
-              <div className="flex-1">
-                <h3 className="font-bold text-[var(--md-sys-color-on-surface)] text-lg leading-tight">{loc.name}</h3>
-                <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{loc.zone}</p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-bold text-sm text-[var(--md-sys-color-on-surface)] truncate">{loc.name}</h3>
+                  <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]">· {loc.zone}</span>
+                </div>
               </div>
-              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${
-                loc.confidenceScore >= 70 ? "bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]" :
-                loc.confidenceScore >= 40 ? "bg-[#F59E0B] text-[#0A0F0A]" :
-                "bg-[#FF8A80] text-[#690005]"
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap shrink-0 ${
+                loc.confidenceScore >= 70 ? "bg-[var(--md-sys-color-primary)]/15 text-[var(--md-sys-color-primary)]" :
+                loc.confidenceScore >= 40 ? "bg-[#F59E0B]/15 text-[#B45309]" :
+                "bg-[#FF8A80]/15 text-[#DC2626]"
               }`}>
                 {loc.confidenceScore}
               </span>
@@ -412,61 +414,49 @@ function MapContent({ localities, onClose, standalone }: {
 
             {loc.submissionCount > 0 ? (
               <>
-                {/* Key metrics row */}
-                <div className="flex items-stretch gap-2 text-sm mb-3">
-                  {loc.median2BHK && (
-                    <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-[--radius-md] px-3 py-2 flex-1 min-w-0">
-                      <p className="text-[var(--md-sys-color-on-surface-variant)] text-[10px] uppercase tracking-wider">2BHK median</p>
-                      <p className="font-mono text-base font-bold text-[var(--md-sys-color-primary)] mt-0.5 truncate">{formatINR(loc.median2BHK)}</p>
-                    </div>
-                  )}
-                  <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-[--radius-md] px-3 py-2 flex-1 min-w-0">
-                    <p className="text-[var(--md-sys-color-on-surface-variant)] text-[10px] uppercase tracking-wider">Avg rent</p>
-                    <p className="font-mono text-base font-bold text-[var(--md-sys-color-on-surface)] mt-0.5 truncate">{formatINR(loc.avgRent)}</p>
-                  </div>
-                  <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-[--radius-md] px-3 py-2 flex-1 min-w-0">
-                    <p className="text-[var(--md-sys-color-on-surface-variant)] text-[10px] uppercase tracking-wider">Trust</p>
-                    <p className="font-mono text-base font-bold text-[var(--md-sys-color-primary)] mt-0.5">{loc.avgTrustScore}</p>
-                  </div>
+                {/* Hero rent number */}
+                <div className="mb-3">
+                  <p className="font-mono text-2xl font-bold tracking-tight text-[var(--md-sys-color-on-surface)]">
+                    {loc.median2BHK ? formatINR(loc.median2BHK) : formatINR(loc.avgRent)}
+                  </p>
+                  <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)]">
+                    {loc.median2BHK ? "2BHK median" : "Average rent"} · {loc.submissionCount} signals · {loc.avgTrustScore}/100 trust
+                  </p>
                 </div>
 
-                {/* BHK breakdown - full ranges */}
+                {/* BHK breakdown — compact horizontal */}
                 {loc.bhkBreakdown.length > 0 && (
-                  <div className="bg-[var(--md-sys-color-surface-container-high)] rounded-[--radius-md] p-3 mb-2">
-                    <p className="text-[var(--md-sys-color-on-surface-variant)] text-[10px] uppercase tracking-wider mb-2">Rent by BHK</p>
-                    <div className="space-y-1.5">
-                      {loc.bhkBreakdown.filter((b) => b.count > 0).map((b) => (
-                        <div key={b.bhk} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="inline-flex items-center justify-center size-7 rounded-[--radius-sm] bg-[var(--md-sys-color-background)] text-xs font-bold text-[var(--md-sys-color-primary)] flex-shrink-0">{b.bhk.replace("BHK","")}</span>
-                            <span className="text-[var(--md-sys-color-on-surface-variant)] text-xs whitespace-nowrap">({b.count})</span>
-                          </div>
-                          <span className="font-mono text-[var(--md-sys-color-on-surface)] font-medium text-xs truncate ml-2">
-                            {formatINR(b.minRent)} – {formatINR(b.maxRent)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-1 mb-2.5">
+                    {loc.bhkBreakdown.filter((b) => b.count > 0).map((b) => (
+                      <div key={b.bhk} className="rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-2.5 py-1.5 text-xs">
+                        <span className="font-semibold text-[var(--md-sys-color-on-surface)]">{b.bhk}</span>
+                        <span className="font-mono font-medium text-[var(--md-sys-color-primary)] ml-1">{formatINR(b.medianRent ?? 0)}</span>
+                        <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)] ml-0.5">({b.count})</span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                {/* Furnishing chips */}
+                {/* Furnishing chips — inline */}
                 {loc.furnishingBreakdown.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--md-sys-color-on-surface-variant)] mb-3">
+                  <div className="flex flex-wrap gap-1 mb-2.5">
                     {loc.furnishingBreakdown.map((f) => (
-                      <span key={f.furnishing} className="bg-[var(--md-sys-color-surface-container-high)] rounded-full px-2.5 py-1">
-                        {f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"} ({f.count})
+                      <span key={f.furnishing} className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]">
+                        {f.furnishing === "FULLY_FURNISHED" ? "Fully" : f.furnishing === "SEMI_FURNISHED" ? "Semi" : "Unfurnished"}
+                        <span className="ml-0.5">({f.count})</span>
+                        {f !== loc.furnishingBreakdown[loc.furnishingBreakdown.length - 1] && <span className="mx-1">·</span>}
                       </span>
                     ))}
                   </div>
                 )}
 
-                <div className="flex gap-2 mt-3">
+                {/* Action buttons — compact */}
+                <div className="flex gap-2">
                   <button
                     onClick={() => animateOutLocality(() => router.push(`/hyderabad/${loc.slug}`))}
-                    className="flex-1 rounded-[--radius-button] bg-[var(--md-sys-color-primary)] py-2.5 text-sm font-semibold text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-all active:scale-[0.97]"
+                    className="flex-1 rounded-[--radius-button] bg-[var(--md-sys-color-primary)] py-2 text-xs font-semibold text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-all active:scale-[0.97]"
                   >
-                    View full report
+                    View report
                   </button>
                   <button
                     onClick={() => {
@@ -476,15 +466,15 @@ function MapContent({ localities, onClose, standalone }: {
                         setSubmitStep(0);
                       });
                     }}
-                    className="flex-1 rounded-[--radius-button] border border-[var(--md-sys-color-outline)] py-2.5 text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-all active:scale-[0.97]"
+                    className="flex-1 rounded-[--radius-button] border border-[var(--md-sys-color-outline)] py-2 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-all active:scale-[0.97]"
                   >
                     Submit rent
                   </button>
                 </div>
               </>
             ) : (
-              <>
-                <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] my-3">No data yet. Be the first to submit.</p>
+              <div className="flex items-center gap-2">
+                <p className="flex-1 text-xs text-[var(--md-sys-color-on-surface-variant)]">No data yet</p>
                 <button
                   onClick={() => {
                     setPin({ lat: loc.lat, lng: loc.lng });
@@ -492,11 +482,11 @@ function MapContent({ localities, onClose, standalone }: {
                     setSubmitStep(0);
                     animateOutLocality();
                   }}
-                  className="w-full rounded-[--radius-button] bg-[var(--md-sys-color-primary)] py-2.5 text-sm font-semibold text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-all active:scale-[0.97]"
+                  className="rounded-[--radius-button] bg-[var(--md-sys-color-primary)] px-4 py-1.5 text-xs font-semibold text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-all active:scale-[0.97]"
                 >
-                  Submit first rent
+                  Submit first
                 </button>
-              </>
+              </div>
             )}
           </div>
         </div>
