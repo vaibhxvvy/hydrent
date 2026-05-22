@@ -13,6 +13,8 @@ import {
 import { generatedLocalityCopy, generateLocalityJsonLd, localityMetadata } from "@/lib/seo";
 import { formatINR } from "@/lib/utils";
 import { ConfidenceIndicator } from "@/components/ui/confidence-indicator";
+import { TrustScoreBadge } from "@/components/ui/trust-score-badge";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ElevatedCard, FilledCard } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -181,8 +183,11 @@ export default async function LocalityPage({
                 <span className="text-[var(--md-sys-color-on-surface-variant)]">P25 <span className="font-mono text-[var(--md-sys-color-on-surface)]">{formatINR(aggregate.p25)}</span></span>
                 <span className="text-[var(--md-sys-color-on-surface-variant)]">P75 <span className="font-mono text-[var(--md-sys-color-on-surface)]">{formatINR(aggregate.p75)}</span></span>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex items-center gap-3">
                 <ConfidenceIndicator score={aggregate.confidenceScore} sampleSize={aggregate.sampleSize} />
+                <TooltipProvider>
+                  <TrustScoreBadge score={aggregate.confidenceScore} />
+                </TooltipProvider>
               </div>
             </div>
           </ElevatedCard>

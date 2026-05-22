@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, IndianRupee, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, IndianRupee, MapPin, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { submitRentAction } from "@/app/submit/actions";
 import { localities } from "@/lib/data/hyderabad";
 import { formatINR } from "@/lib/utils";
@@ -29,6 +30,8 @@ const STEPS = [
 export function SubmissionForm() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Step 1 state
   const [locality, setLocality] = useState("");
@@ -80,26 +83,35 @@ export function SubmissionForm() {
   }, [step, locality, bhk, rentAmount]);
 
   const handleSubmit = async () => {
-    // Build form data and submit
-    const formData = new FormData();
-    formData.append("localitySlug", locality);
-    formData.append("microLocality", microLocality || locality);
-    formData.append("bhk", bhk);
-    formData.append("rentType", rentType);
-    formData.append("furnishing", furnishing);
-    formData.append("rentAmount", String(rentAmount));
-    formData.append("maintenanceAmount", String(maintenanceAmount));
-    formData.append("maintenanceIncluded", String(maintenanceIncluded));
-    formData.append("securityDeposit", String(securityDeposit));
-    formData.append("moveInDate", moveInDate);
-    formData.append("occupancyType", "ANY");
-    formData.append("parkingCount", "1");
-    formData.append("brokerInvolved", submitterType === "broker" ? "true" : "false");
-    formData.append("gatedSociety", "false");
-    formData.append("petFriendly", "false");
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const formData = new FormData();
+      formData.append("localitySlug", locality);
+      formData.append("microLocality", microLocality || locality);
+      formData.append("bhk", bhk);
+      formData.append("rentType", rentType);
+      formData.append("furnishing", furnishing);
+      formData.append("rentAmount", String(rentAmount));
+      formData.append("maintenanceAmount", String(maintenanceAmount));
+      formData.append("maintenanceIncluded", String(maintenanceIncluded));
+      formData.append("securityDeposit", String(securityDeposit));
+      formData.append("moveInDate", moveInDate);
+      formData.append("occupancyType", "ANY");
+      formData.append("parkingCount", "1");
+      formData.append("brokerInvolved", submitterType === "broker" ? "true" : "false");
+      formData.append("gatedSociety", "false");
+      formData.append("petFriendly", "false");
 
-    await submitRentAction(formData);
-    setSubmitted(true);
+      await submitRentAction(formData);
+      setSubmitted(true);
+      toast.success("Rent submitted — thank you!");
+    } catch {
+      setSubmitError("Something went wrong. Please try again.");
+      toast.error("Failed to submit. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -433,6 +445,12 @@ export function SubmissionForm() {
             </div>
           </div>
         )}
+
+        {submitError && (
+          <div className="mt-4 rounded-lg border border-[var(--md-sys-color-error)]/30 bg-[var(--md-sys-color-error-container)]/20 p-3 text-sm text-[var(--md-sys-color-error)]">
+            {submitError}
+          </div>
+        )}
       </div>
 
       {/* Navigation buttons */}
@@ -460,10 +478,14 @@ export function SubmissionForm() {
         ) : (
           <button
             onClick={handleSubmit}
-            className="flex items-center gap-2 rounded-lg bg-[var(--md-sys-color-primary)] px-6 py-2.5 text-sm font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-colors"
+            disabled={submitting}
+            className="flex items-center gap-2 rounded-lg bg-[var(--md-sys-color-primary)] px-6 py-2.5 text-sm font-medium text-[var(--md-sys-color-on-primary)] hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Submit rent
-            <Check className="size-4" />
+            {submitting ? (
+              <><Loader2 className="size-4 animate-spin" /> Submitting...</>
+            ) : (
+              <><Check className="size-4" /> Submit rent</>
+            )}
           </button>
         )}
       </div>

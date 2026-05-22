@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -44,6 +45,7 @@ export default function RootLayout({
           </div>
           <OnboardingTour />
         </TooltipProvider>
+        <Toaster position="bottom-center" richColors closeButton />
       </body>
     </html>
   );

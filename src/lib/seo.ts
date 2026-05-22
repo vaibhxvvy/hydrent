@@ -122,20 +122,25 @@ export function generatedLocalityCopy(locality: Locality) {
     .slice(0, 3)
     .map((candidate) => candidate.name);
 
-  return {
-    summary: `${locality.name} currently shows a trust-weighted median effective monthly cost of ${formatINR(
-      aggregate.median,
-    )}. The central range sits between ${formatINR(aggregate.p25)} and ${formatINR(
-      aggregate.p75,
-    )}, with ${aggregate.verifiedRatio}% of the local sample verified or community-reviewed.`,
-    affordability: `Using a conservative household income assumption of ${formatINR(
-      locality.medianIncomeAssumption,
-    )}, the median rent-to-income pressure is ${Math.round(
-      (aggregate.median / locality.medianIncomeAssumption) * 100,
-    )}%.`,
-    nearby:
-      alternatives.length > 0
+  const median = aggregate.median;
+  const p25 = aggregate.p25;
+  const p75 = aggregate.p75;
+
+  if (!median || median === 0) {
+    return {
+      summary: null,
+      affordability: null,
+      nearby: alternatives.length > 0
         ? `Nearby comparison markets worth checking: ${alternatives.join(", ")}.`
         : "Nearby comparison markets will appear as the dataset grows.",
+    };
+  }
+
+  return {
+    summary: `${locality.name} currently shows a trust-weighted median effective monthly cost of ${formatINR(median)}. The central range sits between ${formatINR(p25)} and ${formatINR(p75)}, with ${aggregate.verifiedRatio}% of the local sample verified or community-reviewed.`,
+    affordability: `Using a conservative household income assumption of ${formatINR(locality.medianIncomeAssumption)}, the median rent-to-income pressure is ${Math.round((median / locality.medianIncomeAssumption) * 100)}%.`,
+    nearby: alternatives.length > 0
+      ? `Nearby comparison markets worth checking: ${alternatives.join(", ")}.`
+      : "Nearby comparison markets will appear as the dataset grows.",
   };
 }

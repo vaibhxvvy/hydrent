@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { RentDistributionChart } from "@/components/charts/rent-distribution-chart";
 import { ConfidenceMeter } from "@/components/rent/confidence-meter";
+import { NegotiationGuide } from "@/components/rent/negotiation-guide";
+import { FairnessCalculator } from "@/components/rent/fairness-calculator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,6 +72,20 @@ export default async function BhkPage({
   });
   const hasData = submissions.length > 0;
 
+  const bhkStats = (["1BHK", "2BHK", "3BHK", "4BHK"] as const).map((b) => {
+    const bSubs = allSubmissions.filter((s) => s.bhk === b);
+    const bAgg = aggregateRent(bSubs, { label: b });
+    return {
+      bhk: b,
+      minRent: bSubs.length > 0 ? Math.min(...bSubs.map((s) => s.effectiveMonthlyCost)) : 0,
+      maxRent: bSubs.length > 0 ? Math.max(...bSubs.map((s) => s.effectiveMonthlyCost)) : 0,
+      medianRent: bAgg.median,
+      count: bSubs.length,
+    };
+  });
+
+  const currentBhkStats = bhkStats.find((b) => b.bhk === label) || null;
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <Badge variant="trust">{locality.name}</Badge>
@@ -126,6 +142,15 @@ export default async function BhkPage({
           </CardContent>
         </Card>
       </div>
+
+      <NegotiationGuide
+        locality={locality.name}
+        bhk={label}
+        stats={currentBhkStats}
+        submissionCount={submissions.length}
+      />
+
+      <FairnessCalculator stats={bhkStats} />
 
       <div className="mt-6 flex flex-wrap gap-2">
         <Button asChild variant="outline" size="sm">

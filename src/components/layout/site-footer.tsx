@@ -1,55 +1,39 @@
 import Link from "next/link";
-import { Mail, Github } from "lucide-react";
-
-const links = [
-  { href: "/how-data-works", label: "How data works" },
-  { href: "/submit", label: "Submit rent" },
-  { href: "/issues", label: "Report an issue" },
-];
+import { ExternalLink } from "lucide-react";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-dim)]">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.3fr_1fr]">
+    <footer className="border-t border-[var(--md-sys-color-outline)] mt-20 bg-[var(--md-sys-color-surface-dim)]">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="flex size-6 items-center justify-center rounded-md bg-[var(--md-sys-color-primary)] text-xs font-bold text-[var(--md-sys-color-on-primary)]">
-              H
-            </span>
-            <p className="text-sm font-semibold text-[var(--md-sys-color-on-surface)]">HydRent</p>
-          </div>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--md-sys-color-on-surface-variant)]">
-            Open source · Built for Hyderabad renters · No broker quotes, no inflated listing prices.
+          <div className="font-semibold text-lg text-[var(--md-sys-color-on-surface)]">HydRent</div>
+          <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] mt-2 leading-relaxed">
+            Community-verified rent intelligence for Hyderabad.
+            Open source. No broker quotes. No ads.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <a
-              href="mailto:labusepc@gmail.com?subject=Website%20Issue%20Report"
-              className="inline-flex items-center gap-2 rounded-[--radius-button] border border-[var(--md-sys-color-outline)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
-            >
-              <Mail className="size-4" />
-              Report an Issue
-            </a>
-            <Link
-              href="/issues"
-              className="inline-flex items-center gap-2 rounded-[--radius-button] border border-[var(--md-sys-color-outline)] px-3 py-1.5 text-sm text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
-            >
-              <Github className="size-4" />
-              Submit Feedback
-            </Link>
+        </div>
+        <div>
+          <div className="text-sm font-medium text-[var(--md-sys-color-on-surface)] mb-3">Data</div>
+          <div className="flex flex-col gap-2 text-sm text-[var(--md-sys-color-on-surface-variant)]">
+            <Link href="/localities" className="hover:text-[var(--md-sys-color-on-surface)] transition-colors">All localities</Link>
+            <Link href="/compare" className="hover:text-[var(--md-sys-color-on-surface)] transition-colors">Compare localities</Link>
+            <Link href="/how-data-works" className="hover:text-[var(--md-sys-color-on-surface)] transition-colors">How data works</Link>
           </div>
         </div>
-        <nav className="grid gap-2 text-sm" aria-label="Footer navigation">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] transition-colors">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-      <div className="border-t border-[var(--md-sys-color-outline)]">
-        <div className="mx-auto max-w-7xl px-4 py-4 text-center text-xs text-[var(--md-sys-color-on-surface-variant)] sm:px-6">
-          Open source · Built for Hyderabad renters · hydrent.vercel.app
+        <div>
+          <div className="text-sm font-medium text-[var(--md-sys-color-on-surface)] mb-3">Contribute</div>
+          <div className="flex flex-col gap-2 text-sm text-[var(--md-sys-color-on-surface-variant)]">
+            <Link href="/submit" className="hover:text-[var(--md-sys-color-on-surface)] transition-colors">Submit your rent</Link>
+            <Link href="/issues" className="hover:text-[var(--md-sys-color-on-surface)] transition-colors">Report an issue</Link>
+            <a href="https://github.com/vaibhxvvy/hydrent" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-[var(--md-sys-color-on-surface)] transition-colors">
+              GitHub <ExternalLink className="size-3" />
+            </a>
+          </div>
         </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 border-t border-[var(--md-sys-color-outline)] flex flex-wrap justify-between items-center gap-4 text-xs text-[var(--md-sys-color-on-surface-variant)]">
+        <span>© 2025 HydRent · Open source civic tech</span>
+        <span>Data from real renters, not brokers</span>
       </div>
     </footer>
   );

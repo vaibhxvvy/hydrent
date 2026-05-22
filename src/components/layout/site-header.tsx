@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,15 @@ const nav = [
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--md-sys-color-outline)] bg-[var(--md-sys-color-surface-dim)]/92 backdrop-blur-lg">
@@ -48,8 +57,11 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 top-14 z-50 bg-[var(--md-sys-color-surface-dim)] border-t border-[var(--md-sys-color-outline)] md:hidden">
+      <div
+        className={`fixed inset-0 top-14 z-50 transition-opacity duration-300 md:hidden ${mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+      >
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+        <div className={`relative bg-[var(--md-sys-color-surface-dim)] border-t border-[var(--md-sys-color-outline)] transition-transform duration-300 ${mobileOpen ? "translate-y-0" : "-translate-y-4"}`}>
           <nav className="flex flex-col gap-1 p-4" aria-label="Mobile navigation">
             {nav.map((item) => (
               <Link
@@ -71,7 +83,7 @@ export function SiteHeader() {
             </div>
           </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 }
