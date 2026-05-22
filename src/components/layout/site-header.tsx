@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const nav = [
+  { href: "/explore", label: "Explore" },
   { href: "/localities", label: "Localities" },
   { href: "/compare", label: "Compare" },
   { href: "/how-data-works", label: "How it works" },
@@ -40,7 +41,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild size="sm" className="hidden sm:inline-flex gap-1.5">
+          <Button asChild size="sm" className="inline-flex gap-1.5">
             <Link href="/submit">
               <Plus className="size-4" />
               Submit rent
@@ -75,7 +76,10 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <div className="mt-3 border-t border-[var(--md-sys-color-outline)] pt-3">
+            <div className="mt-3 flex flex-col gap-1 border-t border-[var(--md-sys-color-outline)] pt-3">
+              <Link href="/explore" onClick={() => setMobileOpen(false)} className="rounded-[--radius-md] px-4 py-3 text-base text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors">
+                Explore map
+              </Link>
               <Button asChild size="lg" className="w-full gap-1.5">
                 <Link href="/submit" onClick={() => setMobileOpen(false)}>
                   <Plus className="size-4" />
