@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck, TrendingUp, ArrowUpRight } from "lucide-react";
+import { ShieldCheck, TrendingUp, ArrowUpRight, MapPin } from "lucide-react";
 import { RentTrendChart } from "@/components/charts/rent-trend-chart";
 import { LocalityMap } from "@/components/maps/locality-map";
 import { LocalityGrid } from "@/components/rent/locality-grid";
@@ -192,11 +192,17 @@ export default async function HomePage() {
       {/* SECTION 5 — MAP */}
       {mapLocalities.length > 0 && (
         <section className="mt-8">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-base font-semibold text-[var(--md-sys-color-on-surface)]">Hyderabad rent map</h2>
-              <p className="mt-0.5 text-sm text-[var(--md-sys-color-on-surface-variant)]">Confidence-weighted markers · Tap for locality data</p>
+              <p className="mt-0.5 text-sm text-[var(--md-sys-color-on-surface-variant)]">Confidence-weighted markers · Tap for locality data · Filter by BHK/furnishing</p>
             </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/explore">
+                <MapPin className="size-4" />
+                Full explore view
+              </Link>
+            </Button>
           </div>
           <LocalityMap localities={mapLocalities} />
         </section>

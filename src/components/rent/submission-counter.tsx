@@ -4,22 +4,37 @@ import { useEffect, useState } from "react";
 
 export function SubmissionCounter({ totalSubmissions }: { totalSubmissions: number }) {
   const [count, setCount] = useState(0);
+  const [liveTotal, setLiveTotal] = useState(totalSubmissions);
 
   useEffect(() => {
-    if (totalSubmissions === 0) return;
-    const duration = 800;
-    const steps = 30;
-    const increment = Math.max(1, Math.floor(totalSubmissions / steps));
-    let current = 0;
-    const timer = setInterval(() => {
-      current = Math.min(current + increment, totalSubmissions);
-      setCount(current);
-      if (current >= totalSubmissions) clearInterval(timer);
-    }, duration / steps);
-    return () => clearInterval(timer);
+    const fetchLive = async () => {
+      try {
+        const res = await fetch("/api/stats");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.totalSubmissions > 0) setLiveTotal(data.totalSubmissions);
+        }
+      } catch {
+        // silent
+      }
+    };
+    fetchLive();
+    const interval = setInterval(fetchLive, 60000);
+    return () => clearInterval(interval);
   }, [totalSubmissions]);
 
-  if (totalSubmissions === 0) return null;
+  useEffect(() => {
+    const duration = 800;
+    const steps = 30;
+    const increment = Math.max(1, Math.floor(liveTotal / steps));
+    let current = 0;
+    const timer = setInterval(() => {
+      current = Math.min(current + increment, liveTotal);
+      setCount(current);
+      if (current >= liveTotal) clearInterval(timer);
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, [liveTotal]);
 
   return (
     <div className="mt-4 flex items-center justify-center gap-2 text-sm text-[var(--md-sys-color-on-surface-variant)]">
